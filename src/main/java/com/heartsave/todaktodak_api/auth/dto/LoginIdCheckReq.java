@@ -1,3 +1,3 @@
-package com.heartsave.todaktodak_api.member.dto;
+package com.heartsave.todaktodak_api.auth.dto;
 
 public record LoginIdCheckReq(String loginId) {}
