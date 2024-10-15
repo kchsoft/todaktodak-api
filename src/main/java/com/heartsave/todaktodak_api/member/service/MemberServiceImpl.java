@@ -16,13 +16,13 @@ public class MemberServiceImpl implements MemberService {
   private final MemberRepository memberRepository;
 
   @Override
-  public boolean isDuplicatedNickname(LoginIdCheckReq dto) {
+  public boolean isDuplicatedLoginId(LoginIdCheckReq dto) {
     String targetId = dto.loginId();
     return memberRepository.findMemberByLoginId(targetId).isPresent();
   }
 
   @Override
-  public boolean isDuplicatedLoginId(NicknameCheckReq dto) {
+  public boolean isDuplicatedNickname(NicknameCheckReq dto) {
     String targetNickname = dto.nickname();
     return memberRepository.findMemberByNickname(targetNickname).isPresent();
   }
