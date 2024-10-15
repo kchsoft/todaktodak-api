@@ -10,24 +10,24 @@ import lombok.*;
 @Getter
 @Builder
 public class Member {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
 
-    @Column(length = 50)
-    private String email;
+  @Column(length = 50)
+  private String email;
 
-    @Column(length = 50)
-    private String nickname;
+  @Column(length = 50)
+  private String nickname;
 
-    @Column(length = 30)
-    private String loginId;
+  @Column(length = 30)
+  private String loginId;
 
-    @Column(length = 30)
-    private String password;
+  @Column(length = 30)
+  private String password;
 
-    private String characterImageUrl;
+  private String characterImageUrl;
 
-    @Enumerated(EnumType.STRING)
-    private AuthType authType;
+  @Enumerated(EnumType.STRING)
+  private AuthType authType;
 }

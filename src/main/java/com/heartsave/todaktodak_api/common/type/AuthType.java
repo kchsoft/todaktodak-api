@@ -4,14 +4,14 @@ import lombok.Getter;
 
 @Getter
 public enum AuthType {
-    BASE("BASE"),
-    KAKAO("KAKAO"),
-    NAVER("NAVER"),
-    GOOGLE("GOOGLE");
+  BASE("BASE"),
+  KAKAO("KAKAO"),
+  NAVER("NAVER"),
+  GOOGLE("GOOGLE");
 
-    private final String type;
+  private final String type;
 
-    AuthType(String type) {
-        this.type = type;
-    }
+  AuthType(String type) {
+    this.type = type;
+  }
 }
