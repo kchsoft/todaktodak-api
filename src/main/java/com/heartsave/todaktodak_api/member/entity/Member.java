@@ -11,7 +11,8 @@ import lombok.*;
 @Builder
 public class Member {
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "member")
+  @SequenceGenerator(name = "member", sequenceName = "member_seq", allocationSize = 1)
   private Long id;
 
   @Column(length = 50)
