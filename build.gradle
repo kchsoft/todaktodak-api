@@ -49,6 +49,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     testImplementation 'com.h2database:h2:2.3.232'
+    testImplementation 'com.squareup.okhttp3:mockwebserver'
 }
 
 tasks.named('test') {
