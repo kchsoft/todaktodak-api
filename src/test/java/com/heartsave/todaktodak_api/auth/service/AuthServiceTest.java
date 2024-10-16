@@ -1,7 +1,6 @@
 package com.heartsave.todaktodak_api.auth.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
@@ -11,7 +10,6 @@ import com.heartsave.todaktodak_api.auth.dto.NicknameCheckReq;
 import com.heartsave.todaktodak_api.member.entity.Member;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,12 +29,6 @@ class AuthServiceTest {
   private final Member member =
       Member.builder().loginId("TEST_LOGIN").nickname("TEST_NICKNAME").build();
 
-  @BeforeEach
-  void setup() {
-    // given
-    when(memberRepository.save(any(Member.class))).thenReturn(member);
-  }
-
   @Test
   @DisplayName("로그인 아이디 중복 확인")
   void isDuplicatedLoginId() {
@@ -44,7 +36,6 @@ class AuthServiceTest {
     when(memberRepository.findMemberByLoginId(anyString())).thenReturn(Optional.of(member));
 
     // when
-    memberRepository.save(member);
     LoginIdCheckReq dto = new LoginIdCheckReq(LOGIN_ID);
     boolean isDuplicated = authService.isDuplicatedLoginId(dto);
 
@@ -60,7 +51,6 @@ class AuthServiceTest {
     when(memberRepository.findMemberByNickname(anyString())).thenReturn(Optional.of(member));
 
     // when
-    memberRepository.save(member);
     NicknameCheckReq dto = new NicknameCheckReq(NICKNAME);
     boolean isDuplicated = authService.isDuplicatedNickname(dto);
 
