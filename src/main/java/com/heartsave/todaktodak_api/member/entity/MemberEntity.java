@@ -9,7 +9,7 @@ import lombok.*;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
-public class Member {
+public class MemberEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "member")
   @SequenceGenerator(name = "member", sequenceName = "member_seq", allocationSize = 1)

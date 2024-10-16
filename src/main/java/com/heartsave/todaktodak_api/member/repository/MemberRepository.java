@@ -1,13 +1,13 @@
 package com.heartsave.todaktodak_api.member.repository;
 
-import com.heartsave.todaktodak_api.member.entity.Member;
+import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MemberRepository extends JpaRepository<Member, Long> {
-  Optional<Member> findMemberByLoginId(String loginId);
+public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
+  Optional<MemberEntity> findMemberByLoginId(String loginId);
 
-  Optional<Member> findMemberByNickname(String nickname);
+  Optional<MemberEntity> findMemberByNickname(String nickname);
 }

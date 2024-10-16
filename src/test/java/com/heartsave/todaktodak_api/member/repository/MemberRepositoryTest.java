@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.member.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.heartsave.todaktodak_api.member.entity.Member;
+import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +18,8 @@ class MemberRepositoryTest {
 
     // Given
     String loginId = "TEST_ID1";
-    Member member = Member.builder().loginId(loginId).build();
-    memberRepository.save(member);
+    MemberEntity memberEntity = MemberEntity.builder().loginId(loginId).build();
+    memberRepository.save(memberEntity);
 
     // When
     var retrievedMember = memberRepository.findMemberByLoginId(loginId);
@@ -34,8 +34,8 @@ class MemberRepositoryTest {
 
     // Given
     String nickname = "TEST_NICKNAME";
-    Member member = Member.builder().nickname(nickname).build();
-    memberRepository.save(member);
+    MemberEntity memberEntity = MemberEntity.builder().nickname(nickname).build();
+    memberRepository.save(memberEntity);
 
     // When
     var retrievedMember = memberRepository.findMemberByNickname(nickname);

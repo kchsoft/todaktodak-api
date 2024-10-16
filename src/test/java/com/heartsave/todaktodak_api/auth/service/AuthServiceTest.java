@@ -5,9 +5,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
-import com.heartsave.todaktodak_api.auth.dto.LoginIdCheckReq;
-import com.heartsave.todaktodak_api.auth.dto.NicknameCheckReq;
-import com.heartsave.todaktodak_api.member.entity.Member;
+import com.heartsave.todaktodak_api.auth.dto.LoginIdCheckRequest;
+import com.heartsave.todaktodak_api.auth.dto.NicknameCheckRequest;
+import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -26,17 +26,17 @@ class AuthServiceTest {
   private final String LOGIN_ID = "TEST_LOGIN";
   private final String NICKNAME = "TEST_NICKNAME";
 
-  private final Member member =
-      Member.builder().loginId("TEST_LOGIN").nickname("TEST_NICKNAME").build();
+  private final MemberEntity memberEntity =
+      MemberEntity.builder().loginId("TEST_LOGIN").nickname("TEST_NICKNAME").build();
 
   @Test
   @DisplayName("로그인 아이디 중복 확인")
   void isDuplicatedLoginId() {
     // given
-    when(memberRepository.findMemberByLoginId(anyString())).thenReturn(Optional.of(member));
+    when(memberRepository.findMemberByLoginId(anyString())).thenReturn(Optional.of(memberEntity));
 
     // when
-    LoginIdCheckReq dto = new LoginIdCheckReq(LOGIN_ID);
+    LoginIdCheckRequest dto = new LoginIdCheckRequest(LOGIN_ID);
     boolean isDuplicated = authService.isDuplicatedLoginId(dto);
 
     // then
@@ -48,10 +48,10 @@ class AuthServiceTest {
   @DisplayName("닉네임 중복 확인")
   void checkNicknameDuplicationTest() {
     // given
-    when(memberRepository.findMemberByNickname(anyString())).thenReturn(Optional.of(member));
+    when(memberRepository.findMemberByNickname(anyString())).thenReturn(Optional.of(memberEntity));
 
     // when
-    NicknameCheckReq dto = new NicknameCheckReq(NICKNAME);
+    NicknameCheckRequest dto = new NicknameCheckRequest(NICKNAME);
     boolean isDuplicated = authService.isDuplicatedNickname(dto);
 
     // then
