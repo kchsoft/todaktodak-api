@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.member.entity;
 
+import com.heartsave.todaktodak_api.common.entity.BaseEntity;
 import com.heartsave.todaktodak_api.common.type.AuthType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,7 +10,8 @@ import lombok.*;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
-public class MemberEntity {
+@Table(name = "member")
+public class MemberEntity extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "member")
   @SequenceGenerator(name = "member", sequenceName = "member_seq", allocationSize = 1)
