@@ -3,6 +3,8 @@ package com.heartsave.todaktodak_api.ai.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.heartsave.todaktodak_api.diary.common.DiaryEmotion;
+import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,12 +70,20 @@ class AiServiceTest {
   void webclientAsyncRequest() throws InterruptedException {
     List<String> methodCallOrder = List.of(WEBTOON_URI, BGM_URI, COMMENT_URI);
     List<String> requestOrder = List.of(WEBTOON_URI, BGM_URI, COMMENT_URI);
+    MemberEntity member = MemberEntity.builder().id(2L).build();
+    DiaryEntity diary =
+        DiaryEntity.builder()
+            .id(1L)
+            .emotion(DiaryEmotion.JOY)
+            .content("content")
+            .publicContent("public content")
+            .isPublic(true)
+            .memberEntity(member)
+            .build();
 
     while (methodCallOrder.equals(requestOrder) == true) {
       requestOrder = new ArrayList<>();
-      aiService.callWebtoon(1L, "content", DiaryEmotion.JOY);
-      aiService.callBgm(1L, "content", DiaryEmotion.JOY);
-      aiService.callComment(1L, "content", DiaryEmotion.JOY);
+      aiService.callAiContent(diary);
 
       RecordedRequest request = mockWebServer.takeRequest();
       requestOrder.add(request.getPath());

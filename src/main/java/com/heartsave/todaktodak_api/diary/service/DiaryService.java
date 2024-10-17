@@ -25,18 +25,11 @@ public class DiaryService {
             .isPublic(request.getIsPublic())
             .postCreatedAt(request.getDate())
             .build();
-    callAiContent(diaryEntity);
-    return diaryRepository.save(diaryEntity).getId();
-  }
 
-  private void callAiContent(DiaryEntity diaryEntity) {
     log.info("AI 컨텐츠 생성 요청을 시작합니다.");
-    aiService.callWebtoon(
-        diaryEntity.getMemberEntity().getId(), diaryEntity.getContent(), diaryEntity.getEmotion());
-    aiService.callBgm(
-        diaryEntity.getMemberEntity().getId(), diaryEntity.getContent(), diaryEntity.getEmotion());
-    aiService.callComment(
-        diaryEntity.getMemberEntity().getId(), diaryEntity.getContent(), diaryEntity.getEmotion());
+    aiService.callAiContent(diaryEntity);
     log.info("AI 컨텐츠 생성 요청을 마쳤습니다.");
+    log.info("DB에 일기 저장을 요청합니다.");
+    return diaryRepository.save(diaryEntity).getId();
   }
 }
