@@ -15,7 +15,10 @@ public class ErrorResponse {
   private static final String VALIDATION_ERROR = "VALIDATION_ERROR";
 
   public static ErrorResponse from(ErrorSpec errorSpec) {
-    return ErrorResponse.builder().title(errorSpec.name()).description(errorSpec.message()).build();
+    return ErrorResponse.builder()
+        .title(errorSpec.name())
+        .description(errorSpec.getMessage())
+        .build();
   }
 
   public static ErrorResponse from(Map<String, String> jsonMessage) {
