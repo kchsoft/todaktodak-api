@@ -8,8 +8,4 @@ public enum AuthType {
   KAKAO,
   NAVER,
   GOOGLE;
-
-  public String getType() {
-    return this.name();
-  }
 }
