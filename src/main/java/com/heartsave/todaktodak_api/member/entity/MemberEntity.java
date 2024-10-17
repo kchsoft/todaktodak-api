@@ -3,6 +3,8 @@ package com.heartsave.todaktodak_api.member.entity;
 import com.heartsave.todaktodak_api.common.type.AuthType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,6 +31,10 @@ public class MemberEntity {
   private String password;
 
   private String characterImageUrl;
+
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(columnDefinition = "jsonb")
+  private Object characterInfo;
 
   @Enumerated(EnumType.STRING)
   private AuthType authType;
