@@ -76,6 +76,6 @@ public class DiaryEntity extends BaseEntity {
       name = "post_created_at",
       nullable = false,
       updatable = false,
-      columnDefinition = "TIMESTAMPTZ")
+      columnDefinition = "TIMESTAMP")
   private LocalDateTime postCreatedAt;
 }
