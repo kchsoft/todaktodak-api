@@ -8,12 +8,12 @@ import com.heartsave.todaktodak_api.diary.common.DiaryEmotion;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
 public class DiaryWriteRequest {
-  @PastOrPresent private Instant date;
+  @PastOrPresent private LocalDateTime date;
 
   @NotNull private DiaryEmotion emotion;
 

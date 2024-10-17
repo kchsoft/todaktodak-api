@@ -20,7 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -77,5 +77,5 @@ public class DiaryEntity extends BaseEntity {
       nullable = false,
       updatable = false,
       columnDefinition = "TIMESTAMPTZ")
-  private Instant postCreatedAt;
+  private LocalDateTime postCreatedAt;
 }
