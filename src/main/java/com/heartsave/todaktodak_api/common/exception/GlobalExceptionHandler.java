@@ -17,6 +17,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
   private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+  // API Exception
+  @ExceptionHandler(BaseException.class)
+  public ResponseEntity<ErrorResponse> handleBaseException(BaseException e) {
+    return ResponseEntity.status(e.getErrorSpec().getStatus())
+        .body(ErrorResponse.from(e.getErrorSpec()));
+  }
+
   // 유효성 검사 실패
   @ExceptionHandler(MethodArgumentNotValidException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
