@@ -20,10 +20,15 @@ public class TodakUser implements UserDetails, OAuth2User, Serializable {
   private final MemberRole role;
 
   // TODO: 각 소셜 플랫폼 적용
-  private final Map<String, String> attributes;
+  private final Map<String, Object> attributes;
 
   public static TodakUser from(MemberEntity entity) {
     return new TodakUser(entity.getLoginId(), entity.getRole(), Map.of());
+  }
+
+  @Override
+  public Map<String, Object> getAttributes() {
+    return attributes;
   }
 
   @Override
