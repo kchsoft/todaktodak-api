@@ -1,9 +1,12 @@
 package com.heartsave.todaktodak_api;
 
-import com.heartsave.todaktodak_api.config.BaseSpringbootTest;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
-class TodaktodakApiApplicationTests extends BaseSpringbootTest {
+@SpringBootTest
+@ActiveProfiles("test")
+class TodaktodakApiApplicationTests {
 
   @Test
   void contextLoads() {}
