@@ -31,4 +31,4 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build
         env:
-          SPRING_CONFIG_ADDITIONAL_LOCATION: file:.env
+          SPRING_CONFIG_ADDITIONAL_LOCATION: file:.env[.properties]
