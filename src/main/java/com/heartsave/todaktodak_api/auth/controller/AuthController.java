@@ -27,6 +27,7 @@ public class AuthController {
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "204", description = "유일한 닉네임"),
+        @ApiResponse(responseCode = "400", description = "유효성 검사 실패"),
         @ApiResponse(responseCode = "409", description = "중복 닉네임 존재")
       })
   @PostMapping("/nickname")
@@ -39,6 +40,7 @@ public class AuthController {
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "204", description = "유일한 아이디"),
+        @ApiResponse(responseCode = "400", description = "유효성 검사 실패"),
         @ApiResponse(responseCode = "409", description = "중복 아이디 존재")
       })
   @PostMapping("/login-id")
