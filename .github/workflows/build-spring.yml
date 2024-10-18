@@ -18,17 +18,17 @@ jobs:
           distribution: "oracle"
           java-version: "21"
 
-      - name: Set up environment variables
-        run: |
-          echo "${{ secrets.SPRING_ENV }}" > .env
-          while IFS= read -r line; do
-            echo "$line" >> $GITHUB_ENV
-          done < .env
+      # - name: Set up environment variables
+      #   run: |
+      #     echo "${{ secrets.SPRING_ENV }}" > .env
+      #     while IFS= read -r line; do
+      #       echo "$line" >> $GITHUB_ENV
+      #     done < .env
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build with Gradle
         run: ./gradlew clean build
-        env:
-          SPRING_CONFIG_ADDITIONAL_LOCATION: file:.env[.properties]
+        # env:
+        #   SPRING_CONFIG_ADDITIONAL_LOCATION: file:.env[.properties]
