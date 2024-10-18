@@ -34,7 +34,7 @@ public class MemberEntity {
 
   // AI 컨텐츠 사전 정보
   @JdbcTypeCode(SqlTypes.JSON)
-  @Column(columnDefinition = "jsonb")
+  @Column(columnDefinition = "json")
   private Object characterInfo;
 
   @Enumerated(EnumType.STRING)
