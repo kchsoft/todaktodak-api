@@ -29,6 +29,6 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew clean build --debug
+        run: ./gradlew clean build
         # env:
         #   SPRING_CONFIG_ADDITIONAL_LOCATION: file:.env[.properties]
