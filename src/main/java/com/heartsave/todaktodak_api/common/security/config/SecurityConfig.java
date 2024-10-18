@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.config;
+package com.heartsave.todaktodak_api.common.security.config;
 
 import java.util.List;
 import org.springframework.context.annotation.Bean;

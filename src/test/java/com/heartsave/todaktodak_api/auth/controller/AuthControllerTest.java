@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.auth.dto.LoginIdCheckRequest;
 import com.heartsave.todaktodak_api.auth.dto.NicknameCheckRequest;
 import com.heartsave.todaktodak_api.auth.service.AuthService;
-import com.heartsave.todaktodak_api.config.SecurityConfig;
+import com.heartsave.todaktodak_api.common.security.config.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
