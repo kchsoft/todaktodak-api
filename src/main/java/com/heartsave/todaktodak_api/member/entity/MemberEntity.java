@@ -3,12 +3,15 @@ package com.heartsave.todaktodak_api.member.entity;
 import com.heartsave.todaktodak_api.common.type.AuthType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
+@Table(name = "member")
 public class MemberEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "member")
@@ -28,6 +31,11 @@ public class MemberEntity {
   private String password;
 
   private String characterImageUrl;
+
+  // AI 컨텐츠 사전 정보
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(columnDefinition = "json")
+  private Object characterInfo;
 
   @Enumerated(EnumType.STRING)
   private AuthType authType;
