@@ -37,7 +37,7 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("**/", getCorsConfiguration());
+    source.registerCorsConfiguration("/**", getCorsConfiguration());
     return source;
   }
 
