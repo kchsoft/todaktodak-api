@@ -32,6 +32,7 @@ public class MemberEntity {
 
   private String characterImageUrl;
 
+  // AI 컨텐츠 사전 정보
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(columnDefinition = "jsonb")
   private Object characterInfo;
