@@ -8,18 +8,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.auth.dto.LoginIdCheckRequest;
 import com.heartsave.todaktodak_api.auth.dto.NicknameCheckRequest;
 import com.heartsave.todaktodak_api.auth.service.AuthService;
+import com.heartsave.todaktodak_api.config.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(
-    controllers = AuthController.class,
-    excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@WebMvcTest(controllers = AuthController.class)
+@Import(SecurityConfig.class)
 class AuthControllerTest {
   @Autowired private MockMvc mockMvc;
 
