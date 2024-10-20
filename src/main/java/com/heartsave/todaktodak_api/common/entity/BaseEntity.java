@@ -13,15 +13,19 @@ import org.springframework.data.annotation.LastModifiedDate;
 @MappedSuperclass
 public class BaseEntity {
 
-  @CreatedDate
-  @Column(name = "created_time", updatable = false, columnDefinition = "TIMESTAMP")
-  private LocalDateTime createdTime;
+    @CreatedDate
+    @Column(name = "created_time", updatable = false, columnDefinition = "TIMESTAMP")
+    private LocalDateTime createdTime;
 
-  @CreatedBy private String createdBy;
+    @CreatedBy
+    @Column(name = "created_by")
+    private Long createdBy;
 
-  @LastModifiedDate
-  @Column(name = "updated_time", columnDefinition = "TIMESTAMP")
-  private LocalDateTime updatedTime;
+    @LastModifiedDate
+    @Column(name = "updated_time", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedTime;
 
-  @LastModifiedBy private String updatedBy;
+    @LastModifiedBy
+    @Column(name = "updated_By")
+    private Long updatedBy;
 }
