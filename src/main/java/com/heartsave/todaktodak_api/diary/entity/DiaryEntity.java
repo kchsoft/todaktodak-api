@@ -50,24 +50,24 @@ public class DiaryEntity extends BaseEntity {
     private MemberEntity memberEntity;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 30)
     private DiaryEmotion emotion;
 
     @Size(min = DIARY_CONTENT_MIN_SIZE, max = DIARY_CONTENT_MAX_SIZE)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "text")
     private String content;
 
     @Size(max = DIARY_PUBLIC_CONTENT_MAX_SIZE)
-    @Column(name = "public_content", nullable = true)
+    @Column(name = "public_content", nullable = true, columnDefinition = "text")
     private String publicContent;
 
-    @Column(name = "ai_comment", nullable = true)
+    @Column(name = "ai_comment", nullable = true, columnDefinition = "text")
     private String aiComment;
 
-    @Column(name = "webtoon_image_url", nullable = true)
+    @Column(name = "webtoon_image_url", nullable = true, length = 255)
     private String webtoonImageUrl;
 
-    @Column(name = "bgm_url", nullable = true)
+    @Column(name = "bgm_url", nullable = true, length = 255)
     private String bgmUrl;
 
     @Column(name = "is_public", nullable = false)
