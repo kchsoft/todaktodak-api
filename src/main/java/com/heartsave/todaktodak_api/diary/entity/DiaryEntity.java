@@ -4,6 +4,7 @@ import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraint
 import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_CONTENT_MIN_SIZE;
 import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_PUBLIC_CONTENT_MAX_SIZE;
 
+import com.heartsave.todaktodak_api.ai.dto.AiContentResponse;
 import com.heartsave.todaktodak_api.common.entity.BaseEntity;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
@@ -79,4 +80,8 @@ public class DiaryEntity extends BaseEntity {
             updatable = false,
             columnDefinition = "TIMESTAMP")
     private LocalDateTime diaryCreatedAt;
+
+    public void addAiContent(AiContentResponse response) {
+        this.aiComment = response.getAiComment();
+    }
 }

@@ -29,7 +29,7 @@ public class DiaryService {
         DiaryEntity diary = createDiaryEntity(auth, request);
         Long memberId = diary.getMemberEntity().getId();
         LocalDateTime diaryCreatedDate = diary.getDiaryCreatedAt();
-        
+
         if (diaryRepository.existsByDate(memberId, diaryCreatedDate)) {
             log.error("하루 일기 작성량을 초과하였습니다. memberId = {}", diary.getMemberEntity().getId());
             throw new BaseException(ErrorSpec.DIARY_DAILY_WRITING_LIMIT_EXCEPTION);
@@ -40,6 +40,7 @@ public class DiaryService {
         log.info("AI 컨텐츠 생성 요청을 마쳤습니다.");
 
         log.info("DB에 일기 저장을 요청합니다.");
+        diary.addAiContent(response);
         diaryRepository.save(diary);
         log.info("DB에 일기를 저장하였습니다.");
         return DiaryWriteResponse.builder().aiComment(response.getAiComment()).build();
