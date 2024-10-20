@@ -1,11 +1,11 @@
 package com.heartsave.todaktodak_api.diary.entity;
 
-import static com.heartsave.todaktodak_api.diary.common.DiaryContentConstraintConstant.DIARY_CONTENT_MAX_SIZE;
-import static com.heartsave.todaktodak_api.diary.common.DiaryContentConstraintConstant.DIARY_CONTENT_MIN_SIZE;
-import static com.heartsave.todaktodak_api.diary.common.DiaryContentConstraintConstant.DIARY_PUBLIC_CONTENT_MAX_SIZE;
+import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_CONTENT_MAX_SIZE;
+import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_CONTENT_MIN_SIZE;
+import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_PUBLIC_CONTENT_MAX_SIZE;
 
 import com.heartsave.todaktodak_api.common.entity.BaseEntity;
-import com.heartsave.todaktodak_api.diary.common.DiaryEmotion;
+import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

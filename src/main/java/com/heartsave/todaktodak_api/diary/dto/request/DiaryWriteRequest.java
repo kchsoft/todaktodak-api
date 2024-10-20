@@ -1,10 +1,10 @@
 package com.heartsave.todaktodak_api.diary.dto.request;
 
-import static com.heartsave.todaktodak_api.diary.common.DiaryContentConstraintConstant.DIARY_CONTENT_MAX_SIZE;
-import static com.heartsave.todaktodak_api.diary.common.DiaryContentConstraintConstant.DIARY_CONTENT_MIN_SIZE;
-import static com.heartsave.todaktodak_api.diary.common.DiaryContentConstraintConstant.DIARY_PUBLIC_CONTENT_MAX_SIZE;
+import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_CONTENT_MAX_SIZE;
+import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_CONTENT_MIN_SIZE;
+import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_PUBLIC_CONTENT_MAX_SIZE;
 
-import com.heartsave.todaktodak_api.diary.common.DiaryEmotion;
+import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
