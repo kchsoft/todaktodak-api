@@ -2,7 +2,7 @@ name: Spring Boot Build and Test
 
 on:
   pull_request:
-    branches: [ main, release, develop ]
+    branches: [main, release, develop]
 
 jobs:
   build:
@@ -32,3 +32,14 @@ jobs:
         run: ./gradlew clean build
         # env:
         #   SPRING_CONFIG_ADDITIONAL_LOCATION: file:.env[.properties]
+
+      - name: Discord 알림
+        uses: sarisia/actions-status-discord@v1
+        if: always()
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ job.status }}
+          title: "NextJS 빌드 결과"
+          description: |
+            ${{ job.status != 'success' && format('실패 단계: {0}', job.status) || '' }}
+          color: ${{ job.status == 'success' && '0x00ff00' || '0xff0000' }}
