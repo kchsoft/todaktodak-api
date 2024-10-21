@@ -39,7 +39,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           status: ${{ job.status }}
-          title: "NextJS 빌드 결과"
+          title: "Spring 빌드 결과"
           description: |
             ${{ job.status != 'success' && format('실패 단계: {0}', job.status) || '' }}
           color: ${{ job.status == 'success' && '0x00ff00' || '0xff0000' }}
