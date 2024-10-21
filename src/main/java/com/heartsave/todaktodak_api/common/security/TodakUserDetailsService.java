@@ -1,8 +1,6 @@
 package com.heartsave.todaktodak_api.common.security;
 
-import com.heartsave.todaktodak_api.common.exception.BaseException;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
-import com.heartsave.todaktodak_api.common.type.ErrorSpec;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +19,7 @@ public class TodakUserDetailsService implements UserDetailsService {
     MemberEntity memberEntity =
         memberRepository
             .findMemberByLoginId(username)
-            .orElseThrow(() -> new BaseException(ErrorSpec.NOT_FOUND));
+            .orElseThrow(() -> new UsernameNotFoundException("USER NOT FOUND"));
     return TodakUser.from(memberEntity);
   }
 }
