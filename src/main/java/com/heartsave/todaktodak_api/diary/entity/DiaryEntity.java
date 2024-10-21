@@ -2,7 +2,6 @@ package com.heartsave.todaktodak_api.diary.entity;
 
 import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_CONTENT_MAX_SIZE;
 import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_CONTENT_MIN_SIZE;
-import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_PUBLIC_CONTENT_MAX_SIZE;
 
 import com.heartsave.todaktodak_api.ai.dto.AiContentResponse;
 import com.heartsave.todaktodak_api.common.entity.BaseEntity;
@@ -34,54 +33,47 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SequenceGenerator(
-        name = "DIARY_SEQ_GENERATOR", // jpa name
-        sequenceName = "DIARY_SEQ", // DB name
-        initialValue = 1,
-        allocationSize = 50)
+    name = "DIARY_SEQ_GENERATOR", // jpa name
+    sequenceName = "DIARY_SEQ", // DB name
+    initialValue = 1,
+    allocationSize = 50)
 @Table(name = "diary")
 public class DiaryEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DIARY_SEQ_GENERATOR")
-    @Column(updatable = false)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DIARY_SEQ_GENERATOR")
+  @Column(updatable = false)
+  private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private MemberEntity memberEntity;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "member_id", nullable = false)
+  private MemberEntity memberEntity;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
-    private DiaryEmotion emotion;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 30)
+  private DiaryEmotion emotion;
 
-    @Size(min = DIARY_CONTENT_MIN_SIZE, max = DIARY_CONTENT_MAX_SIZE)
-    @Column(nullable = false, columnDefinition = "text")
-    private String content;
+  @Size(min = DIARY_CONTENT_MIN_SIZE, max = DIARY_CONTENT_MAX_SIZE)
+  @Column(nullable = false, columnDefinition = "text")
+  private String content;
 
-    @Size(max = DIARY_PUBLIC_CONTENT_MAX_SIZE)
-    @Column(name = "public_content", nullable = true, columnDefinition = "text")
-    private String publicContent;
+  @Column(name = "ai_comment", nullable = true, columnDefinition = "text")
+  private String aiComment;
 
-    @Column(name = "ai_comment", nullable = true, columnDefinition = "text")
-    private String aiComment;
+  @Column(name = "webtoon_image_url", nullable = true, length = 255)
+  private String webtoonImageUrl;
 
-    @Column(name = "webtoon_image_url", nullable = true, length = 255)
-    private String webtoonImageUrl;
+  @Column(name = "bgm_url", nullable = true, length = 255)
+  private String bgmUrl;
 
-    @Column(name = "bgm_url", nullable = true, length = 255)
-    private String bgmUrl;
+  @Column(
+      name = "diary_created_at",
+      nullable = false,
+      updatable = false,
+      columnDefinition = "TIMESTAMP")
+  private LocalDateTime diaryCreatedAt;
 
-    @Column(name = "is_public", nullable = false)
-    private Boolean isPublic;
-
-    @Column(
-            name = "diary_created_at",
-            nullable = false,
-            updatable = false,
-            columnDefinition = "TIMESTAMP")
-    private LocalDateTime diaryCreatedAt;
-
-    public void addAiContent(AiContentResponse response) {
-        this.aiComment = response.getAiComment();
-    }
+  public void addAiContent(AiContentResponse response) {
+    this.aiComment = response.getAiComment();
+  }
 }

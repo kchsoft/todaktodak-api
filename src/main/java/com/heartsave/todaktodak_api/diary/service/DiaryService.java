@@ -21,40 +21,38 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class DiaryService {
 
-    private final AiService aiService;
-    private final DiaryRepository diaryRepository;
-    private final MemberRepository memberRepository;
+  private final AiService aiService;
+  private final DiaryRepository diaryRepository;
+  private final MemberRepository memberRepository;
 
-    public DiaryWriteResponse write(OAuth2User auth, DiaryWriteRequest request) {
-        DiaryEntity diary = createDiaryEntity(auth, request);
-        Long memberId = diary.getMemberEntity().getId();
-        LocalDateTime diaryCreatedDate = diary.getDiaryCreatedAt();
+  public DiaryWriteResponse write(OAuth2User auth, DiaryWriteRequest request) {
+    DiaryEntity diary = createDiaryEntity(auth, request);
+    Long memberId = diary.getMemberEntity().getId();
+    LocalDateTime diaryCreatedDate = diary.getDiaryCreatedAt();
 
-        if (diaryRepository.existsByDate(memberId, diaryCreatedDate)) {
-            log.error("하루 일기 작성량을 초과하였습니다. memberId = {}", diary.getMemberEntity().getId());
-            throw new BaseException(ErrorSpec.DIARY_DAILY_WRITING_LIMIT_EXCEPTION);
-        }
-
-        log.info("AI 컨텐츠 생성 요청을 시작합니다.");
-        AiContentResponse response = aiService.callAiContent(diary);
-        log.info("AI 컨텐츠 생성 요청을 마쳤습니다.");
-
-        log.info("DB에 일기 저장을 요청합니다.");
-        diary.addAiContent(response);
-        diaryRepository.save(diary);
-        log.info("DB에 일기를 저장하였습니다.");
-        return DiaryWriteResponse.builder().aiComment(response.getAiComment()).build();
+    if (diaryRepository.existsByDate(memberId, diaryCreatedDate)) {
+      log.error("하루 일기 작성량을 초과하였습니다. memberId = {}", diary.getMemberEntity().getId());
+      throw new BaseException(ErrorSpec.DIARY_DAILY_WRITING_LIMIT_EXCEPTION);
     }
 
-    private DiaryEntity createDiaryEntity(OAuth2User auth, DiaryWriteRequest request) {
-        MemberEntity member = memberRepository.findMemberByLoginId(auth.getName()).get();
-        return DiaryEntity.builder()
-                .memberEntity(member)
-                .emotion(request.getEmotion())
-                .content(request.getContent())
-                .publicContent(request.getPublicContent())
-                .isPublic(request.getIsPublic())
-                .diaryCreatedAt((request.getDate()))
-                .build();
-    }
+    log.info("AI 컨텐츠 생성 요청을 시작합니다.");
+    AiContentResponse response = aiService.callAiContent(diary);
+    log.info("AI 컨텐츠 생성 요청을 마쳤습니다.");
+
+    log.info("DB에 일기 저장을 요청합니다.");
+    diary.addAiContent(response);
+    diaryRepository.save(diary);
+    log.info("DB에 일기를 저장하였습니다.");
+    return DiaryWriteResponse.builder().aiComment(response.getAiComment()).build();
+  }
+
+  private DiaryEntity createDiaryEntity(OAuth2User auth, DiaryWriteRequest request) {
+    MemberEntity member = memberRepository.findMemberByLoginId(auth.getName()).get();
+    return DiaryEntity.builder()
+        .memberEntity(member)
+        .emotion(request.getEmotion())
+        .content(request.getContent())
+        .diaryCreatedAt((request.getDate()))
+        .build();
+  }
 }
