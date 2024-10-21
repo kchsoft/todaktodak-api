@@ -49,7 +49,8 @@ public class DiaryService {
   }
 
   private DiaryEntity createDiaryEntity(OAuth2User auth, DiaryWriteRequest request) {
-    MemberEntity member = memberRepository.findMemberByLoginId(auth.getName()).get();
+    Long memberId = Long.valueOf(auth.getName());
+    MemberEntity member = memberRepository.findById(memberId).get();
     return DiaryEntity.builder()
         .memberEntity(member)
         .emotion(request.getEmotion())
