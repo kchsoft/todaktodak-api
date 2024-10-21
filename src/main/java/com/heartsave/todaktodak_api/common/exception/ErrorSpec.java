@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.common.type;
+package com.heartsave.todaktodak_api.common.exception;
 
 import lombok.AccessLevel;
 import lombok.Getter;

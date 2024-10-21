@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.member.entity;
 
-import com.heartsave.todaktodak_api.common.type.AuthType;
+import com.heartsave.todaktodak_api.common.security.domain.AuthType;
 import com.heartsave.todaktodak_api.member.domain.MemberRole;
 import jakarta.persistence.*;
 import lombok.*;
