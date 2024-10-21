@@ -1,45 +1,16 @@
-name: Spring Boot Build and Test
+#reuse workflow
+
+name: Reuse Build and Publish to GHCR
 
 on:
-  pull_request:
+  push:
     branches: [main, release, develop]
+  pull_request:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: "oracle"
-          java-version: "21"
-
-      # - name: Set up environment variables
-      #   run: |
-      #     echo "${{ secrets.SPRING_ENV }}" > .env
-      #     while IFS= read -r line; do
-      #       echo "$line" >> $GITHUB_ENV
-      #     done < .env
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build with Gradle
-        run: ./gradlew clean build
-        # env:
-        #   SPRING_CONFIG_ADDITIONAL_LOCATION: file:.env[.properties]
-
-      - name: Discord 알림
-        uses: sarisia/actions-status-discord@v1
-        if: always()
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          status: ${{ job.status }}
-          title: "Spring 빌드 결과"
-          description: |
-            ${{ job.status != 'success' && format('실패 단계: {0}', job.status) || '' }}
-          color: ${{ job.status == 'success' && '0x00ff00' || '0xff0000' }}
+  build-and-publish:
+    uses: kakaotech-19/.github/.github/workflows/build-and-publish-ghcr.yml@main
+    secrets:
+      ORGANIZATION: ${{ secrets.ORGANIZATION }}
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
