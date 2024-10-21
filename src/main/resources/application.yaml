@@ -4,9 +4,6 @@ server:
 spring:
   profiles:
     active: "local"
-todak:
-  cors:
-    allowed-origin: ${ALLOWED_LOCAL_ORIGIN}
 ---
 spring:
   datasource:
@@ -21,9 +18,13 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   config:
     activate:
       on-profile: "local"
+todak:
+  cors:
+    allowed-origin: ${ALLOWED_LOCAL_ORIGIN}
 ---
 spring:
   config:
@@ -37,6 +38,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
   h2:
     console:
       enabled: true
+todak:
+  cors:
+    allowed-origin: "http://localhost:1234"
