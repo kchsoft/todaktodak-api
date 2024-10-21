@@ -7,6 +7,5 @@ import lombok.Getter;
 @Builder
 public class AiContentResponse {
 
-    private String aiComment;
-
+  private String aiComment;
 }
