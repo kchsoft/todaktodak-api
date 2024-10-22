@@ -11,10 +11,4 @@ jobs:
   build-and-publish:
     uses: kakaotech-19/.github/.github/workflows/build-and-publish-ghcr.yml@main
     secrets:
-      ORGANIZATION: ${{ secrets.ORGANIZATION }}
-      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-      POSTGRESQL_URL: ${{ secrets.POSTGRESQL_URL }}
-      POSTGRESQL_USER: ${{ secrets.POSTGRESQL_USER }}
-      POSTGRESQL_PASSWORD: ${{ secrets.POSTGRESQL_PASSWORD }}
-      ALLOWED_LOCAL_ORIGIN: ${{ secrets.ALLOWED_LOCAL_ORIGIN }}
+      inherit: true
