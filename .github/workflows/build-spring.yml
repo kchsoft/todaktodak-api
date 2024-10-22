@@ -10,5 +10,4 @@ on:
 jobs:
   build-and-publish:
     uses: kakaotech-19/.github/.github/workflows/build-and-publish-ghcr.yml@main
-    secrets:
-      inherit: true
+    secrets: inherit
