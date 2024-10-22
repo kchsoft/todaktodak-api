@@ -1,6 +1,5 @@
 package com.heartsave.todaktodak_api.common.exception;
 
-import com.heartsave.todaktodak_api.common.type.ErrorSpec;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

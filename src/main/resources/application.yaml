@@ -17,7 +17,7 @@ spring:
     password: ${POSTGRESQL_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
@@ -25,19 +25,28 @@ spring:
   config:
     activate:
       on-profile: "local"
+todak:
+  cors:
+    allowed-origin: ${ALLOWED_LOCAL_ORIGIN}
+ai:
+  server:
+    url:
+      domain: ${AI_SERVER_URL_DOMAIN}
 ---
 spring:
   config:
     activate:
       on-profile: "test"
-  datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password:
   jpa:
     hibernate:
       ddl-auto: create-drop
   h2:
     console:
       enabled: true
+todak:
+  cors:
+    allowed-origin: "http://localhost:1234"
+ai:
+  server:
+    url:
+      domain: "test-ai-server-url-domain"
