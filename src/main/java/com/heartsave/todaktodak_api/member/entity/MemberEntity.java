@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.member.entity;
 
 import com.heartsave.todaktodak_api.common.security.domain.AuthType;
-import com.heartsave.todaktodak_api.member.domain.MemberRole;
+import com.heartsave.todaktodak_api.member.domain.TodakRole;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -42,5 +42,5 @@ public class MemberEntity {
   private AuthType authType;
 
   @Enumerated(EnumType.STRING)
-  private MemberRole role;
+  private TodakRole role;
 }

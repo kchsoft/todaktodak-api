@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.common.security.domain;
 
-import com.heartsave.todaktodak_api.member.domain.MemberRole;
+import com.heartsave.todaktodak_api.member.domain.TodakRole;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.io.Serializable;
 import java.util.Collection;
@@ -17,7 +17,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 public class TodakUser implements UserDetails, OAuth2User, Serializable {
 
   private final String username;
-  private final MemberRole role;
+  private final TodakRole role;
 
   // TODO: 각 소셜 플랫폼 적용
   private final Map<String, Object> attributes;
