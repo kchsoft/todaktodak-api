@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.common;
 
-import com.heartsave.todaktodak_api.common.type.AuthType;
+import com.heartsave.todaktodak_api.common.security.domain.AuthType;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;

@@ -3,7 +3,7 @@ package com.heartsave.todaktodak_api.diary.service;
 import com.heartsave.todaktodak_api.ai.dto.AiContentResponse;
 import com.heartsave.todaktodak_api.ai.service.AiService;
 import com.heartsave.todaktodak_api.common.exception.BaseException;
-import com.heartsave.todaktodak_api.common.type.ErrorSpec;
+import com.heartsave.todaktodak_api.common.exception.ErrorSpec;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;

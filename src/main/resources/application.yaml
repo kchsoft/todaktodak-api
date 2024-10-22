@@ -21,6 +21,9 @@ spring:
   config:
     activate:
       on-profile: "local"
+todak:
+  cors:
+    allowed-origin: ${ALLOWED_LOCAL_ORIGIN}
 ai:
   server:
     url:
@@ -36,6 +39,9 @@ spring:
   h2:
     console:
       enabled: true
+todak:
+  cors:
+    allowed-origin: "http://localhost:1234"
 ai:
   server:
     url:

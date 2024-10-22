@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.common.type;
+package com.heartsave.todaktodak_api.common.security.domain;
 
 import lombok.Getter;
 
