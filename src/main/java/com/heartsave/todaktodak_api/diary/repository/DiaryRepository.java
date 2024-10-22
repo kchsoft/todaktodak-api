@@ -8,7 +8,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
 
-    @Query(value = "SELECT EXISTS(SELECT 1 FROM diary WHERE memberId == id and diaryDate::date == diary_created_at::date)", nativeQuery = true)
-    boolean existsByDate(@Param("memberId") Long memberId,
-            @Param("diaryDate") LocalDateTime diaryDate);
+  @Query(
+      value =
+          "SELECT CASE WHEN COUNT(d) > 0 THEN true ELSE false END FROM DiaryEntity d "
+              + "WHERE d.memberEntity.id = :memberId "
+              + "AND CAST(d.diaryCreatedAt AS date) = CAST(:diaryDate AS date)")
+  boolean existsByDate(
+      @Param("memberId") Long memberId, @Param("diaryDate") LocalDateTime diaryDate);
 }
