@@ -3,7 +3,6 @@ package com.heartsave.todaktodak_api.common.security;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,11 +20,6 @@ public class TodakUserDetailsService implements UserDetailsService {
         memberRepository
             .findMemberByLoginId(username)
             .orElseThrow(() -> new UsernameNotFoundException("USER NOT FOUND"));
-    return TodakUser.builder()
-        .id(memberEntity.getId())
-        .username(memberEntity.getLoginId())
-        .role(memberEntity.getRole())
-        .attributes(Map.of())
-        .build();
+    return TodakUser.from(memberEntity);
   }
 }

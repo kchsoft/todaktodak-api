@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.common.security.domain;
 
 import com.heartsave.todaktodak_api.member.domain.TodakRole;
+import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,6 +23,10 @@ public class TodakUser implements UserDetails, OAuth2User, Serializable {
 
   // TODO: 각 소셜 플랫폼 적용
   private final Map<String, Object> attributes;
+
+  public static TodakUser from(MemberEntity entity) {
+    return new TodakUser(entity.getId(), entity.getLoginId(), entity.getRole(), Map.of());
+  }
 
   @Override
   public Map<String, Object> getAttributes() {
