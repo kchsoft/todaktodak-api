@@ -1,5 +1,8 @@
 package com.heartsave.todaktodak_api.common.security.component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
+import com.heartsave.todaktodak_api.common.exception.ErrorSpec;
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -22,6 +25,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtValidationFilter extends OncePerRequestFilter {
   private final JwtUtils jwtUtils;
+  private final ObjectMapper objectMapper;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
@@ -40,8 +44,11 @@ public class JwtValidationFilter extends OncePerRequestFilter {
   }
 
   private void setErrorResponse(HttpServletResponse response) throws IOException {
-    response.getWriter().write("유효하지 않은 토큰입니다.");
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    response.setContentType("application/json;charset=UTF-8");
+    response
+        .getWriter()
+        .write(objectMapper.writeValueAsString(ErrorResponse.from(ErrorSpec.INVALID_TOKEN)));
   }
 
   private String extractToken(HttpServletRequest request) {
