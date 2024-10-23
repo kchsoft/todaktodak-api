@@ -40,6 +40,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
     var token = extractToken(request);
 
     if (!isValidToken(token)) {
+      logger.error("INVALID TOKEN: {}", token);
       setErrorResponse(response);
       return;
     }
@@ -53,7 +54,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
     response.setContentType("application/json;charset=UTF-8");
     response
         .getWriter()
-        .write(objectMapper.writeValueAsString(ErrorResponse.from(ErrorSpec.INVALID_TOKEN)));
+        .write(objectMapper.writeValueAsString(ErrorResponse.from(ErrorSpec.EXPIRED_TOKEN)));
   }
 
   private String extractToken(HttpServletRequest request) {
