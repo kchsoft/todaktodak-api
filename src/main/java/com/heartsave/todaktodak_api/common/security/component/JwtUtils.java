@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.common.security.component;
 
+import com.heartsave.todaktodak_api.common.security.TodakUserDetailsService;
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import io.jsonwebtoken.Claims;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class JwtUtils {
+  private final TodakUserDetailsService userDetailsService;
+
   private final String ROLE = "role";
   private final String TYPE = "type";
 
@@ -55,8 +58,7 @@ public class JwtUtils {
   }
 
   private TodakUser getUser(String token) {
-    String role = extractRole(token);
-    return TodakUser.builder().role(role).build();
+    return (TodakUser) userDetailsService.loadUserByUsername(extractSubject(token));
   }
 
   private String extractRole(String token) {
