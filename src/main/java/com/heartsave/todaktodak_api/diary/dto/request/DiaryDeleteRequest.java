@@ -9,6 +9,6 @@ import lombok.Getter;
 @Schema(description = "일기 삭제 요청 데이터")
 public class DiaryDeleteRequest {
   @Positive(message = "1 이상의 정수가 와야 합니다.")
-  @Min(value = 1)
+  @Min(value = 1, message = "diaryId의 값은 최소 1 이상이어야 합니다.")
   private Long diaryId;
 }
