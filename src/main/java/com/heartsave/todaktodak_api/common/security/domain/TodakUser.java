@@ -14,7 +14,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-@Builder
 public class TodakUser implements UserDetails, OAuth2User, Serializable {
 
   private final Long id;
