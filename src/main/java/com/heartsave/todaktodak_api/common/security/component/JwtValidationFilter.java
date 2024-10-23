@@ -3,7 +3,9 @@ package com.heartsave.todaktodak_api.common.security.component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
 import com.heartsave.todaktodak_api.common.exception.ErrorSpec;
+import com.heartsave.todaktodak_api.common.security.TodakUserDetailsService;
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
+import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -17,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -24,6 +28,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 // @Component
 @RequiredArgsConstructor
 public class JwtValidationFilter extends OncePerRequestFilter {
+  private final TodakUserDetailsService userDetailsService;
   private final JwtUtils jwtUtils;
   private final ObjectMapper objectMapper;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -84,7 +89,16 @@ public class JwtValidationFilter extends OncePerRequestFilter {
   }
 
   private void setAuthentication(String token) {
-    var authentication = jwtUtils.getAuthentication(token);
+    var authentication = getAuthentication(token);
     SecurityContextHolder.getContext().setAuthentication(authentication);
+  }
+
+  private Authentication getAuthentication(String token) {
+    return new UsernamePasswordAuthenticationToken(
+        jwtUtils.extractSubject(token), "", getUser(token).getAuthorities());
+  }
+
+  private TodakUser getUser(String token) {
+    return (TodakUser) userDetailsService.loadUserByUsername(jwtUtils.extractSubject(token));
   }
 }
