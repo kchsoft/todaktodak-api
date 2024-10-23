@@ -5,9 +5,9 @@ spring:
   profiles:
     active: "local"
 jwt:
-  secret-key: ${JWT_SECRET_KEY}
-  access-expire-time: ${ACCESS_EXPIRE_TIME}
-  refresh-expire-time: ${REFRESH_EXPIRE_TIME}
+  secret-key: ${JWT_SECRET_KEY:abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijkl}
+  access-expire-time: ${ACCESS_EXPIRE_TIME:3600000}
+  refresh-expire-time: ${REFRESH_EXPIRE_TIME:604800000}
 ---
 spring:
   datasource:
