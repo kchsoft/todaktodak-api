@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.member.entity;
 
+import com.heartsave.todaktodak_api.common.entity.BaseEntity;
 import com.heartsave.todaktodak_api.common.security.domain.AuthType;
 import com.heartsave.todaktodak_api.member.domain.TodakRole;
 import jakarta.persistence.*;
@@ -13,7 +14,7 @@ import org.hibernate.type.SqlTypes;
 @Getter
 @Builder
 @Table(name = "member")
-public class MemberEntity {
+public class MemberEntity extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "member")
   @SequenceGenerator(name = "member", sequenceName = "member_seq", allocationSize = 1)
