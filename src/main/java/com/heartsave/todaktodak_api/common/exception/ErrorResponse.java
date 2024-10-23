@@ -17,6 +17,13 @@ public class ErrorResponse {
     return ErrorResponse.builder().title(errorSpec.name()).message(message).build();
   }
 
+  public static ErrorResponse from(ErrorSpec errorSpec) {
+    return ErrorResponse.builder()
+        .title(errorSpec.name())
+        .message(errorSpec.getDescription())
+        .build();
+  }
+
   public static ErrorResponse from(Map<String, String> jsonMessage) {
     return ErrorResponse.builder().title(VALIDATION_ERROR).message(jsonMessage).build();
   }
