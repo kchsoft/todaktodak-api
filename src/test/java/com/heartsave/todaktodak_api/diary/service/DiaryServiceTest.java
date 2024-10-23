@@ -15,6 +15,7 @@ import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
@@ -78,8 +79,9 @@ public class DiaryServiceTest {
     when(diaryRepository.existsByDate(anyLong(), any(LocalDateTime.class))).thenReturn(true);
 
     BaseException baseException =
-        assertThrows(BaseException.class, () -> diaryService.write(oAuth2User, request));
-    assertThat(baseException.getErrorSpec())
-        .isEqualTo(ErrorSpec.DIARY_DAILY_WRITING_LIMIT_EXCEPTION);
+        assertThrows(
+            DiaryDailyWritingLimitExceedException.class,
+            () -> diaryService.write(oAuth2User, request));
+    assertThat(baseException.getErrorSpec()).isEqualTo(ErrorSpec.LIMIT_EXCEED);
   }
 }

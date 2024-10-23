@@ -9,18 +9,15 @@ import lombok.*;
 @Getter
 public class ErrorResponse {
   private String title;
-  private Object description;
+  private Object message;
 
   private static final String VALIDATION_ERROR = "VALIDATION_ERROR";
 
-  public static ErrorResponse from(ErrorSpec errorSpec) {
-    return ErrorResponse.builder()
-        .title(errorSpec.name())
-        .description(errorSpec.getMessage())
-        .build();
+  public static ErrorResponse from(ErrorSpec errorSpec, String message) {
+    return ErrorResponse.builder().title(errorSpec.name()).message(message).build();
   }
 
   public static ErrorResponse from(Map<String, String> jsonMessage) {
-    return ErrorResponse.builder().title(VALIDATION_ERROR).description(jsonMessage).build();
+    return ErrorResponse.builder().title(VALIDATION_ERROR).message(jsonMessage).build();
   }
 }
