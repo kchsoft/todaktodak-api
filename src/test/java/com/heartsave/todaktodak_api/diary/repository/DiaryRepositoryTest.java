@@ -7,12 +7,19 @@ import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.LocalDateTime;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+@Slf4j
 @DataJpaTest
 public class DiaryRepositoryTest {
 
@@ -42,5 +49,23 @@ public class DiaryRepositoryTest {
   void existDiaryByDateAndMember() {
     boolean exist = diaryRepository.existsByDate(member.getId(), diary.getDiaryCreatedAt());
     assertThat(exist).as("memberID와 날짜에 해당하는 일기가 없습니다.").isTrue();
+  }
+
+  @Test
+  @DisplayName("Audit 기능 활성화 확인.")
+  void auditJpaEntity() {
+    assertThat(diary.getCreatedBy()).as("Audit이 설정 되어 있지만, DB에는 null이 들어가 있습니다.").isEqualTo(7L);
+    assertThat(diary.getCreatedTime()).as("Audit이 설정 되어 있지만, DB에는 null이 들어가 있습니다.").isNotNull();
+    log.info("test diary createdBy = {}", diary.getCreatedBy());
+    log.info("test diary createdTime = {}", diary.getCreatedTime());
+  }
+
+  @EnableJpaAuditing
+  @TestConfiguration
+  static class TestJpaConfig {
+    @Bean
+    AuditorAware<Long> auditorAware() {
+      return () -> Optional.of(7L);
+    }
   }
 }
