@@ -45,7 +45,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
   }
 
   private boolean isValidToken(String token) {
-    return token != null & isValidTokenStructure(token) && isValidTokenType(token);
+    return token != null && isValidTokenStructure(token) && isValidTokenType(token);
   }
 
   private boolean isValidTokenStructure(String token) {
