@@ -65,7 +65,7 @@ public class JwtUtils {
     return extractAllClaims(token).get(ROLE, String.class);
   }
 
-  private String extractType(String token) {
+  public String extractType(String token) {
     return extractAllClaims(token).get(TYPE, String.class);
   }
 
@@ -73,7 +73,7 @@ public class JwtUtils {
     return extractAllClaims(token).getSubject();
   }
 
-  private Claims extractAllClaims(String token) {
+  public Claims extractAllClaims(String token) {
     return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
   }
 
