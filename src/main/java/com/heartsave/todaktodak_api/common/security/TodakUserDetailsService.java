@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.common.security;
 
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.member.domain.TodakRole;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class TodakUserDetailsService implements UserDetailsService {
     return TodakUser.builder()
         .id(memberEntity.getId())
         .username(memberEntity.getLoginId())
-        .role(memberEntity.getRole().name())
+        .role(TodakRole.valueOf(memberEntity.getRole().name()))
         .attributes(Map.of())
         .build();
   }

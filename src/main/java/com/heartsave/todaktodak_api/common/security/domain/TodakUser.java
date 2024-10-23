@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.common.security.domain;
 
+import com.heartsave.todaktodak_api.member.domain.TodakRole;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,7 +18,7 @@ public class TodakUser implements UserDetails, OAuth2User, Serializable {
 
   private final Long id;
   private final String username;
-  private final String role;
+  private final TodakRole role;
 
   // TODO: 각 소셜 플랫폼 적용
   private final Map<String, Object> attributes;
@@ -29,7 +30,7 @@ public class TodakUser implements UserDetails, OAuth2User, Serializable {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return Collections.singletonList(new SimpleGrantedAuthority(role));
+    return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
   }
 
   @Override
