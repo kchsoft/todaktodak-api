@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 @Getter
 public class TodakUser implements UserDetails, OAuth2User, Serializable {
 
+  private final Long id;
   private final String username;
   private final TodakRole role;
 
@@ -23,7 +24,7 @@ public class TodakUser implements UserDetails, OAuth2User, Serializable {
   private final Map<String, Object> attributes;
 
   public static TodakUser from(MemberEntity entity) {
-    return new TodakUser(entity.getLoginId(), entity.getRole(), Map.of());
+    return new TodakUser(entity.getId(), entity.getLoginId(), entity.getRole(), Map.of());
   }
 
   @Override
