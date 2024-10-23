@@ -36,8 +36,8 @@ public class JwtUtils {
   private SecretKey key;
 
   public String issueToken(TodakUser user, String type) {
-    var now = System.currentTimeMillis();
-    var expireTime =
+    long now = System.currentTimeMillis();
+    long expireTime =
         type.equals(JwtConstant.ACCESS_TYPE)
             ? ACCESS_TOKEN_EXPIRE_TIME_MILLI_SECOND
             : REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND;
