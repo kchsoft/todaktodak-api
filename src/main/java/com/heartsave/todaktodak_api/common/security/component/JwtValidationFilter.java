@@ -13,6 +13,7 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -30,12 +31,17 @@ public class JwtValidationFilter extends OncePerRequestFilter {
     var token = extractToken(request);
 
     if (!isValidToken(token)) {
-      filterChain.doFilter(request, response);
+      setErrorResponse(response);
       return;
     }
 
     setAuthentication(token);
     filterChain.doFilter(request, response);
+  }
+
+  private void setErrorResponse(HttpServletResponse response) throws IOException {
+    response.getWriter().write("유효하지 않은 토큰입니다.");
+    response.setStatus(HttpStatus.UNAUTHORIZED.value());
   }
 
   private String extractToken(HttpServletRequest request) {
