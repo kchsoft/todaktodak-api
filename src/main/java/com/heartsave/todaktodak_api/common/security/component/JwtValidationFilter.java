@@ -14,10 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@Component
+// TODO: JWT 필터 완성시 컴포넌트화
+// @Component
 @RequiredArgsConstructor
 public class JwtValidationFilter extends OncePerRequestFilter {
   private final JwtUtils jwtUtils;
