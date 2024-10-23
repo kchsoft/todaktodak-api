@@ -2,11 +2,11 @@ package com.heartsave.todaktodak_api.diary.service;
 
 import com.heartsave.todaktodak_api.ai.dto.AiContentResponse;
 import com.heartsave.todaktodak_api.ai.service.AiService;
-import com.heartsave.todaktodak_api.common.exception.BaseException;
 import com.heartsave.todaktodak_api.common.exception.ErrorSpec;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
@@ -33,8 +33,7 @@ public class DiaryService {
     LocalDateTime diaryCreatedDate = diary.getDiaryCreatedAt();
 
     if (diaryRepository.existsByDate(memberId, diaryCreatedDate)) {
-      log.error("하루 일기 작성량을 초과하였습니다. memberId = {}", diary.getMemberEntity().getId());
-      throw new BaseException(ErrorSpec.DIARY_DAILY_WRITING_LIMIT_EXCEPTION);
+      throw new DiaryDailyWritingLimitExceedException(ErrorSpec.LIMIT_EXCEED, memberId);
     }
 
     log.info("AI 컨텐츠 생성 요청을 시작합니다.");
