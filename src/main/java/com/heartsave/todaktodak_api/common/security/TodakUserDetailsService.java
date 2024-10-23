@@ -24,7 +24,7 @@ public class TodakUserDetailsService implements UserDetailsService {
     return TodakUser.builder()
         .id(memberEntity.getId())
         .username(memberEntity.getLoginId())
-        .role(memberEntity.getRole())
+        .role(memberEntity.getRole().name())
         .attributes(Map.of())
         .build();
   }

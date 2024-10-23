@@ -31,7 +31,7 @@ public class AuthController {
         @ApiResponse(responseCode = "409", description = "중복 닉네임 존재")
       })
   @PostMapping("/nickname")
-  ResponseEntity<Void> checkNickname(@Valid @RequestBody NicknameCheckRequest dto) {
+  public ResponseEntity<Void> checkNickname(@Valid @RequestBody NicknameCheckRequest dto) {
     if (!authService.isDuplicatedNickname(dto)) return ResponseEntity.noContent().build();
     return ResponseEntity.status(HttpStatus.CONFLICT).build();
   }
@@ -44,7 +44,7 @@ public class AuthController {
         @ApiResponse(responseCode = "409", description = "중복 아이디 존재")
       })
   @PostMapping("/login-id")
-  ResponseEntity<Void> checkLoginId(@Valid @RequestBody LoginIdCheckRequest dto) {
+  public ResponseEntity<Void> checkLoginId(@Valid @RequestBody LoginIdCheckRequest dto) {
     if (!authService.isDuplicatedLoginId(dto)) return ResponseEntity.noContent().build();
     return ResponseEntity.status(HttpStatus.CONFLICT).build();
   }
