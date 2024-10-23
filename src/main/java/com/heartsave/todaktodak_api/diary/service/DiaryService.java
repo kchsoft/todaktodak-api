@@ -4,7 +4,6 @@ import com.heartsave.todaktodak_api.ai.dto.AiContentResponse;
 import com.heartsave.todaktodak_api.ai.service.AiService;
 import com.heartsave.todaktodak_api.common.exception.ErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
-import com.heartsave.todaktodak_api.diary.dto.request.DiaryDeleteRequest;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
@@ -49,11 +48,11 @@ public class DiaryService {
     return DiaryWriteResponse.builder().aiComment(response.getAiComment()).build();
   }
 
-  public void delete(TodakUser principal, DiaryDeleteRequest request) {
+  public void delete(TodakUser principal, Long diaryId) {
     Long memberId = principal.getId();
 
-    if (0 == diaryRepository.deleteByIds(memberId, request.getDiaryId()))
-      throw new DiaryDeleteNotFoundException(ErrorSpec.NOT_FOUND, memberId, request.getDiaryId());
+    if (0 == diaryRepository.deleteByIds(memberId, diaryId))
+      throw new DiaryDeleteNotFoundException(ErrorSpec.NOT_FOUND, memberId, diaryId);
 
     // TODO :  s3에서 webtoon,bgm,comment 삭제 요청
     return;
