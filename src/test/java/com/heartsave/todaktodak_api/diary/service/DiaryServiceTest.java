@@ -11,6 +11,7 @@ import com.heartsave.todaktodak_api.ai.dto.AiContentResponse;
 import com.heartsave.todaktodak_api.ai.service.AiService;
 import com.heartsave.todaktodak_api.common.exception.BaseException;
 import com.heartsave.todaktodak_api.common.exception.ErrorSpec;
+import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
@@ -29,7 +30,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @ExtendWith(MockitoExtension.class)
 public class DiaryServiceTest {
@@ -38,7 +38,7 @@ public class DiaryServiceTest {
   @Mock private DiaryRepository diaryRepository;
   @Mock private AiService aiService;
   @InjectMocks private DiaryService diaryService;
-  private static OAuth2User oAuth2User;
+  private static TodakUser principal;
   private static DiaryWriteRequest request;
   private static MemberEntity member;
   private String AI_COMMENT = "this is test ai comment";
@@ -46,10 +46,10 @@ public class DiaryServiceTest {
 
   @BeforeAll
   static void allSetup() {
-    oAuth2User = mock(OAuth2User.class);
+    principal = mock(TodakUser.class);
     request = mock(DiaryWriteRequest.class);
 
-    when(oAuth2User.getName()).thenReturn("2");
+    when(principal.getName()).thenReturn("2");
     member = MemberEntity.builder().id(2L).build();
 
     when(request.getContent()).thenReturn("test diary content");
@@ -69,7 +69,7 @@ public class DiaryServiceTest {
     when(aiService.callAiContent(any(DiaryEntity.class)))
         .thenReturn(AiContentResponse.builder().aiComment("this is test ai comment").build());
 
-    DiaryWriteResponse write = diaryService.write(oAuth2User, request);
+    DiaryWriteResponse write = diaryService.write(principal, request);
     assertThat(write.getAiComment()).as("AI 코멘트 결과에 문제가 발생했습니다.").isEqualTo(AI_COMMENT);
   }
 
@@ -81,7 +81,7 @@ public class DiaryServiceTest {
     BaseException baseException =
         assertThrows(
             DiaryDailyWritingLimitExceedException.class,
-            () -> diaryService.write(oAuth2User, request));
+            () -> diaryService.write(principal, request));
     assertThat(baseException.getErrorSpec()).isEqualTo(ErrorSpec.LIMIT_EXCEED);
   }
 }

@@ -3,6 +3,7 @@ package com.heartsave.todaktodak_api.diary.service;
 import com.heartsave.todaktodak_api.ai.dto.AiContentResponse;
 import com.heartsave.todaktodak_api.ai.service.AiService;
 import com.heartsave.todaktodak_api.common.exception.ErrorSpec;
+import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
@@ -13,7 +14,6 @@ import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +27,8 @@ public class DiaryService {
   private final DiaryRepository diaryRepository;
   private final MemberRepository memberRepository;
 
-  public DiaryWriteResponse write(OAuth2User auth, DiaryWriteRequest request) {
-    DiaryEntity diary = createDiaryEntity(auth, request);
+  public DiaryWriteResponse write(TodakUser principal, DiaryWriteRequest request) {
+    DiaryEntity diary = createDiaryEntity(principal, request);
     Long memberId = diary.getMemberEntity().getId();
     LocalDateTime diaryCreatedDate = diary.getDiaryCreatedAt();
 
@@ -47,8 +47,8 @@ public class DiaryService {
     return DiaryWriteResponse.builder().aiComment(response.getAiComment()).build();
   }
 
-  private DiaryEntity createDiaryEntity(OAuth2User auth, DiaryWriteRequest request) {
-    Long memberId = Long.valueOf(auth.getName());
+  private DiaryEntity createDiaryEntity(TodakUser principal, DiaryWriteRequest request) {
+    Long memberId = principal.getId();
     MemberEntity member = memberRepository.findById(memberId).get();
     return DiaryEntity.builder()
         .memberEntity(member)
