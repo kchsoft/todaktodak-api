@@ -4,10 +4,12 @@ import com.heartsave.todaktodak_api.ai.dto.AiContentResponse;
 import com.heartsave.todaktodak_api.ai.service.AiService;
 import com.heartsave.todaktodak_api.common.exception.ErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.diary.dto.request.DiaryDeleteRequest;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
+import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
@@ -45,6 +47,16 @@ public class DiaryService {
     diaryRepository.save(diary);
     log.info("DB에 일기를 저장하였습니다.");
     return DiaryWriteResponse.builder().aiComment(response.getAiComment()).build();
+  }
+
+  public void delete(TodakUser principal, DiaryDeleteRequest request) {
+    Long memberId = principal.getId();
+
+    if (0 == diaryRepository.deleteByIds(memberId, request.getDiaryId()))
+      throw new DiaryDeleteNotFoundException(ErrorSpec.NOT_FOUND, memberId, request.getDiaryId());
+
+    // TODO :  s3에서 webtoon,bgm,comment 삭제 요청
+    return;
   }
 
   private DiaryEntity createDiaryEntity(TodakUser principal, DiaryWriteRequest request) {
