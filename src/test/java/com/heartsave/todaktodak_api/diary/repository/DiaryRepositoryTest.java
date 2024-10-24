@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.diary.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.heartsave.todaktodak_api.common.BaseTestObject;
+import com.heartsave.todaktodak_api.common.BaseTestEntity;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
@@ -30,8 +30,8 @@ public class DiaryRepositoryTest {
 
   @BeforeEach
   void setupAll() {
-    member = BaseTestObject.createMemberEntity();
-    diary = BaseTestObject.createDiaryEntity(member);
+    member = BaseTestEntity.createMemberWithoutId();
+    diary = BaseTestEntity.createDiaryWithMemberHasNotId(member);
     memberRepository.save(member);
     diaryRepository.save(diary);
   }
@@ -49,6 +49,26 @@ public class DiaryRepositoryTest {
   void existDiaryByDateAndMember() {
     boolean exist = diaryRepository.existsByDate(member.getId(), diary.getDiaryCreatedAt());
     assertThat(exist).as("memberID와 날짜에 해당하는 일기가 없습니다.").isTrue();
+  }
+
+  @Test
+  @DisplayName(" 요청한 멤버 ID 및 일기장 ID에 해당하는 일기장 삭제 성공")
+  void deleteDiaryByIdsSuccess() {
+    System.out.println("member.getId() = " + member.getId());
+    System.out.println("diary.getId() = " + diary.getId());
+    assertThat(diaryRepository.deleteByIds(member.getId(), diary.getId()))
+        .as("memberId와 diaryId가 일치하는 diary가 없습니다.")
+        .isEqualTo(1);
+  }
+
+  @Test
+  @DisplayName("요청한 멤버 ID 및 일기장 ID에 해당하는 일기장 삭제 실패")
+  void deleteDiaryByIdsFail() {
+    long falseId = diary.getId() + 1;
+    assertThat(diaryRepository.deleteByIds(member.getId(), falseId)).isEqualTo(0);
+
+    falseId = member.getId() + 1;
+    assertThat(diaryRepository.deleteByIds(falseId, diary.getId())).isEqualTo(0);
   }
 
   @Test
