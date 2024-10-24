@@ -19,8 +19,6 @@ public class TodakUser implements UserDetails, OAuth2User, Serializable {
   private final Long id;
   private final String username;
   private final TodakRole role;
-
-  // TODO: 각 소셜 플랫폼 적용
   private final Map<String, Object> attributes;
 
   public static TodakUser from(MemberEntity entity) {
@@ -42,10 +40,9 @@ public class TodakUser implements UserDetails, OAuth2User, Serializable {
     return "";
   }
 
-  // TODO: 각 소셜 플랫폼 적용
   @Override
   public String getUsername() {
-    return "OAUTH2 USER NAME";
+    return username;
   }
 
   @Override
