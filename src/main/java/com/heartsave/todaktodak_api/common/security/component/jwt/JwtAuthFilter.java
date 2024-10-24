@@ -7,8 +7,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.heartsave.todaktodak_api.auth.dto.LoginRequest;
-import com.heartsave.todaktodak_api.auth.dto.LoginResponse;
+import com.heartsave.todaktodak_api.auth.dto.request.LoginRequest;
+import com.heartsave.todaktodak_api.auth.dto.response.LoginResponse;
 import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
 import com.heartsave.todaktodak_api.common.exception.ErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;

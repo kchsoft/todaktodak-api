@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.auth.service;
 
-import com.heartsave.todaktodak_api.auth.dto.LoginIdCheckRequest;
-import com.heartsave.todaktodak_api.auth.dto.NicknameCheckRequest;
+import com.heartsave.todaktodak_api.auth.dto.request.LoginIdCheckRequest;
+import com.heartsave.todaktodak_api.auth.dto.response.NicknameCheckRequest;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
