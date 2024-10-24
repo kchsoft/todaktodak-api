@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -34,14 +35,14 @@ public class SecurityConfig {
   private final Oauth2FailureHandler oauth2FailureHandler;
   private final DefaultOAuth2UserService oauth2UserDetailsService;
   private final JwtValidationFilter jwtValidationFilter;
-  private final JwtAuthFilter jwtAuthFilter;
   private final JwtLogoutFilter jwtLogoutFilter;
 
   @Value("${todak.cors.allowed-origin}")
   private List<String> ALLOWED_ORIGINS;
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain securityFilterChain(
+      HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
     return http.csrf(AbstractHttpConfigurer::disable)
         .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
         .formLogin(AbstractHttpConfigurer::disable)
@@ -67,7 +68,8 @@ public class SecurityConfig {
             sessionManagement ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(jwtValidationFilter, JwtAuthFilter.class)
-        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(
+            new JwtAuthFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(jwtLogoutFilter, LogoutFilter.class)
         .build();
   }

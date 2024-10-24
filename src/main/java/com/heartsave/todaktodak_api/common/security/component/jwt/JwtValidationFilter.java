@@ -3,7 +3,6 @@ package com.heartsave.todaktodak_api.common.security.component.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
 import com.heartsave.todaktodak_api.common.exception.ErrorSpec;
-import com.heartsave.todaktodak_api.common.security.TodakUserDetailsService;
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -22,13 +21,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 @RequiredArgsConstructor
 public class JwtValidationFilter extends OncePerRequestFilter {
-  private final TodakUserDetailsService userDetailsService;
+  private final UserDetailsService userDetailsService;
   private final JwtUtils jwtUtils;
   private final ObjectMapper objectMapper;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());

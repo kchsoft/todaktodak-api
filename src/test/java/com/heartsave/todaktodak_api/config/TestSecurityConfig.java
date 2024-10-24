@@ -1,6 +1,8 @@
 package com.heartsave.todaktodak_api.config;
 
+import com.heartsave.todaktodak_api.common.security.component.jwt.JwtValidationFilter;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,7 +20,8 @@ public class TestSecurityConfig {
         .cors(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
-        .oauth2Login(AbstractHttpConfigurer::disable)
         .build();
   }
+
+  @MockBean private JwtValidationFilter jwtValidationFilter;
 }
