@@ -51,8 +51,10 @@ public class DiaryService {
   public void delete(TodakUser principal, Long diaryId) {
     Long memberId = principal.getId();
 
+    log.info("DB에 일기를 삭제를 요청합니다.");
     if (0 == diaryRepository.deleteByIds(memberId, diaryId))
       throw new DiaryDeleteNotFoundException(ErrorSpec.NOT_FOUND, memberId, diaryId);
+    log.info("DB에서 일기를 삭제했습니다.");
 
     // TODO :  s3에서 webtoon,bgm,comment 삭제 요청
     return;
