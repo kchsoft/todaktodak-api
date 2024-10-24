@@ -7,10 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest // 기본적으로 h2로 테스트하게 돼있음
-@ActiveProfiles("test")
 class MemberRepositoryTest {
   @Autowired private MemberRepository memberRepository;
 
