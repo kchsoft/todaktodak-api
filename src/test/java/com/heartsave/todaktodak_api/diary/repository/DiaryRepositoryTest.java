@@ -30,8 +30,8 @@ public class DiaryRepositoryTest {
 
   @BeforeEach
   void setupAll() {
-    member = BaseTestEntity.createMemberWithoutId();
-    diary = BaseTestEntity.createDiaryWithMemberHasNotId(member);
+    member = BaseTestEntity.createMemberNoId();
+    diary = BaseTestEntity.createDiaryNoIdWithMember(member);
     memberRepository.save(member);
     diaryRepository.save(diary);
   }

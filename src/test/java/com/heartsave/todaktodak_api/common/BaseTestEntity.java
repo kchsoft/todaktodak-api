@@ -37,7 +37,7 @@ public class BaseTestEntity {
         .build();
   }
 
-  public static MemberEntity createMemberWithoutId() {
+  public static MemberEntity createMemberNoId() {
     return MemberEntity.builder()
         .loginId(TEST_LOGIN_ID)
         .password(TEST_PASSWORD)
@@ -75,7 +75,7 @@ public class BaseTestEntity {
         .build();
   }
 
-  public static DiaryEntity createDiaryWithMemberHasNotId(MemberEntity member) {
+  public static DiaryEntity createDiaryNoIdWithMember(MemberEntity member) {
     return DiaryEntity.builder()
         .emotion(DiaryEmotion.JOY)
         .diaryCreatedAt(TEST_LOCAL_DATE_TIME)
