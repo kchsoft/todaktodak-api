@@ -8,21 +8,14 @@ import lombok.Getter;
 public abstract class DiaryException extends BaseException {
 
   protected DiaryException(
-      ErrorSpec errorSpec, String clientMessage, String explain, Long memberId, Long diaryId) {
-    super(errorSpec, clientMessage, getLog(errorSpec, explain, memberId, diaryId));
+      ErrorSpec errorSpec, String clientMessage, String debugMessage, Long memberId, Long diaryId) {
+    super(errorSpec, clientMessage, debugMessage);
+    getErrorField().add("memberId", memberId).add("diaryId", diaryId);
   }
 
   protected DiaryException(
-      ErrorSpec errorSpec, String clientMessage, String explain, Long memberId) {
-    super(errorSpec, clientMessage, getLog(errorSpec, explain, memberId));
-  }
-
-  private static String getLog(ErrorSpec errorSpec, String explain, Long memberId, Long diaryId) {
-    return String.format(
-        "%s : %s [ memberId=%d, diaryId=%d ]", errorSpec.name(), explain, memberId, diaryId);
-  }
-
-  private static String getLog(ErrorSpec errorSpec, String explain, Long memberId) {
-    return String.format("%s : %s [ memberId=%d ]", errorSpec.name(), explain, memberId);
+      ErrorSpec errorSpec, String clientMessage, String debugMessage, Long memberId) {
+    super(errorSpec, clientMessage, debugMessage);
+    getErrorField().add("memberId", memberId);
   }
 }
