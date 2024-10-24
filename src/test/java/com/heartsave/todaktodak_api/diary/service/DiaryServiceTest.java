@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 import com.heartsave.todaktodak_api.ai.dto.AiContentResponse;
 import com.heartsave.todaktodak_api.ai.service.AiService;
 import com.heartsave.todaktodak_api.common.BaseTestEntity;
-import com.heartsave.todaktodak_api.common.exception.BaseException;
 import com.heartsave.todaktodak_api.common.exception.ErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
@@ -22,11 +21,13 @@ import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
+import com.heartsave.todaktodak_api.diary.exception.DiaryException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 public class DiaryServiceTest {
 
@@ -77,11 +79,12 @@ public class DiaryServiceTest {
     when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
     when(diaryRepository.existsByDate(anyLong(), any(LocalDateTime.class))).thenReturn(true);
 
-    BaseException baseException =
+    DiaryException diaryException =
         assertThrows(
             DiaryDailyWritingLimitExceedException.class,
             () -> diaryService.write(principal, request));
-    assertThat(baseException.getErrorSpec()).isEqualTo(ErrorSpec.LIMIT_EXCEED);
+    assertThat(diaryException.getErrorSpec()).isEqualTo(ErrorSpec.LIMIT_EXCEED);
+    log.info(diaryException.getLogMessage());
   }
 
   @Test
@@ -100,12 +103,14 @@ public class DiaryServiceTest {
   @DisplayName("일기 삭제 요청 실패")
   void diaryDeleteFail() {
     when(diaryRepository.deleteByIds(anyLong(), anyLong())).thenReturn(0);
-    assertThrows(
-        DiaryDeleteNotFoundException.class,
-        () -> {
-          diaryService.delete(principal, diary.getId() + 1L);
-        },
-        "Diary Delete Not Found 예외가 발생하지 않았습니다.");
+    DiaryException diaryException =
+        assertThrows(
+            DiaryDeleteNotFoundException.class,
+            () -> {
+              diaryService.delete(principal, diary.getId() + 1L);
+            },
+            "Diary Delete Not Found 예외가 발생하지 않았습니다.");
     verify(diaryRepository, times(1)).deleteByIds(anyLong(), anyLong());
+    log.info(diaryException.getLogMessage());
   }
 }
