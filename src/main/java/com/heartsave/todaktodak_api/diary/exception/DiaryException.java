@@ -17,13 +17,12 @@ public abstract class DiaryException extends BaseException {
     super(errorSpec, clientMessage, getLog(errorSpec, explain, memberId));
   }
 
-  private static String getLog(
-      ErrorSpec errorSpec, String logMessage, Long memberId, Long diaryId) {
+  private static String getLog(ErrorSpec errorSpec, String explain, Long memberId, Long diaryId) {
     return String.format(
-        "%s : %s [ memberId=%d, diaryId=%d ]", errorSpec.name(), logMessage, memberId, diaryId);
+        "%s : %s [ memberId=%d, diaryId=%d ]", errorSpec.name(), explain, memberId, diaryId);
   }
 
-  private static String getLog(ErrorSpec errorSpec, String logMessage, Long memberId) {
-    return String.format("%s : %s [ memberId=%d ]", errorSpec.name(), logMessage, memberId);
+  private static String getLog(ErrorSpec errorSpec, String explain, Long memberId) {
+    return String.format("%s : %s [ memberId=%d ]", errorSpec.name(), explain, memberId);
   }
 }

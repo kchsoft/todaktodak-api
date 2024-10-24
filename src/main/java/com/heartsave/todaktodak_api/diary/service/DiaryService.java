@@ -11,6 +11,7 @@ import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceed
 import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +63,10 @@ public class DiaryService {
 
   private DiaryEntity createDiaryEntity(TodakUser principal, DiaryWriteRequest request) {
     Long memberId = principal.getId();
-    MemberEntity member = memberRepository.findById(memberId).get();
+    MemberEntity member =
+        memberRepository
+            .findById(memberId)
+            .orElseThrow(() -> new MemberNotFoundException(ErrorSpec.NOT_FOUND, memberId));
     return DiaryEntity.builder()
         .memberEntity(member)
         .emotion(request.getEmotion())
