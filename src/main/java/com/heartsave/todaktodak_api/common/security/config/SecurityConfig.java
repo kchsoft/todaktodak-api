@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.common.security.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.security.component.jwt.JwtAuthFilter;
 import com.heartsave.todaktodak_api.common.security.component.jwt.JwtLogoutFilter;
 import com.heartsave.todaktodak_api.common.security.component.jwt.JwtValidationFilter;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -33,9 +35,10 @@ public class SecurityConfig {
   private final AccessDeniedHandler accessDeniedHandler;
   private final OAuth2SuccessHandler oAuth2SuccessHandler;
   private final Oauth2FailureHandler oauth2FailureHandler;
+  private final UserDetailsService userDetailsService;
   private final DefaultOAuth2UserService oauth2UserDetailsService;
-  private final JwtValidationFilter jwtValidationFilter;
   private final JwtLogoutFilter jwtLogoutFilter;
+  private final ObjectMapper objectMapper;
 
   @Value("${todak.cors.allowed-origin}")
   private List<String> ALLOWED_ORIGINS;
@@ -67,9 +70,11 @@ public class SecurityConfig {
         .sessionManagement(
             sessionManagement ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(jwtValidationFilter, JwtAuthFilter.class)
         .addFilterBefore(
-            new JwtAuthFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
+            new JwtValidationFilter(userDetailsService, objectMapper), JwtAuthFilter.class)
+        .addFilterBefore(
+            new JwtAuthFilter(authenticationManager, objectMapper),
+            UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(jwtLogoutFilter, LogoutFilter.class)
         .build();
   }
