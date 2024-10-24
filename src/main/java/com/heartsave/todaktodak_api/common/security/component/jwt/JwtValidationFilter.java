@@ -1,10 +1,12 @@
 package com.heartsave.todaktodak_api.common.security.component.jwt;
 
+import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
 import com.heartsave.todaktodak_api.common.exception.ErrorSpec;
-import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.common.security.util.JwtUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -75,13 +77,13 @@ public class JwtValidationFilter extends OncePerRequestFilter {
   }
 
   private String extractToken(HttpServletRequest request) {
-    String value = request.getHeader(JwtConstant.HEADER_KEY);
-    if (value == null || !value.contains(JwtConstant.TOKEN_PREFIX)) return null;
-    return value.substring(JwtConstant.TOKEN_PREFIX.length());
+    String value = request.getHeader(HEADER_KEY);
+    if (value == null || !value.contains(TOKEN_PREFIX)) return null;
+    return value.substring(TOKEN_PREFIX.length());
   }
 
   private boolean isValidTokenType(String token) {
-    return JwtUtils.extractType(token).equals(JwtConstant.ACCESS_TYPE);
+    return JwtUtils.extractType(token).equals(ACCESS_TYPE);
   }
 
   private void setAuthentication(String token) {
