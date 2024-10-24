@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleBaseException(BaseException e) {
     log.error(e.getLogMessage());
     return ResponseEntity.status(e.getErrorSpec().getStatus())
-        .body(ErrorResponse.from(e.getErrorSpec(), e.getClientMessage()));
+        .body(ErrorResponse.from(e.getErrorSpec()));
   }
 
   // 유효성 검사 실패

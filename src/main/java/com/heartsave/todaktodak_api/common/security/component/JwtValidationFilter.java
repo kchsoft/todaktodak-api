@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.common.security.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
-import com.heartsave.todaktodak_api.common.exception.ErrorSpec;
+import com.heartsave.todaktodak_api.common.exception.errorspec.TokenErrorSpec;
 import com.heartsave.todaktodak_api.common.security.TodakUserDetailsService;
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
@@ -41,7 +41,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
 
     if (token == null) {
       logger.error("NO TOKEN: {}", token);
-      setErrorResponse(response, ErrorSpec.INVALID_TOKEN);
+      setErrorResponse(response, TokenErrorSpec.INVALID_TOKEN);
       return;
     }
     try {
@@ -49,30 +49,28 @@ public class JwtValidationFilter extends OncePerRequestFilter {
 
       if (!isValidTokenType(token)) {
         logger.error("유효하지 않은 토큰 유형입니다.");
-        setErrorResponse(response, ErrorSpec.INVALID_TOKEN);
+        setErrorResponse(response, TokenErrorSpec.INVALID_TOKEN);
         return;
       }
       setAuthentication(token);
       filterChain.doFilter(request, response);
     } catch (ExpiredJwtException e) {
       logger.error("토큰이 만료됐습니다.");
-      setErrorResponse(response, ErrorSpec.EXPIRED_TOKEN);
+      setErrorResponse(response, TokenErrorSpec.EXPIRED_TOKEN);
     } catch (SecurityException
         | MalformedJwtException
         | UnsupportedJwtException
         | IllegalArgumentException e) {
       logger.error("유효하지 않은 토큰입니다.");
-      setErrorResponse(response, ErrorSpec.INVALID_TOKEN);
+      setErrorResponse(response, TokenErrorSpec.INVALID_TOKEN);
     }
   }
 
-  private void setErrorResponse(HttpServletResponse response, ErrorSpec errorSpec)
+  private void setErrorResponse(HttpServletResponse response, TokenErrorSpec errorSpec)
       throws IOException {
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
     response.setContentType("application/json;charset=UTF-8");
-    response
-        .getWriter()
-        .write(objectMapper.writeValueAsString(ErrorResponse.from(errorSpec, "로그인이 실패됐습니다.")));
+    response.getWriter().write(objectMapper.writeValueAsString(ErrorResponse.from(errorSpec)));
   }
 
   private String extractToken(HttpServletRequest request) {
