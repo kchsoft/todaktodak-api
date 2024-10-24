@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.common.security.component;
+package com.heartsave.todaktodak_api.common.security.component.oauth2;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

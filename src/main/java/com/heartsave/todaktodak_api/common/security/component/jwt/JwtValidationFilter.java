@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.common.security.component;
+package com.heartsave.todaktodak_api.common.security.component.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
