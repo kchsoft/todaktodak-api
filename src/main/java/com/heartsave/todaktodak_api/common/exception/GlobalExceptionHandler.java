@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
   // API Exception
   @ExceptionHandler(BaseException.class)
   public ResponseEntity<ErrorResponse> handleBaseException(BaseException e) {
-    log.error(e.getClientMessage());
+    log.error(e.getLogMessage());
     return ResponseEntity.status(e.getErrorSpec().getStatus())
         .body(ErrorResponse.from(e.getErrorSpec(), e.getClientMessage()));
   }
