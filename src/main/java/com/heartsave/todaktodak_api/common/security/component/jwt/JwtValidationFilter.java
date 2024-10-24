@@ -29,7 +29,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtValidationFilter extends OncePerRequestFilter {
   private final UserDetailsService userDetailsService;
-  private final JwtUtils jwtUtils;
   private final ObjectMapper objectMapper;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -45,7 +44,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
       return;
     }
     try {
-      jwtUtils.extractAllClaims(token);
+      JwtUtils.extractAllClaims(token);
 
       if (!isValidTokenType(token)) {
         logger.error("유효하지 않은 토큰 유형입니다.");
@@ -82,7 +81,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
   }
 
   private boolean isValidTokenType(String token) {
-    return jwtUtils.extractType(token).equals(JwtConstant.ACCESS_TYPE);
+    return JwtUtils.extractType(token).equals(JwtConstant.ACCESS_TYPE);
   }
 
   private void setAuthentication(String token) {
@@ -92,10 +91,10 @@ public class JwtValidationFilter extends OncePerRequestFilter {
 
   private Authentication getAuthentication(String token) {
     return new UsernamePasswordAuthenticationToken(
-        jwtUtils.extractSubject(token), "", getUser(token).getAuthorities());
+        JwtUtils.extractSubject(token), "", getUser(token).getAuthorities());
   }
 
   private TodakUser getUser(String token) {
-    return (TodakUser) userDetailsService.loadUserByUsername(jwtUtils.extractSubject(token));
+    return (TodakUser) userDetailsService.loadUserByUsername(JwtUtils.extractSubject(token));
   }
 }
