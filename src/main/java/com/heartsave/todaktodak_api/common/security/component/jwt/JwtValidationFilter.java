@@ -22,10 +22,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-// TODO: JWT 필터 완성시 컴포넌트화
-// @Component
+@Component
 @RequiredArgsConstructor
 public class JwtValidationFilter extends OncePerRequestFilter {
   private final TodakUserDetailsService userDetailsService;
