@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.common.security.component.jwt;
+package com.heartsave.todaktodak_api.common.security.util;
 
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
