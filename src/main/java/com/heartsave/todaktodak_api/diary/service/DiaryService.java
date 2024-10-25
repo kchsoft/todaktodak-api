@@ -6,8 +6,8 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
-import com.heartsave.todaktodak_api.diary.dto.response.DiaryYearMonthInfoResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
@@ -16,6 +16,7 @@ import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class DiaryService {
   public DiaryWriteResponse write(TodakUser principal, DiaryWriteRequest request) {
     DiaryEntity diary = createDiaryEntity(principal, request);
     Long memberId = diary.getMemberEntity().getId();
-    LocalDateTime diaryCreatedDate = diary.getDiaryCreatedAt();
+    LocalDateTime diaryCreatedDate = diary.getDiaryCreatedTime();
 
     if (diaryRepository.existsByDate(memberId, diaryCreatedDate)) {
       throw new DiaryDailyWritingLimitExceedException(
@@ -65,8 +66,13 @@ public class DiaryService {
     return;
   }
 
-  public DiaryYearMonthInfoResponse getYearMonthInfo(TodakUser principal, YearMonth yearMonth) {
-    return null;
+  public DiaryIndexResponse getIndex(TodakUser principal, YearMonth yearMonth) {
+    LocalDateTime startDate = yearMonth.atDay(1).atStartOfDay();
+    LocalDateTime endDate = yearMonth.atEndOfMonth().atTime(LocalTime.MAX);
+    return DiaryIndexResponse.builder()
+        .diaryIndexes(
+            diaryRepository.findIndexesByMemberIdAndDates(principal.getId(), startDate, endDate))
+        .build();
   }
 
   private DiaryEntity createDiaryEntity(TodakUser principal, DiaryWriteRequest request) {
@@ -79,7 +85,7 @@ public class DiaryService {
         .memberEntity(member)
         .emotion(request.getEmotion())
         .content(request.getContent())
-        .diaryCreatedAt((request.getDate()))
+        .diaryCreatedTime((request.getDate()))
         .build();
   }
 }

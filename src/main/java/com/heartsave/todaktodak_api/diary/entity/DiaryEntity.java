@@ -67,11 +67,11 @@ public class DiaryEntity extends BaseEntity {
   private String bgmUrl;
 
   @Column(
-      name = "diary_created_at",
+      name = "diary_created_time",
       nullable = false,
       updatable = false,
       columnDefinition = "TIMESTAMP")
-  private LocalDateTime diaryCreatedAt;
+  private LocalDateTime diaryCreatedTime;
 
   public void addAiContent(AiContentResponse response) {
     this.aiComment = response.getAiComment();

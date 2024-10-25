@@ -2,8 +2,8 @@ package com.heartsave.todaktodak_api.diary.controller;
 
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
-import com.heartsave.todaktodak_api.diary.dto.response.DiaryYearMonthInfoResponse;
 import com.heartsave.todaktodak_api.diary.service.DiaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -76,10 +76,9 @@ public class DiaryController {
   }
 
   @GetMapping
-  public ResponseEntity<DiaryYearMonthInfoResponse> getDiaryYearMonthInfo(
+  public ResponseEntity<DiaryIndexResponse> getDiaryIndex(
       @AuthenticationPrincipal TodakUser principal,
       @RequestParam("yearMonth") @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth) {
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(diaryService.getYearMonthInfo(principal, yearMonth));
+    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getIndex(principal, yearMonth));
   }
 }

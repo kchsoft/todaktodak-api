@@ -47,7 +47,7 @@ public class DiaryRepositoryTest {
   @Test
   @DisplayName("특정 날짜에 해당되는 사용자 일기가 있음.")
   void existDiaryByDateAndMember() {
-    boolean exist = diaryRepository.existsByDate(member.getId(), diary.getDiaryCreatedAt());
+    boolean exist = diaryRepository.existsByDate(member.getId(), diary.getDiaryCreatedTime());
     assertThat(exist).as("memberID와 날짜에 해당하는 일기가 없습니다.").isTrue();
   }
 
