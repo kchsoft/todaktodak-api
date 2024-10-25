@@ -60,7 +60,7 @@ public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
     TodakUser user = (TodakUser) authentication.getPrincipal();
     var accessToken = JwtUtils.issueToken(user, ACCESS_TYPE);
     var refreshToken = JwtUtils.issueToken(user, REFRESH_TYPE);
-    var refreshCookie = CookieUtils.createValidCookie(COOKIE_KEY, refreshToken);
+    var refreshCookie = CookieUtils.createValidCookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken);
 
     response.addCookie(refreshCookie);
     response.setStatus(SC_NO_CONTENT);
