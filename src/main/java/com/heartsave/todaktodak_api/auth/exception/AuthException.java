@@ -5,7 +5,7 @@ import com.heartsave.todaktodak_api.common.exception.BaseException;
 import com.heartsave.todaktodak_api.common.exception.ErrorFieldBuilder;
 import com.heartsave.todaktodak_api.common.exception.errorspec.ErrorSpec;
 
-public class AuthException extends BaseException {
+public final class AuthException extends BaseException {
   public AuthException(ErrorSpec errorSpec, SignUpRequest dto) {
     super(
         errorSpec,

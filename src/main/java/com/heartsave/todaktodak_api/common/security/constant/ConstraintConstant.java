@@ -4,7 +4,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ConstraintConstant {
+public final class ConstraintConstant {
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
   public static final class Member {
     public static final int EMAIL_MAX_SIZE = 50;
     public static final int NICKNAME_MAX_SIZE = 50;
