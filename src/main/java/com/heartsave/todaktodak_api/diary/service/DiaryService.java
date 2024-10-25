@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -73,8 +74,10 @@ public class DiaryService {
     LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(LocalTime.MAX);
     log.info("해당 연월에 작성한 일기를 정보를 요청합니다.");
     List<DiaryIndexProjection> indexes =
-        diaryRepository.findIndexesByMemberIdAndDateTimes(
-            principal.getId(), startDateTime, endDateTime);
+        Optional.ofNullable(
+                diaryRepository.findIndexesByMemberIdAndDateTimes(
+                    principal.getId(), startDateTime, endDateTime))
+            .orElseGet(List::of);
     log.info("해당 연월에 작성한 일기를 정보를 성공적으로 가져왔습니다.");
     return DiaryIndexResponse.builder().diaryIndexes(indexes).build();
   }

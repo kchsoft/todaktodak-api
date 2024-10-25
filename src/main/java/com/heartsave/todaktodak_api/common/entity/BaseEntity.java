@@ -10,6 +10,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 @Getter
 @EntityListeners(AuditingEntityListener.class)
@@ -17,7 +19,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class BaseEntity {
 
   @CreatedDate
-  @Column(name = "created_time", updatable = false, columnDefinition = "TIMESTAMP")
+  @Column(name = "created_time", updatable = false, columnDefinition = "TIMESTAMP(3)")
+  @DateTimeFormat(iso = ISO.DATE_TIME)
   private LocalDateTime createdTime;
 
   @CreatedBy
@@ -25,7 +28,8 @@ public class BaseEntity {
   private Long createdBy;
 
   @LastModifiedDate
-  @Column(name = "updated_time", columnDefinition = "TIMESTAMP")
+  @Column(name = "updated_time", columnDefinition = "TIMESTAMP(3)")
+  @DateTimeFormat(iso = ISO.DATE_TIME)
   private LocalDateTime updatedTime;
 
   @LastModifiedBy

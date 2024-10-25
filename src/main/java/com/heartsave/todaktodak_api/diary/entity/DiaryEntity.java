@@ -26,6 +26,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 @Entity
 @Getter
@@ -70,7 +72,8 @@ public class DiaryEntity extends BaseEntity {
       name = "diary_created_time",
       nullable = false,
       updatable = false,
-      columnDefinition = "TIMESTAMP")
+      columnDefinition = "TIMESTAMP(3)")
+  @DateTimeFormat(iso = ISO.DATE_TIME)
   private LocalDateTime diaryCreatedTime;
 
   public void addAiContent(AiContentResponse response) {

@@ -4,9 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.heartsave.todaktodak_api.common.BaseTestEntity;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,6 +73,64 @@ public class DiaryRepositoryTest {
 
     falseId = member.getId() + 1;
     assertThat(diaryRepository.deleteByIds(falseId, diary.getId())).isEqualTo(0);
+  }
+
+  @Test
+  @DisplayName("멤버 ID 및 시작/끝 날짜에 해당하는 데이터 가져오기")
+  void findDiaryByMemberIdAndDates() {
+    diaryRepository.delete(diary);
+    DiaryEntity diary1 = BaseTestEntity.createDiaryNoIdWithMember(member);
+    DiaryEntity diary2 = BaseTestEntity.createDiaryNoIdWithMember(member);
+    diaryRepository.save(diary1);
+    diaryRepository.save(diary2);
+    int testYear = diary1.getDiaryCreatedTime().getYear();
+    int testMonth = diary1.getDiaryCreatedTime().getMonthValue();
+
+    LocalDateTime testStart = YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay();
+    LocalDateTime testEnd = YearMonth.of(testYear, testMonth).atEndOfMonth().atTime(LocalTime.MAX);
+
+    List<DiaryIndexProjection> resultIndex =
+        diaryRepository.findIndexesByMemberIdAndDateTimes(member.getId(), testStart, testEnd);
+    assertThat(resultIndex).as("메서드 응답이 null 입니다.").isNotNull();
+
+    DiaryIndexProjection first = resultIndex.get(0);
+    assertThat(first).as("first 인덱스 결과가 null 입니다.").isNotNull();
+    DiaryIndexProjection second = resultIndex.get(1);
+    assertThat(second).as("second 인덱스 결과가 null 입니다.").isNotNull();
+
+    assertThat(first.getId()).as("Diary1 ID와 응답 Diary ID가 서로 다릅니다.").isEqualTo(diary1.getId());
+
+    System.out.println("diary1.getDiaryCreatedTime() = " + diary1.getDiaryCreatedTime());
+    System.out.println("diary2.getDiaryCreatedTime() = " + diary2.getDiaryCreatedTime());
+    System.out.println("first.getDiaryCreatedTime() = " + first.getDiaryCreatedTime());
+    System.out.println("second.getDiaryCreatedTime() = " + second.getDiaryCreatedTime());
+
+    assertThat((first.getDiaryCreatedTime()))
+        .as("Diary1 Time과 응답 Diary Time이 서로 다릅니다.")
+        .isEqualTo(diary1.getDiaryCreatedTime());
+
+    assertThat(second.getId()).as("Diary2 ID와 응답 Diary ID가 서로 다릅니다.").isEqualTo(diary2.getId());
+
+    assertThat((second.getDiaryCreatedTime()))
+        .as("Diary2 Time과 응답 Diary Time이 서로 다릅니다.")
+        .isEqualTo(diary2.getDiaryCreatedTime());
+  }
+
+  @Test
+  @DisplayName("멤버 ID 및 시작/끝 날짜에 해당하는 데이터 가져오기 - 0건 조회")
+  void findDiaryByMemberIdAndDatesZero() {
+    diaryRepository.delete(diary);
+    int testYear = 2023;
+    int testMonth = 10;
+
+    LocalDateTime testStart = YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay();
+    LocalDateTime testEnd = YearMonth.of(testYear, testMonth).atEndOfMonth().atTime(LocalTime.MAX);
+
+    List<DiaryIndexProjection> resultIndex =
+        diaryRepository.findIndexesByMemberIdAndDateTimes(member.getId(), testStart, testEnd);
+    assertThat(resultIndex).as("메서드 응답이 null 입니다.").isNotNull();
+
+    assertThat(resultIndex.isEmpty()).as("메서드 응답 내부가 비어있지 않습니다.").isTrue();
   }
 
   @Test
