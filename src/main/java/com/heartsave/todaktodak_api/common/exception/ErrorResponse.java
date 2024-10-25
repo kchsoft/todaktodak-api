@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.common.exception;
 
+import com.heartsave.todaktodak_api.common.exception.errorspec.ErrorSpec;
 import java.util.Map;
 import lombok.*;
 
@@ -13,14 +14,10 @@ public class ErrorResponse {
 
   private static final String VALIDATION_ERROR = "VALIDATION_ERROR";
 
-  public static ErrorResponse from(ErrorSpec errorSpec, String message) {
-    return ErrorResponse.builder().title(errorSpec.name()).message(message).build();
-  }
-
   public static ErrorResponse from(ErrorSpec errorSpec) {
     return ErrorResponse.builder()
         .title(errorSpec.name())
-        .message(errorSpec.getDescription())
+        .message(errorSpec.getClientMessage())
         .build();
   }
 

@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import com.heartsave.todaktodak_api.ai.dto.AiContentResponse;
 import com.heartsave.todaktodak_api.ai.service.AiService;
 import com.heartsave.todaktodak_api.common.BaseTestEntity;
-import com.heartsave.todaktodak_api.common.exception.ErrorSpec;
+import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
@@ -83,7 +83,7 @@ public class DiaryServiceTest {
         assertThrows(
             DiaryDailyWritingLimitExceedException.class,
             () -> diaryService.write(principal, request));
-    assertThat(diaryException.getErrorSpec()).isEqualTo(ErrorSpec.LIMIT_EXCEED);
+    assertThat(diaryException.getErrorSpec()).isEqualTo(DiaryErrorSpec.DAILY_WRITING_LIMIT_EXCEED);
     log.info(diaryException.getLogMessage());
   }
 
