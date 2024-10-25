@@ -43,4 +43,20 @@ class MemberRepositoryTest {
     // Then
     assertThat(retrievedMember.isPresent()).isEqualTo(true);
   }
+
+  @Test
+  @DisplayName("이메일로 회원 조회")
+  void getMemberByEmailTest() {
+
+    // Given
+    String email = "todak@todak.com";
+    MemberEntity memberEntity = MemberEntity.builder().loginId(email).build();
+    memberRepository.save(memberEntity);
+
+    // When
+    var retrievedMember = memberRepository.findMemberEntityByLoginId(email);
+
+    // Then
+    assertThat(retrievedMember.isPresent()).isEqualTo(true);
+  }
 }
