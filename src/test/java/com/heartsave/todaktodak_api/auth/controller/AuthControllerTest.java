@@ -8,7 +8,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.auth.dto.request.LoginIdCheckRequest;
 import com.heartsave.todaktodak_api.auth.dto.request.NicknameCheckRequest;
+import com.heartsave.todaktodak_api.auth.dto.request.SignUpRequest;
+import com.heartsave.todaktodak_api.auth.exception.AuthException;
 import com.heartsave.todaktodak_api.auth.service.AuthService;
+import com.heartsave.todaktodak_api.common.exception.errorspec.AuthErrorSpec;
 import com.heartsave.todaktodak_api.config.TestSecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -77,5 +80,55 @@ class AuthControllerTest {
         .andDo(print())
         .andExpect(status().isNoContent());
     verify(authService, times(1)).isDuplicatedLoginId(any(String.class));
+  }
+
+  @Test
+  @DisplayName("회원가입 성공")
+  void signUp204Test() throws Exception {
+    // given
+    SignUpRequest request = new SignUpRequest("test@test.com", "unique", "todak", "todak!");
+    doNothing().when(authService).signUp(any(SignUpRequest.class));
+
+    // when + then
+    mockMvc
+        .perform(
+            post("/api/v1/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isNoContent());
+  }
+
+  @Test
+  @DisplayName("회원가입 실패 - 중복된 정보")
+  void signUp409Test() throws Exception {
+    // given
+    SignUpRequest request = new SignUpRequest("test@test.com", "unique", "todak", "todak!");
+    doThrow(new AuthException(AuthErrorSpec.DUPLICATED_INFORMATION, request))
+        .when(authService)
+        .signUp(any(SignUpRequest.class));
+
+    // when + then
+    mockMvc
+        .perform(
+            post("/api/v1/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isConflict());
+  }
+
+  @Test
+  @DisplayName("회원가입 실패 - 잘못된 입력값")
+  void signUpInvalidation400Test() throws Exception {
+    // given
+    // 잘못된 이메일
+    SignUpRequest request = new SignUpRequest("invalid-email", "unique", "todak", "todak!");
+
+    // when & then
+    mockMvc
+        .perform(
+            post("/api/v1/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isBadRequest());
   }
 }
