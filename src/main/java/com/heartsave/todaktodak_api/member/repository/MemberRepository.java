@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
-  Optional<MemberEntity> findMemberByLoginId(String loginId);
+  Optional<MemberEntity> findMemberEntityByLoginId(String loginId);
 
-  Optional<MemberEntity> findMemberByNickname(String nickname);
+  Optional<MemberEntity> findMemberEntityByNickname(String nickname);
+
+  Optional<MemberEntity> findMemberEntityByEmail(String email);
 }
