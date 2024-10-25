@@ -6,7 +6,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
 import com.heartsave.todaktodak_api.auth.dto.request.LoginIdCheckRequest;
-import com.heartsave.todaktodak_api.auth.dto.response.NicknameCheckRequest;
+import com.heartsave.todaktodak_api.auth.dto.request.NicknameCheckRequest;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.util.Optional;

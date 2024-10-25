@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.auth.dto.request.LoginIdCheckRequest;
-import com.heartsave.todaktodak_api.auth.dto.response.NicknameCheckRequest;
+import com.heartsave.todaktodak_api.auth.dto.request.NicknameCheckRequest;
 import com.heartsave.todaktodak_api.auth.service.AuthService;
 import com.heartsave.todaktodak_api.config.TestSecurityConfig;
 import org.junit.jupiter.api.DisplayName;
