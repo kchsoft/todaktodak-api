@@ -2,6 +2,7 @@ package com.heartsave.todaktodak_api.auth.controller;
 
 import com.heartsave.todaktodak_api.auth.dto.request.LoginIdCheckRequest;
 import com.heartsave.todaktodak_api.auth.dto.request.NicknameCheckRequest;
+import com.heartsave.todaktodak_api.auth.dto.request.SignUpRequest;
 import com.heartsave.todaktodak_api.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,7 +33,8 @@ public class AuthController {
       })
   @PostMapping("/nickname")
   public ResponseEntity<Void> checkNickname(@Valid @RequestBody NicknameCheckRequest dto) {
-    if (!authService.isDuplicatedNickname(dto)) return ResponseEntity.noContent().build();
+    if (!authService.isDuplicatedNickname(dto.nickname()))
+      return ResponseEntity.noContent().build();
     return ResponseEntity.status(HttpStatus.CONFLICT).build();
   }
 
@@ -45,7 +47,20 @@ public class AuthController {
       })
   @PostMapping("/login-id")
   public ResponseEntity<Void> checkLoginId(@Valid @RequestBody LoginIdCheckRequest dto) {
-    if (!authService.isDuplicatedLoginId(dto)) return ResponseEntity.noContent().build();
+    if (!authService.isDuplicatedLoginId(dto.loginId())) return ResponseEntity.noContent().build();
     return ResponseEntity.status(HttpStatus.CONFLICT).build();
+  }
+
+  @Operation(summary = "회원가입")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "204", description = "회원가입 성공"),
+        @ApiResponse(responseCode = "400", description = "유효성 검사 실패"),
+        @ApiResponse(responseCode = "409", description = "중복 정보 존재")
+      })
+  @PostMapping("/signup")
+  public ResponseEntity<Void> signUp(@Valid @RequestBody SignUpRequest dto) {
+    authService.signUp(dto);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }
