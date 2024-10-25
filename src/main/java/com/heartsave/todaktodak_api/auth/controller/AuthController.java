@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.auth.controller;
 
-import com.heartsave.todaktodak_api.auth.dto.LoginIdCheckRequest;
-import com.heartsave.todaktodak_api.auth.dto.NicknameCheckRequest;
+import com.heartsave.todaktodak_api.auth.dto.request.LoginIdCheckRequest;
+import com.heartsave.todaktodak_api.auth.dto.response.NicknameCheckRequest;
 import com.heartsave.todaktodak_api.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

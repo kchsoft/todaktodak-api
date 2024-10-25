@@ -12,13 +12,12 @@ import org.springframework.security.web.SecurityFilterChain;
 public class TestSecurityConfig {
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
         .csrf(AbstractHttpConfigurer::disable) // 테스트에서는 CSRF 비활성화
         .cors(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
-        .oauth2Login(AbstractHttpConfigurer::disable)
         .build();
   }
 }
