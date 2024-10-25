@@ -75,10 +75,24 @@ public class DiaryController {
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
+  @Operation(summary = "일기 목록 조회")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "일기 목록 조회 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청")
+      })
   @GetMapping
   public ResponseEntity<DiaryIndexResponse> getDiaryIndex(
       @AuthenticationPrincipal TodakUser principal,
-      @RequestParam("yearMonth") @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth) {
+      @Parameter(
+              name = "yearMonth",
+              description = "조회할 연월",
+              example = "2024-10",
+              required = true,
+              schema = @Schema(type = "string", format = "yyyy-MM"))
+          @RequestParam("yearMonth")
+          @DateTimeFormat(pattern = "yyyy-MM")
+          YearMonth yearMonth) {
     return ResponseEntity.status(HttpStatus.OK).body(diaryService.getIndex(principal, yearMonth));
   }
 }
