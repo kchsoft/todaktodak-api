@@ -33,14 +33,15 @@ class AuthServiceTest {
   @DisplayName("로그인 아이디 중복 확인")
   void isDuplicatedLoginId() {
     // given
-    when(memberRepository.findMemberByLoginId(anyString())).thenReturn(Optional.of(memberEntity));
+    when(memberRepository.findMemberEntityByLoginId(anyString()))
+        .thenReturn(Optional.of(memberEntity));
 
     // when
     LoginIdCheckRequest dto = new LoginIdCheckRequest(LOGIN_ID);
-    boolean isDuplicated = authService.isDuplicatedLoginId(dto);
+    boolean isDuplicated = authService.isDuplicatedLoginId(dto.loginId());
 
     // then
-    verify(memberRepository, times(1)).findMemberByLoginId(anyString());
+    verify(memberRepository, times(1)).findMemberEntityByLoginId(anyString());
     assertThat(isDuplicated).isEqualTo(true);
   }
 
@@ -48,14 +49,15 @@ class AuthServiceTest {
   @DisplayName("닉네임 중복 확인")
   void checkNicknameDuplicationTest() {
     // given
-    when(memberRepository.findMemberByNickname(anyString())).thenReturn(Optional.of(memberEntity));
+    when(memberRepository.findMemberEntityByNickname(anyString()))
+        .thenReturn(Optional.of(memberEntity));
 
     // when
     NicknameCheckRequest dto = new NicknameCheckRequest(NICKNAME);
-    boolean isDuplicated = authService.isDuplicatedNickname(dto);
+    boolean isDuplicated = authService.isDuplicatedNickname(dto.nickname());
 
     // then
-    verify(memberRepository, times(1)).findMemberByNickname(anyString());
+    verify(memberRepository, times(1)).findMemberEntityByNickname(anyString());
     assertThat(isDuplicated).isEqualTo(true);
   }
 }

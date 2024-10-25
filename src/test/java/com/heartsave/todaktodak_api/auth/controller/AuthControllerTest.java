@@ -44,7 +44,7 @@ class AuthControllerTest {
     NicknameCheckRequest request = new NicknameCheckRequest("TEST_NICKNAME");
 
     // when
-    when(authService.isDuplicatedNickname(any(NicknameCheckRequest.class))).thenReturn(false);
+    when(authService.isDuplicatedNickname(any(String.class))).thenReturn(false);
 
     // then
     mockMvc
@@ -56,7 +56,7 @@ class AuthControllerTest {
         .andExpect(status().isNoContent());
 
     // Mock 호출 확인
-    verify(authService).isDuplicatedNickname(any(NicknameCheckRequest.class));
+    verify(authService).isDuplicatedNickname(any(String.class));
   }
 
   @Test
@@ -66,7 +66,7 @@ class AuthControllerTest {
     LoginIdCheckRequest request = new LoginIdCheckRequest("TEST_LOGIN_ID");
 
     // when
-    when(authService.isDuplicatedLoginId(any(LoginIdCheckRequest.class))).thenReturn(false);
+    when(authService.isDuplicatedLoginId(any(String.class))).thenReturn(false);
 
     // then
     mockMvc
@@ -76,6 +76,6 @@ class AuthControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
         .andDo(print())
         .andExpect(status().isNoContent());
-    verify(authService, times(1)).isDuplicatedLoginId(any(LoginIdCheckRequest.class));
+    verify(authService, times(1)).isDuplicatedLoginId(any(String.class));
   }
 }

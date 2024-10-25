@@ -22,7 +22,7 @@ class MemberRepositoryTest {
     memberRepository.save(memberEntity);
 
     // When
-    var retrievedMember = memberRepository.findMemberByLoginId(loginId);
+    var retrievedMember = memberRepository.findMemberEntityByLoginId(loginId);
 
     // Then
     assertThat(retrievedMember.isPresent()).isEqualTo(true);
@@ -38,7 +38,7 @@ class MemberRepositoryTest {
     memberRepository.save(memberEntity);
 
     // When
-    var retrievedMember = memberRepository.findMemberByNickname(nickname);
+    var retrievedMember = memberRepository.findMemberEntityByNickname(nickname);
 
     // Then
     assertThat(retrievedMember.isPresent()).isEqualTo(true);
