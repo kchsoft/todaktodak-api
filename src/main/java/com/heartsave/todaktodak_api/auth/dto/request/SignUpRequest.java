@@ -4,11 +4,14 @@ import static com.heartsave.todaktodak_api.common.security.constant.ConstraintCo
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Schema(description = "회원가입 요청 데이터")
 public record SignUpRequest(
-    @NotBlank(message = "Blank data") @Size(max = EMAIL_MAX_SIZE, message = "Exceed size")
+    @NotBlank(message = "Blank data")
+        @Pattern(regexp = "^[^@.]+@[^@.]+\\.[^@.]+$", message = "올바른 이메일 형식이 아닙니다")
+        @Size(max = EMAIL_MAX_SIZE, message = "Exceed size")
         String email,
     @NotBlank(message = "Blank data") @Size(max = NICKNAME_MAX_SIZE, message = "Exceed size")
         String nickname,
