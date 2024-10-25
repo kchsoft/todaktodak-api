@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.BaseTestEntity;
+import com.heartsave.todaktodak_api.common.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
@@ -25,17 +26,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 @WebMvcTest(
     controllers = DiaryController.class,
-    excludeAutoConfiguration = {SecurityAutoConfiguration.class})
+    excludeFilters = {
+      @ComponentScan.Filter(
+          type = FilterType.ASSIGNABLE_TYPE,
+          classes = {OncePerRequestFilter.class})
+    })
+@AutoConfigureMockMvc(addFilters = false)
 public class DiaryControllerTest {
 
   @MockBean private DiaryService diaryService;
@@ -44,10 +53,12 @@ public class DiaryControllerTest {
 
   @Test
   @DisplayName("일기 작성 요청 성공")
+  @WithMockTodakUser
   void writeDiarySuccess() throws Exception {
     DiaryWriteRequest request =
         new DiaryWriteRequest(
             LocalDateTime.now(), DiaryEmotion.JOY, BaseTestEntity.DUMMY_STRING_CONTENT);
+
     final String AI_COMMENT = "this is test ai comment";
 
     when(diaryService.write(any(TodakUser.class), any(DiaryWriteRequest.class)))
@@ -69,6 +80,7 @@ public class DiaryControllerTest {
 
   @ParameterizedTest
   @DisplayName("일기 삭제 요청 성공")
+  @WithMockTodakUser
   @ValueSource(longs = {1L, Long.MAX_VALUE, 25234L})
   void deleteDiarySuccess(Long diaryId) throws Exception {
     doNothing().when(diaryService).delete(any(TodakUser.class), anyLong());

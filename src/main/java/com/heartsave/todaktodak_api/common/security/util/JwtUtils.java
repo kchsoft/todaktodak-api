@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.common.security.component;
+package com.heartsave.todaktodak_api.common.security.util;
 
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
@@ -6,33 +6,31 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
 import java.util.Date;
 import javax.crypto.SecretKey;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class JwtUtils {
 
-  private final String ROLE = "role";
-  private final String TYPE = "type";
-  private final String USERNAME = "username";
+  private static final String ROLE = "role";
+  private static final String TYPE = "type";
+  private static final String USERNAME = "username";
+  private static String JWT_SECRET_KEY;
+  private static Long ACCESS_TOKEN_EXPIRE_TIME_MILLI_SECOND;
+  private static Long REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND;
+  private static SecretKey key;
 
-  @Value("${jwt.secret-key}")
-  private String JWT_SECRET_KEY;
+  private JwtUtils(
+      @Value("${jwt.secret-key}") String JWT_SECRET_KEY,
+      @Value("${jwt.access-expire-time}") Long ACCESS_TOKEN_EXPIRE_TIME_MILLI_SECOND,
+      @Value("${jwt.refresh-expire-time}") Long REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND) {
+    var keyBytes = Decoders.BASE64.decode(JWT_SECRET_KEY);
+    key = Keys.hmacShaKeyFor(keyBytes);
+  }
 
-  @Value("${jwt.access-expire-time}")
-  private Long ACCESS_TOKEN_EXPIRE_TIME_MILLI_SECOND;
-
-  @Value("${jwt.refresh-expire-time}")
-  private Long REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND;
-
-  private SecretKey key;
-
-  public String issueToken(TodakUser user, String type) {
+  public static String issueToken(TodakUser user, String type) {
     long now = System.currentTimeMillis();
     long expireTime =
         type.equals(JwtConstant.ACCESS_TYPE)
@@ -49,29 +47,19 @@ public class JwtUtils {
         .compact();
   }
 
-  private String extractRole(String token) {
+  private static String extractRole(String token) {
     return extractAllClaims(token).get(ROLE, String.class);
   }
 
-  public String extractType(String token) {
+  public static String extractType(String token) {
     return extractAllClaims(token).get(TYPE, String.class);
   }
 
-  public String extractSubject(String token) {
+  public static String extractSubject(String token) {
     return extractAllClaims(token).getSubject();
   }
 
-  public Claims extractAllClaims(String token) {
+  public static Claims extractAllClaims(String token) {
     return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
-  }
-
-  @PostConstruct
-  private void init() {
-    initKey();
-  }
-
-  private void initKey() {
-    var keyBytes = Decoders.BASE64.decode(JWT_SECRET_KEY);
-    key = Keys.hmacShaKeyFor(keyBytes);
   }
 }
