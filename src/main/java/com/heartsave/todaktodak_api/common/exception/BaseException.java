@@ -19,7 +19,7 @@ public abstract class BaseException extends RuntimeException {
 
   public String getLogMessage() {
     StringJoiner joiner = new StringJoiner(", ", "[ ", " ]");
-    errorField.getBy().forEach((key, value) -> joiner.add(key + "=" + value));
+    errorField.get().forEach((key, value) -> joiner.add(key + "=" + value));
     return String.format(
         "[ERROR] %s : %s = %s %s",
         errorSpec.getCode(), errorSpec.name(), errorSpec.getDebugMessage(), joiner);

@@ -15,11 +15,11 @@ public class ErrorField {
     return this;
   }
 
-  public Map<String, Object> getBy() {
+  public Map<String, Object> get() {
     return fields;
   }
 
-  public Object getBy(String key) {
+  public Object get(String key) {
     return fields.get(key);
   }
 }
