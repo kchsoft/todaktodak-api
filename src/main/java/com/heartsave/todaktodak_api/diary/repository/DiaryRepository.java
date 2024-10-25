@@ -26,9 +26,9 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
 
   @Query(
       value =
-          "SELECT d.id, d.diaryCreatedTime FROM DiaryEntity d WHERE d.memberEntity.id = :memberId AND d.diaryCreatedTime BETWEEN :startDate AND :endDate")
-  List<DiaryIndexProjection> findIndexesByMemberIdAndDates(
+          "SELECT d.id, d.diaryCreatedTime FROM DiaryEntity d WHERE d.memberEntity.id = :memberId AND d.diaryCreatedTime BETWEEN :startDateTime AND :endDateTime")
+  List<DiaryIndexProjection> findIndexesByMemberIdAndDateTimes(
       @Param("memberId") Long memberId,
-      @Param("startDate") LocalDateTime startDate,
-      @Param("endDate") LocalDateTime endDate);
+      @Param("startDateTime") LocalDateTime startDateTime,
+      @Param("endDateTime") LocalDateTime endDateTime);
 }

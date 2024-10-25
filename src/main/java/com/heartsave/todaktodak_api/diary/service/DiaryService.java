@@ -9,6 +9,7 @@ import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
@@ -18,6 +19,7 @@ import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -67,12 +69,14 @@ public class DiaryService {
   }
 
   public DiaryIndexResponse getIndex(TodakUser principal, YearMonth yearMonth) {
-    LocalDateTime startDate = yearMonth.atDay(1).atStartOfDay();
-    LocalDateTime endDate = yearMonth.atEndOfMonth().atTime(LocalTime.MAX);
-    return DiaryIndexResponse.builder()
-        .diaryIndexes(
-            diaryRepository.findIndexesByMemberIdAndDates(principal.getId(), startDate, endDate))
-        .build();
+    LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
+    LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(LocalTime.MAX);
+    log.info("해당 연월에 작성한 일기를 정보를 요청합니다.");
+    List<DiaryIndexProjection> indexes =
+        diaryRepository.findIndexesByMemberIdAndDateTimes(
+            principal.getId(), startDateTime, endDateTime);
+    log.info("해당 연월에 작성한 일기를 정보를 성공적으로 가져왔습니다.");
+    return DiaryIndexResponse.builder().diaryIndexes(indexes).build();
   }
 
   private DiaryEntity createDiaryEntity(TodakUser principal, DiaryWriteRequest request) {
