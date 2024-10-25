@@ -6,7 +6,7 @@ import java.util.Map;
 public class ErrorField {
   private final Map<String, Object> fields;
 
-  public ErrorField() {
+  protected ErrorField() {
     this.fields = new HashMap<>();
   }
 
