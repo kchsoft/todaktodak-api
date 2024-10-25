@@ -46,4 +46,6 @@ public class MemberEntity extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   private TodakRole role;
+
+  private Integer characterSeed;
 }
