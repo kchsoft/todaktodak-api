@@ -6,8 +6,10 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
@@ -15,6 +17,10 @@ import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,7 +39,7 @@ public class DiaryService {
   public DiaryWriteResponse write(TodakUser principal, DiaryWriteRequest request) {
     DiaryEntity diary = createDiaryEntity(principal, request);
     Long memberId = diary.getMemberEntity().getId();
-    LocalDateTime diaryCreatedDate = diary.getDiaryCreatedAt();
+    LocalDateTime diaryCreatedDate = diary.getDiaryCreatedTime();
 
     if (diaryRepository.existsByDate(memberId, diaryCreatedDate)) {
       throw new DiaryDailyWritingLimitExceedException(
@@ -63,6 +69,19 @@ public class DiaryService {
     return;
   }
 
+  public DiaryIndexResponse getIndex(TodakUser principal, YearMonth yearMonth) {
+    LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
+    LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(LocalTime.MAX);
+    log.info("해당 연월에 작성한 일기를 정보를 요청합니다.");
+    List<DiaryIndexProjection> indexes =
+        Optional.ofNullable(
+                diaryRepository.findIndexesByMemberIdAndDateTimes(
+                    principal.getId(), startDateTime, endDateTime))
+            .orElseGet(List::of);
+    log.info("해당 연월에 작성한 일기를 정보를 성공적으로 가져왔습니다.");
+    return DiaryIndexResponse.builder().diaryIndexes(indexes).build();
+  }
+
   private DiaryEntity createDiaryEntity(TodakUser principal, DiaryWriteRequest request) {
     Long memberId = principal.getId();
     MemberEntity member =
@@ -73,7 +92,7 @@ public class DiaryService {
         .memberEntity(member)
         .emotion(request.getEmotion())
         .content(request.getContent())
-        .diaryCreatedAt((request.getDate()))
+        .diaryCreatedTime((request.getDate()))
         .build();
   }
 }

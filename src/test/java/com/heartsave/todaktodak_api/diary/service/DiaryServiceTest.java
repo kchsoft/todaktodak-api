@@ -15,10 +15,13 @@ import com.heartsave.todaktodak_api.ai.service.AiService;
 import com.heartsave.todaktodak_api.common.BaseTestEntity;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.diary.common.TestDiaryObjectFactory;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryException;
@@ -26,6 +29,10 @@ import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
@@ -40,33 +47,34 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class DiaryServiceTest {
 
-  @Mock private MemberRepository memberRepository;
-  @Mock private DiaryRepository diaryRepository;
-  @Mock private AiService aiService;
+  @Mock private MemberRepository mockMemberRepository;
+  @Mock private DiaryRepository mockDiaryRepository;
+  @Mock private AiService mockAiService;
   @InjectMocks private DiaryService diaryService;
   private static TodakUser principal;
-  private static DiaryWriteRequest request;
   private static MemberEntity member;
   private static DiaryEntity diary;
-  private String AI_COMMENT = "this is test ai comment";
   private static final LocalDateTime FIXED_DATE = LocalDateTime.of(2024, 10, 21, 14, 14);
 
   @BeforeAll
   static void allSetup() {
-    principal = mock(TodakUser.class);
-    request = new DiaryWriteRequest(FIXED_DATE, DiaryEmotion.JOY, "test diary content");
-
     member = BaseTestEntity.createMember();
     diary = BaseTestEntity.createDiaryWithMember(member);
+
+    principal = mock(TodakUser.class);
     when(principal.getId()).thenReturn(member.getId());
   }
 
   @Test
   @DisplayName("일기 작성 성공")
   void diaryWritingSuccess() {
-    when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-    when(diaryRepository.existsByDate(anyLong(), any(LocalDateTime.class))).thenReturn(false);
-    when(aiService.callAiContent(any(DiaryEntity.class)))
+    DiaryWriteRequest request =
+        new DiaryWriteRequest(FIXED_DATE, DiaryEmotion.JOY, "test diary content");
+    String AI_COMMENT = "this is test ai comment";
+
+    when(mockMemberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+    when(mockDiaryRepository.existsByDate(anyLong(), any(LocalDateTime.class))).thenReturn(false);
+    when(mockAiService.callAiContent(any(DiaryEntity.class)))
         .thenReturn(AiContentResponse.builder().aiComment("this is test ai comment").build());
 
     DiaryWriteResponse write = diaryService.write(principal, request);
@@ -76,8 +84,10 @@ public class DiaryServiceTest {
   @Test
   @DisplayName("하루 일기 작성 횟수 초과 에러 발생")
   void dailyDiaryWritingLimitException() {
-    when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-    when(diaryRepository.existsByDate(anyLong(), any(LocalDateTime.class))).thenReturn(true);
+    DiaryWriteRequest request =
+        new DiaryWriteRequest(FIXED_DATE, DiaryEmotion.JOY, "test diary content");
+    when(mockMemberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+    when(mockDiaryRepository.existsByDate(anyLong(), any(LocalDateTime.class))).thenReturn(true);
 
     DiaryException diaryException =
         assertThrows(
@@ -90,19 +100,19 @@ public class DiaryServiceTest {
   @Test
   @DisplayName("일기 삭제 요청 성공")
   void diaryDeleteSuccess() {
-    when(diaryRepository.deleteByIds(anyLong(), anyLong())).thenReturn(1);
+    when(mockDiaryRepository.deleteByIds(anyLong(), anyLong())).thenReturn(1);
     assertDoesNotThrow(
         () -> {
           diaryService.delete(principal, diary.getId());
         },
         "예상치 못한 예외가 발생했습니다.");
-    verify(diaryRepository, times(1)).deleteByIds(anyLong(), anyLong());
+    verify(mockDiaryRepository, times(1)).deleteByIds(anyLong(), anyLong());
   }
 
   @Test
   @DisplayName("일기 삭제 요청 실패")
   void diaryDeleteFail() {
-    when(diaryRepository.deleteByIds(anyLong(), anyLong())).thenReturn(0);
+    when(mockDiaryRepository.deleteByIds(anyLong(), anyLong())).thenReturn(0);
     DiaryException diaryException =
         assertThrows(
             DiaryDeleteNotFoundException.class,
@@ -110,7 +120,66 @@ public class DiaryServiceTest {
               diaryService.delete(principal, diary.getId() + 1L);
             },
             "Diary Delete Not Found 예외가 발생하지 않았습니다.");
-    verify(diaryRepository, times(1)).deleteByIds(anyLong(), anyLong());
+    verify(mockDiaryRepository, times(1)).deleteByIds(anyLong(), anyLong());
     log.info(diaryException.getLogMessage());
+  }
+
+  @Test
+  @DisplayName("연월 일기 작성 현황 조회 1건 이상 성공")
+  void yearMonthMoreThanOneSuccess() {
+    int testYear = 2024;
+    int testMonth = 3;
+    LocalDateTime testStart = YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay();
+    LocalDateTime testEnd = YearMonth.of(testYear, testMonth).atEndOfMonth().atTime(LocalTime.MAX);
+    List<DiaryIndexProjection> testProjection =
+        TestDiaryObjectFactory.getTestDiaryIndexProjections_2024_03_Data_Of_2();
+
+    when(mockDiaryRepository.findIndexesByMemberIdAndDateTimes(
+            principal.getId(), testStart, testEnd))
+        .thenReturn(testProjection);
+
+    DiaryIndexResponse indexes =
+        diaryService.getIndex(principal, YearMonth.of(testYear, testMonth));
+
+    List<DiaryIndexProjection> responseIndexes = indexes.getDiaryIndexes();
+    DiaryIndexProjection first = responseIndexes.get(0);
+    DiaryIndexProjection second = responseIndexes.get(1);
+
+    assertThat(first.getId())
+        .as("설정 Diary ID와 응답 DiaryID가 서로 다릅니다.")
+        .isEqualTo(testProjection.get(0).getId());
+
+    assertThat((first.getDiaryCreatedTime()))
+        .as("설정 Diary Time과 응답 Diary Time이 서로 다릅니다.")
+        .isEqualTo(testProjection.get(0).getDiaryCreatedTime());
+
+    assertThat(second.getId())
+        .as("설정 Diary ID와 응답 DiaryID가 서로 다릅니다.")
+        .isEqualTo(testProjection.get(1).getId());
+
+    assertThat((second.getDiaryCreatedTime()))
+        .as("설정 Diary Time과 응답 Diary Time이 서로 다릅니다.")
+        .isEqualTo(testProjection.get(1).getDiaryCreatedTime());
+  }
+
+  @Test
+  @DisplayName("연월 일기 작성 현황 조회 0건 성공")
+  void yearMonthZeroSuccess() {
+    int testYear = 2024;
+    int testMonth = 2;
+    LocalDateTime testStart = YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay();
+    LocalDateTime testEnd = YearMonth.of(testYear, testMonth).atEndOfMonth().atTime(LocalTime.MAX);
+
+    when(mockDiaryRepository.findIndexesByMemberIdAndDateTimes(
+            principal.getId(), testStart, testEnd))
+        .thenReturn(new ArrayList<>());
+
+    DiaryIndexResponse indexes =
+        diaryService.getIndex(principal, YearMonth.of(testYear, testMonth));
+
+    List<DiaryIndexProjection> responseIndexes = indexes.getDiaryIndexes();
+    System.out.println("responseIndexes = " + responseIndexes);
+    assertThat(responseIndexes).as("응답이 null 입니다.").isNotNull();
+    assertThat(responseIndexes.size()).as("응답 내용의 크기가 0이 아닙니다.").isEqualTo(0);
   }
 }
