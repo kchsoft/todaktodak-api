@@ -100,10 +100,8 @@ public class DiaryRepositoryTest {
 
     assertThat(first.getId()).as("Diary1 ID와 응답 Diary ID가 서로 다릅니다.").isEqualTo(diary1.getId());
 
-    System.out.println("diary1.getDiaryCreatedTime() = " + diary1.getDiaryCreatedTime());
-    System.out.println("diary2.getDiaryCreatedTime() = " + diary2.getDiaryCreatedTime());
-    System.out.println("first.getDiaryCreatedTime() = " + first.getDiaryCreatedTime());
-    System.out.println("second.getDiaryCreatedTime() = " + second.getDiaryCreatedTime());
+    log.info("from Java LocalDateTime Serialize = {}", diary1.getDiaryCreatedTime());
+    log.info("from RDB TIMESTAMP Serialize = {}", first.getDiaryCreatedTime());
 
     assertThat((first.getDiaryCreatedTime()))
         .as("Diary1 Time과 응답 Diary Time이 서로 다릅니다.")
