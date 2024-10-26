@@ -86,6 +86,7 @@ public class DiaryService {
 
   public DiaryViewDetailResponse getDiary(TodakUser principal, LocalDate requestDate) {
     Long memberId = principal.getId();
+    log.info("사용자의 나의 일기 정보를 요청합니다.");
     DiaryEntity diary =
         diaryRepository
             .findByMemberIdAndDate(memberId, requestDate)
@@ -95,6 +96,8 @@ public class DiaryService {
                         DiaryErrorSpec.DIARY_NOT_FOUND, memberId, requestDate));
     DiaryReactionCountProjection reactionCount =
         diaryRepository.findReactionCountById(diary.getId()).get();
+    log.info("사용자의 나의 일기 정보를 성공적으로 가져왔습니다.");
+
     return DiaryViewDetailResponse.builder()
         .diaryId(diary.getId())
         .emotion(diary.getEmotion())
