@@ -11,8 +11,10 @@ import com.heartsave.todaktodak_api.diary.dto.response.DiaryViewDetailResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
+import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
@@ -22,7 +24,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -76,16 +77,34 @@ public class DiaryService {
     LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(LocalTime.MAX);
     log.info("해당 연월에 작성한 일기를 정보를 요청합니다.");
     List<DiaryIndexProjection> indexes =
-        Optional.ofNullable(
-                diaryRepository.findIndexesByMemberIdAndDateTimes(
-                    principal.getId(), startDateTime, endDateTime))
+        diaryRepository
+            .findIndexesByMemberIdAndDateTimes(principal.getId(), startDateTime, endDateTime)
             .orElseGet(List::of);
     log.info("해당 연월에 작성한 일기를 정보를 성공적으로 가져왔습니다.");
     return DiaryIndexResponse.builder().diaryIndexes(indexes).build();
   }
 
   public DiaryViewDetailResponse getDiary(TodakUser principal, LocalDate requestDate) {
-    return DiaryViewDetailResponse.builder().build();
+    Long memberId = principal.getId();
+    DiaryEntity diary =
+        diaryRepository
+            .findByMemberIdAndDate(memberId, requestDate)
+            .orElseThrow(
+                () ->
+                    new DiaryNotFoundException(
+                        DiaryErrorSpec.DIARY_NOT_FOUND, memberId, requestDate));
+    DiaryReactionCountProjection reactionCount =
+        diaryRepository.findReactionCountById(diary.getId()).get();
+    return DiaryViewDetailResponse.builder()
+        .diaryId(diary.getId())
+        .emotion(diary.getEmotion())
+        .content(diary.getContent())
+        .webtoonImageUrl(diary.getWebtoonImageUrl())
+        .bgmUrl(diary.getBgmUrl())
+        .aiComment(diary.getAiComment())
+        .date(diary.getDiaryCreatedTime().toLocalDate())
+        .reactionCount(reactionCount)
+        .build();
   }
 
   private DiaryEntity createDiaryEntity(TodakUser principal, DiaryWriteRequest request) {

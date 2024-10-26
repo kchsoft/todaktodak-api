@@ -31,7 +31,6 @@ import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -136,7 +135,7 @@ public class DiaryServiceTest {
 
     when(mockDiaryRepository.findIndexesByMemberIdAndDateTimes(
             principal.getId(), testStart, testEnd))
-        .thenReturn(testProjection);
+        .thenReturn(Optional.of(testProjection));
 
     DiaryIndexResponse indexes =
         diaryService.getIndex(principal, YearMonth.of(testYear, testMonth));
@@ -172,7 +171,7 @@ public class DiaryServiceTest {
 
     when(mockDiaryRepository.findIndexesByMemberIdAndDateTimes(
             principal.getId(), testStart, testEnd))
-        .thenReturn(new ArrayList<>());
+        .thenReturn(Optional.empty());
 
     DiaryIndexResponse indexes =
         diaryService.getIndex(principal, YearMonth.of(testYear, testMonth));

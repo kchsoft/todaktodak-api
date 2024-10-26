@@ -90,7 +90,9 @@ public class DiaryRepositoryTest {
     LocalDateTime testEnd = YearMonth.of(testYear, testMonth).atEndOfMonth().atTime(LocalTime.MAX);
 
     List<DiaryIndexProjection> resultIndex =
-        diaryRepository.findIndexesByMemberIdAndDateTimes(member.getId(), testStart, testEnd);
+        diaryRepository
+            .findIndexesByMemberIdAndDateTimes(member.getId(), testStart, testEnd)
+            .orElseGet(List::of);
     assertThat(resultIndex).as("메서드 응답이 null 입니다.").isNotNull();
 
     DiaryIndexProjection first = resultIndex.get(0);
@@ -125,7 +127,9 @@ public class DiaryRepositoryTest {
     LocalDateTime testEnd = YearMonth.of(testYear, testMonth).atEndOfMonth().atTime(LocalTime.MAX);
 
     List<DiaryIndexProjection> resultIndex =
-        diaryRepository.findIndexesByMemberIdAndDateTimes(member.getId(), testStart, testEnd);
+        diaryRepository
+            .findIndexesByMemberIdAndDateTimes(member.getId(), testStart, testEnd)
+            .orElseGet(List::of);
     assertThat(resultIndex).as("메서드 응답이 null 입니다.").isNotNull();
 
     assertThat(resultIndex.isEmpty()).as("메서드 응답 내부가 비어있지 않습니다.").isTrue();
