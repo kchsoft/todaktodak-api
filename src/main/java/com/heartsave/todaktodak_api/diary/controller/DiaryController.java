@@ -3,6 +3,7 @@ package com.heartsave.todaktodak_api.diary.controller;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryViewDetailResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.service.DiaryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PastOrPresent;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -94,5 +97,13 @@ public class DiaryController {
           @DateTimeFormat(pattern = "yyyy-MM")
           YearMonth yearMonth) {
     return ResponseEntity.status(HttpStatus.OK).body(diaryService.getIndex(principal, yearMonth));
+  }
+
+  @GetMapping("/detail")
+  public ResponseEntity<DiaryViewDetailResponse> getDiaryDetail(
+      @AuthenticationPrincipal TodakUser principal,
+      @Valid @PastOrPresent(message = "현재 날짜 이전의 일기만 조회가 가능합니다.") @RequestParam("date")
+          LocalDate requestDate) {
+    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getDiary(principal, requestDate));
   }
 }

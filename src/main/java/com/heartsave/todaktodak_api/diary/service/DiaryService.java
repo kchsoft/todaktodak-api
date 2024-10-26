@@ -7,6 +7,7 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryViewDetailResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
@@ -16,6 +17,7 @@ import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
@@ -80,6 +82,10 @@ public class DiaryService {
             .orElseGet(List::of);
     log.info("해당 연월에 작성한 일기를 정보를 성공적으로 가져왔습니다.");
     return DiaryIndexResponse.builder().diaryIndexes(indexes).build();
+  }
+
+  public DiaryViewDetailResponse getDiary(TodakUser principal, LocalDate requestDate) {
+    return DiaryViewDetailResponse.builder().build();
   }
 
   private DiaryEntity createDiaryEntity(TodakUser principal, DiaryWriteRequest request) {
