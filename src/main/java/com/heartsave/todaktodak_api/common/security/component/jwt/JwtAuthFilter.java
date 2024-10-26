@@ -31,11 +31,12 @@ public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
   private final AuthenticationManager authenticationManager;
   private final ObjectMapper objectMapper;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private static final String LOGIN_URL = "/api/v1/auth/login";
 
   public JwtAuthFilter(AuthenticationManager authenticationManager, ObjectMapper objectMapper) {
     this.authenticationManager = authenticationManager;
     this.objectMapper = objectMapper;
-    setFilterProcessesUrl("/api/v1/auth/login");
+    setFilterProcessesUrl(LOGIN_URL);
   }
 
   @Override

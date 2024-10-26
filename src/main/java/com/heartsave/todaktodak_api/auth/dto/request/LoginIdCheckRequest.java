@@ -1,5 +1,7 @@
 package com.heartsave.todaktodak_api.auth.dto.request;
 
+import static com.heartsave.todaktodak_api.common.security.constant.ConstraintConstant.Member.LOGIN_ID_MAX_SIZE;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -8,5 +10,5 @@ import jakarta.validation.constraints.Size;
 public record LoginIdCheckRequest(
     @Schema(example = "todak", description = "최대 30자")
         @NotBlank(message = "Blank data")
-        @Size(max = 30, message = "Exceed size")
+        @Size(max = LOGIN_ID_MAX_SIZE, message = "Exceed size")
         String loginId) {}

@@ -18,7 +18,7 @@ public class TodakUserDetailsService implements UserDetailsService {
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     MemberEntity memberEntity =
         memberRepository
-            .findMemberByLoginId(username)
+            .findMemberEntityByLoginId(username)
             .orElseThrow(() -> new UsernameNotFoundException("USER NOT FOUND"));
     return TodakUser.from(memberEntity);
   }
