@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "일기장", description = "나의 일기장 API")
+@Tag(name = "나의 일기장", description = "나의 일기장 API")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
