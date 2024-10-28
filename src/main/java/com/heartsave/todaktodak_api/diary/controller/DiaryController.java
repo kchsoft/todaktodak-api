@@ -120,6 +120,7 @@ public class DiaryController {
           @RequestParam("date")
           @DateTimeFormat(pattern = "yyyy-MM-dd")
           LocalDate requestDate) {
-    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getDiary(principal, requestDate));
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(diaryService.getDetail(principal, requestDate));
   }
 }

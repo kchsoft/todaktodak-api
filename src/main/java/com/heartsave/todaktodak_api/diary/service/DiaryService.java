@@ -84,7 +84,7 @@ public class DiaryService {
     return DiaryIndexResponse.builder().diaryIndexes(indexes).build();
   }
 
-  public DiaryViewDetailResponse getDiary(TodakUser principal, LocalDate requestDate) {
+  public DiaryViewDetailResponse getDetail(TodakUser principal, LocalDate requestDate) {
     Long memberId = principal.getId();
     log.info("사용자의 나의 일기 정보를 요청합니다.");
     DiaryEntity diary =
