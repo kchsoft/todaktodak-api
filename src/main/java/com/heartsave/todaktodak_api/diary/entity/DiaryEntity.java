@@ -30,7 +30,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
@@ -87,7 +86,6 @@ public class DiaryEntity extends BaseEntity {
       cascade = CascadeType.ALL,
       orphanRemoval = true)
   @Builder.Default
-  @Setter
   private List<DiaryReactionEntity> reactions = new ArrayList<>();
 
   public void addAiContent(AiContentResponse response) {
