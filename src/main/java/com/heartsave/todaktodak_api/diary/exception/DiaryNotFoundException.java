@@ -8,4 +8,8 @@ public class DiaryNotFoundException extends DiaryException {
   public DiaryNotFoundException(DiaryErrorSpec errorSpec, Long memberId, LocalDate diaryDate) {
     super(errorSpec, memberId, diaryDate);
   }
+
+  public DiaryNotFoundException(DiaryErrorSpec errorSpec, Long memberId, Long diaryId) {
+    super(errorSpec, memberId, diaryId);
+  }
 }

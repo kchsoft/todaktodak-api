@@ -6,6 +6,7 @@ import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.service.PublicDiaryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +29,9 @@ public class PublicDiaryController {
   @PostMapping
   public ResponseEntity<Void> writePublicContent(
       @AuthenticationPrincipal TodakUser principal,
-      @Valid @Size(max = PUBLIC_DIARY_CONTENT_MAX_SIZE) String publicContent) {
-    publicDiaryService.write(principal, publicContent);
+      @Valid @Size(max = PUBLIC_DIARY_CONTENT_MAX_SIZE) String publicContent,
+      @Valid @Min(1L) Long diaryId) {
+    publicDiaryService.write(principal, publicContent, diaryId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }
