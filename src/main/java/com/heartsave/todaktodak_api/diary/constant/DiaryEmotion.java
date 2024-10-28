@@ -1,5 +1,11 @@
 package com.heartsave.todaktodak_api.diary.constant;
 
 public enum DiaryEmotion {
-  JOY;
+  JOY("joy");
+
+  private final String emotion;
+
+  DiaryEmotion(String emotion) {
+    this.emotion = emotion;
+  }
 }
