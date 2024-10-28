@@ -2,8 +2,11 @@ package com.heartsave.todaktodak_api.diary.repository;
 
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,8 +30,28 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
   @Query(
       value =
           "SELECT d.id as id, d.diaryCreatedTime as diaryCreatedTime FROM DiaryEntity d WHERE d.memberEntity.id = :memberId AND d.diaryCreatedTime BETWEEN :startDateTime AND :endDateTime ORDER BY d.diaryCreatedTime ASC")
-  List<DiaryIndexProjection> findIndexesByMemberIdAndDateTimes(
+  Optional<List<DiaryIndexProjection>> findIndexesByMemberIdAndDateTimes(
       @Param("memberId") Long memberId,
       @Param("startDateTime") LocalDateTime startDateTime,
       @Param("endDateTime") LocalDateTime endDateTime);
+
+  @Query(
+      value =
+          " SELECT d FROM DiaryEntity  d WHERE d.memberEntity.id = :memberId AND CAST (d.diaryCreatedTime as DATE) = :diaryDate ")
+  Optional<DiaryEntity> findByMemberIdAndDate(
+      @Param("memberId") Long memberId, @Param("diaryDate") LocalDate diaryDate);
+
+  @Query(
+      value =
+          """
+            SELECT
+              COUNT(CASE WHEN reaction_type = 'LIKE' THEN 1 END) as likes,
+              COUNT(CASE WHEN reaction_type = 'SURPRISED' THEN 1 END) as surprised,
+              COUNT(CASE WHEN reaction_type = 'EMPATHIZE' THEN 1 END) as empathize,
+              COUNT(CASE WHEN reaction_type = 'CHEERING' THEN 1 END) as cheering
+            FROM diary_reaction
+            WHERE diary_id = :diaryId
+            """,
+      nativeQuery = true)
+  Optional<DiaryReactionCountProjection> findReactionCountById(Long diaryId);
 }

@@ -21,9 +21,11 @@ import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryViewDetailResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
 import com.heartsave.todaktodak_api.diary.service.DiaryService;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -168,5 +170,68 @@ public class DiaryControllerTest {
     String contentAsString = mvcResult.getResponse().getContentAsString();
     System.out.println("contentAsString = " + contentAsString);
     assertThat(contentAsString).as("응답에 null 이 있습니다.").doesNotContain("null", "Null", "NULL");
+  }
+
+  @Test
+  @DisplayName("일기 상세 조회 요청 성공")
+  @WithMockTodakUser
+  void getDiaryDetailSuccess() throws Exception {
+    // given
+    LocalDate validDate = LocalDate.now().minusDays(1); // 어제 날짜
+    DiaryViewDetailResponse mockResponse =
+        DiaryViewDetailResponse.builder()
+            .content("테스트 일기 내용")
+            .emotion(DiaryEmotion.JOY)
+            .date(validDate)
+            .build();
+
+    // when
+    when(diaryService.getDetail(any(TodakUser.class), any(LocalDate.class)))
+        .thenReturn(mockResponse);
+
+    // then
+    MvcResult mvcResult =
+        mockMvc
+            .perform(get("/api/v1/diary/my/detail").param("date", validDate.toString()))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andReturn();
+
+    MockHttpServletResponse response = mvcResult.getResponse();
+    response.setCharacterEncoding("utf-8");
+    String contentAsString = response.getContentAsString();
+    assertThat(contentAsString).contains("테스트 일기 내용").contains("JOY");
+  }
+
+  @Test
+  @DisplayName("일기 상세 조회 실패 - 미래 날짜 요청")
+  @WithMockTodakUser
+  void getDiaryDetailFailFutureDate() throws Exception {
+    LocalDate futureDate = LocalDate.now().plusDays(1); // 내일 날짜
+
+    mockMvc
+        .perform(get("/api/v1/diary/my/detail").param("date", futureDate.toString()))
+        .andExpect(status().isBadRequest())
+        .andDo(print());
+  }
+
+  @ParameterizedTest
+  @DisplayName("일기 상세 조회 실패 - 잘못된 날짜 형식")
+  @ValueSource(
+      strings = {
+        "2024.03.15", // 잘못된 구분자
+        "2024-3-15", // 잘못된 월 형식
+        "2024-03-5", // 잘못된 일 형식
+        "24-03-15", // 잘못된 년도 형식
+        "2024-13-15", // 존재하지 않는 월
+        "2024-03-32", // 존재하지 않는 일
+        "abcd-ef-gh", // 문자열
+        "2024-03" // 불완전한 형식
+      })
+  void getDiaryDetailFailInvalidDateFormat(String invalidDate) throws Exception {
+    mockMvc
+        .perform(get("/api/v1/diary/my/detail").param("date", invalidDate))
+        .andExpect(status().isBadRequest())
+        .andDo(print());
   }
 }
