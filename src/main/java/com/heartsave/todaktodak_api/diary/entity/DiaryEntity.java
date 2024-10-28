@@ -19,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
@@ -87,6 +88,13 @@ public class DiaryEntity extends BaseEntity {
       orphanRemoval = true)
   @Builder.Default
   private List<DiaryReactionEntity> reactions = new ArrayList<>();
+
+  @OneToOne(
+      fetch = FetchType.LAZY,
+      mappedBy = "diaryEntity",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  private PublicDiaryEntity publicDiaryEntity;
 
   public void addAiContent(AiContentResponse response) {
     this.aiComment = response.getAiComment();
