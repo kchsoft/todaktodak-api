@@ -5,8 +5,6 @@ import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
 import com.heartsave.todaktodak_api.common.exception.errorspec.TokenErrorSpec;
-import com.heartsave.todaktodak_api.common.security.TodakUserDetailsService;
-import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.security.util.JwtUtils;
 import io.jsonwebtoken.ExpiredJwtException;
