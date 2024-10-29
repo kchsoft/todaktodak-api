@@ -60,6 +60,10 @@ public class JwtUtils {
     return extractAllClaims(token).get(ROLE, String.class);
   }
 
+  public static String extractUsername(String token) {
+    return extractAllClaims(token).get(USERNAME, String.class);
+  }
+
   public static String extractType(String token) {
     return extractAllClaims(token).get(TYPE, String.class);
   }
