@@ -185,20 +185,23 @@ public class DiaryRepositoryTest {
     Long expectedSurprised = 3L;
     Long expectedEmpathize = 14L;
     Long expectedCheering = 100L;
-
+    MemberEntity testMember = BaseTestEntity.createMemberNoId();
+    memberRepository.save(testMember);
     // LIKE 1개 생성
     diaryReactionRepository.save(
         DiaryReactionEntity.builder()
-            .memberEntity(member)
+            .memberEntity(testMember)
             .diaryEntity(diary)
             .reactionType(DiaryReactionType.LIKE)
             .build());
 
     // SURPRISED 3개 생성
     for (int i = 0; i < expectedSurprised; i++) {
+      testMember = BaseTestEntity.createMemberNoId();
+      memberRepository.save(testMember);
       diaryReactionRepository.save(
           DiaryReactionEntity.builder()
-              .memberEntity(member)
+              .memberEntity(testMember)
               .diaryEntity(diary)
               .reactionType(DiaryReactionType.SURPRISED)
               .build());
@@ -206,9 +209,11 @@ public class DiaryRepositoryTest {
 
     // EMPATHIZE 14개 생성
     for (int i = 0; i < expectedEmpathize; i++) {
+      testMember = BaseTestEntity.createMemberNoId();
+      memberRepository.save(testMember);
       diaryReactionRepository.save(
           DiaryReactionEntity.builder()
-              .memberEntity(member)
+              .memberEntity(testMember)
               .diaryEntity(diary)
               .reactionType(DiaryReactionType.EMPATHIZE)
               .build());
@@ -216,9 +221,11 @@ public class DiaryRepositoryTest {
 
     // CHEERING 100개 생성
     for (int i = 0; i < expectedCheering; i++) {
+      testMember = BaseTestEntity.createMemberNoId();
+      memberRepository.save(testMember);
       diaryReactionRepository.save(
           DiaryReactionEntity.builder()
-              .memberEntity(member)
+              .memberEntity(testMember)
               .diaryEntity(diary)
               .reactionType(DiaryReactionType.CHEERING)
               .build());

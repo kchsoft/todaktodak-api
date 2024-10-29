@@ -46,7 +46,7 @@ public class PublicDiaryController {
 
   @PostMapping("/reaction")
   public ResponseEntity<Void> toggleReaction(
-      @AuthenticationPrincipal TodakUser principal,
+      @AuthenticationPrincipal TodakUser principal, // Todo: 커스텀 에너테이션을 통해 TodakUser의 ID 바로 가져오기
       @Valid @RequestBody PublicDiaryReactionRequest request) {
     publicDiaryService.toggleReactionStatus(principal, request);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
