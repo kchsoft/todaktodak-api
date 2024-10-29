@@ -3,6 +3,7 @@ package com.heartsave.todaktodak_api.diary.exception;
 import com.heartsave.todaktodak_api.common.exception.BaseException;
 import com.heartsave.todaktodak_api.common.exception.ErrorFieldBuilder;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
+import java.time.LocalDate;
 import lombok.Getter;
 
 @Getter
@@ -16,5 +17,11 @@ public abstract class DiaryException extends BaseException {
 
   protected DiaryException(DiaryErrorSpec errorSpec, Long memberId) {
     super(errorSpec, ErrorFieldBuilder.builder().add("memberId", memberId).build());
+  }
+
+  protected DiaryException(DiaryErrorSpec errorSpec, Long memberId, LocalDate diaryDate) {
+    super(
+        errorSpec,
+        ErrorFieldBuilder.builder().add("memberId", memberId).add("diaryDate", diaryDate).build());
   }
 }

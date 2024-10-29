@@ -17,7 +17,9 @@ public enum DiaryErrorSpec implements ErrorSpec {
       HttpStatus.BAD_REQUEST,
       "DIARY-002",
       "일기 삭제에 실패했습니다.",
-      "사용자가 삭제하려는 일기의 작성자가 아니거나, 삭제하려는 일기가 없습니다.");
+      "사용자가 삭제하려는 일기의 작성자가 아니거나, 삭제하려는 일기가 없습니다."),
+  DIARY_NOT_FOUND(
+      HttpStatus.BAD_REQUEST, "DIARY-003", "일기를 찾을 수 없습니다.", "사용자가 조회하려는 일기를 찾을 수 없습니다.");
 
   private final HttpStatus status;
   private final String code;

@@ -3,6 +3,7 @@ package com.heartsave.todaktodak_api.diary.controller;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryViewDetailResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.service.DiaryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PastOrPresent;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "일기장", description = "일기장 API")
+@Tag(name = "나의 일기장", description = "나의 일기장 API")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -94,5 +97,30 @@ public class DiaryController {
           @DateTimeFormat(pattern = "yyyy-MM")
           YearMonth yearMonth) {
     return ResponseEntity.status(HttpStatus.OK).body(diaryService.getIndex(principal, yearMonth));
+  }
+
+  @Operation(summary = "일기 상세 조회")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "일기 상세 조회 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+        @ApiResponse(responseCode = "404", description = "해당 날짜의 일기를 찾을 수 없음")
+      })
+  @GetMapping("/detail")
+  public ResponseEntity<DiaryViewDetailResponse> getDiaryDetail(
+      @AuthenticationPrincipal TodakUser principal,
+      @Parameter(
+              name = "date",
+              description = "조회할 일기의 날짜",
+              example = "2024-10-26",
+              required = true,
+              schema = @Schema(type = "string", format = "yyyy-MM-dd"))
+          @Valid
+          @PastOrPresent(message = "현재 날짜 이전의 일기만 조회가 가능합니다.")
+          @RequestParam("date")
+          @DateTimeFormat(pattern = "yyyy-MM-dd")
+          LocalDate requestDate) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(diaryService.getDetail(principal, requestDate));
   }
 }

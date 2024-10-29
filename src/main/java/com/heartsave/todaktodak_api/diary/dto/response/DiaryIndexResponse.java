@@ -14,5 +14,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Schema(description = "연월 일기 작성 현황 API 응답 객체")
 public class DiaryIndexResponse {
+  @Schema(description = "일기 연월 작성 현황 목록")
   private List<DiaryIndexProjection> diaryIndexes;
 }

@@ -7,6 +7,7 @@ import com.heartsave.todaktodak_api.ai.dto.AiContentResponse;
 import com.heartsave.todaktodak_api.common.entity.BaseEntity;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,10 +18,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -76,7 +81,26 @@ public class DiaryEntity extends BaseEntity {
   @DateTimeFormat(iso = ISO.DATE_TIME)
   private LocalDateTime diaryCreatedTime;
 
+  @OneToMany(
+      fetch = FetchType.LAZY,
+      mappedBy = "diaryEntity",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  @Builder.Default
+  private List<DiaryReactionEntity> reactions = new ArrayList<>();
+
+  @OneToOne(
+      fetch = FetchType.LAZY,
+      mappedBy = "diaryEntity",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  private PublicDiaryEntity publicDiaryEntity;
+
   public void addAiContent(AiContentResponse response) {
     this.aiComment = response.getAiComment();
+  }
+
+  public void addReaction(DiaryReactionEntity reactionType) {
+    reactions.add(reactionType);
   }
 }
