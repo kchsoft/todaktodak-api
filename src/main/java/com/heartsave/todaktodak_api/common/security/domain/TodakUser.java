@@ -73,4 +73,11 @@ public class TodakUser implements UserDetails, OAuth2User, Serializable {
   public String getName() {
     return this.username;
   }
+
+  @Override
+  public String toString() {
+    return """
+ID: %s, USERNAME: %s, ROLE: %s"""
+        .formatted(id, username, role);
+  }
 }
