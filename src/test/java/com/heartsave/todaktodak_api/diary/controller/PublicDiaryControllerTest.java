@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.heartsave.todaktodak_api.common.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.service.PublicDiaryService;
@@ -19,7 +20,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -39,7 +39,7 @@ public class PublicDiaryControllerTest {
 
   @Test
   @DisplayName("공개 일기 작성 성공")
-  @WithMockUser
+  @WithMockTodakUser
   void writePublicContent_Success() throws Exception {
     Long diaryId = 1L;
     String content = "테스트 공개 일기 내용";
@@ -57,7 +57,7 @@ public class PublicDiaryControllerTest {
 
   @Test
   @DisplayName("공개 일기 작성 실패 - 잘못된 diaryId")
-  @WithMockUser
+  @WithMockTodakUser
   void writePublicContent_Fail_InvalidDiaryId() throws Exception {
     Long invalidDiaryId = 0L;
     String content = "테스트 공개 일기 내용";
