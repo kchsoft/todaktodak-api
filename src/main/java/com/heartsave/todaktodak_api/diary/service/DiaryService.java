@@ -15,6 +15,7 @@ import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountPr
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
+import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
@@ -37,6 +38,7 @@ public class DiaryService {
 
   private final AiService aiService;
   private final DiaryRepository diaryRepository;
+  private final DiaryReactionRepository diaryReactionRepository;
   private final MemberRepository memberRepository;
 
   public DiaryWriteResponse write(TodakUser principal, DiaryWriteRequest request) {
@@ -95,7 +97,7 @@ public class DiaryService {
                     new DiaryNotFoundException(
                         DiaryErrorSpec.DIARY_NOT_FOUND, memberId, requestDate));
     DiaryReactionCountProjection reactionCount =
-        diaryRepository.findReactionCountById(diary.getId()).get();
+        diaryReactionRepository.countByDiaryId(diary.getId()).get();
     log.info("사용자의 나의 일기 정보를 성공적으로 가져왔습니다.");
 
     return DiaryViewDetailResponse.builder()

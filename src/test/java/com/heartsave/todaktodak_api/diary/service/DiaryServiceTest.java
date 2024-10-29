@@ -28,6 +28,7 @@ import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceed
 import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
+import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
@@ -52,6 +53,7 @@ public class DiaryServiceTest {
 
   @Mock private MemberRepository mockMemberRepository;
   @Mock private DiaryRepository mockDiaryRepository;
+  @Mock private DiaryReactionRepository mockDiaryReactionRepository;
   @Mock private AiService mockAiService;
   @InjectMocks private DiaryService diaryService;
   private TodakUser principal;
@@ -216,7 +218,7 @@ public class DiaryServiceTest {
 
     when(mockDiaryRepository.findByMemberIdAndDate(anyLong(), any(LocalDate.class)))
         .thenReturn(Optional.of(diary));
-    when(mockDiaryRepository.findReactionCountById(anyLong()))
+    when(mockDiaryReactionRepository.countByDiaryId(anyLong()))
         .thenReturn(Optional.of(mockReactionCount));
 
     DiaryViewDetailResponse response = diaryService.getDetail(principal, requestDate);
@@ -239,7 +241,7 @@ public class DiaryServiceTest {
             });
 
     verify(mockDiaryRepository, times(1)).findByMemberIdAndDate(anyLong(), any(LocalDate.class));
-    verify(mockDiaryRepository, times(1)).findReactionCountById(anyLong());
+    verify(mockDiaryReactionRepository, times(1)).countByDiaryId(anyLong());
   }
 
   @Test
@@ -256,6 +258,6 @@ public class DiaryServiceTest {
 
     assertThat(diaryException.getErrorSpec()).isEqualTo(DiaryErrorSpec.DIARY_NOT_FOUND);
     verify(mockDiaryRepository, times(1)).findByMemberIdAndDate(anyLong(), any(LocalDate.class));
-    verify(mockDiaryRepository, times(0)).findReactionCountById(anyLong());
+    verify(mockDiaryReactionRepository, times(0)).countByDiaryId(anyLong());
   }
 }

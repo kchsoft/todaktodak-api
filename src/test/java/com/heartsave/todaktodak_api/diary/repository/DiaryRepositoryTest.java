@@ -232,7 +232,7 @@ public class DiaryRepositoryTest {
     }
 
     Optional<DiaryReactionCountProjection> result =
-        diaryRepository.findReactionCountById(diary.getId());
+        diaryReactionRepository.countByDiaryId(diary.getId());
 
     assertThat(result).isPresent();
     DiaryReactionCountProjection count = result.get();
@@ -246,7 +246,7 @@ public class DiaryRepositoryTest {
   @DisplayName("findReactionCountById - 반응이 없는 경우")
   void findReactionCountByIdEmpty() {
     Optional<DiaryReactionCountProjection> result =
-        diaryRepository.findReactionCountById(diary.getId());
+        diaryReactionRepository.countByDiaryId(diary.getId());
 
     assertThat(result).isPresent();
     DiaryReactionCountProjection count = result.get();
@@ -281,7 +281,7 @@ public class DiaryRepositoryTest {
     diaryRepository.delete(diary);
 
     Optional<DiaryReactionCountProjection> result =
-        diaryRepository.findReactionCountById(diary.getId());
+        diaryReactionRepository.countByDiaryId(diary.getId());
 
     assertThat(result.get().getLikes()).as("삭제된 일기의 반응 수가 조회되었습니다.").isEqualTo(0);
     assertThat(result.get().getCheering()).as("삭제된 일기의 반응 수가 조회되었습니다.").isEqualTo(0);
