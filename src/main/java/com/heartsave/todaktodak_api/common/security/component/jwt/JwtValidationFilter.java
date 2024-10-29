@@ -43,7 +43,6 @@ public class JwtValidationFilter extends OncePerRequestFilter {
     if (token == null) {
       logger.error("NO TOKEN: {}", token);
       filterChain.doFilter(request, response);
-      //      setErrorResponse(response, TokenErrorSpec.INVALID_TOKEN);
       return;
     }
     try {
