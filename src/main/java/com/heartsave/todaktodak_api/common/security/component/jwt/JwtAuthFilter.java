@@ -62,7 +62,6 @@ public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
     var accessToken = JwtUtils.issueToken(user, ACCESS_TYPE);
     var refreshToken = JwtUtils.issueToken(user, REFRESH_TYPE);
     var refreshCookie = CookieUtils.createValidCookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken);
-
     response.addCookie(refreshCookie);
     response.setStatus(SC_NO_CONTENT);
     setResponseHeader(response);
