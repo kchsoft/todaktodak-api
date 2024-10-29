@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Transactional
 public class PublicDiaryService {
-  private DiaryRepository diaryRepository;
-  private PublicDiaryRepository publicDiaryRepository;
+  private final DiaryRepository diaryRepository;
+  private final PublicDiaryRepository publicDiaryRepository;
 
   public void write(TodakUser principal, String publicContent, Long diaryId) {
     Long memberId = principal.getId();
