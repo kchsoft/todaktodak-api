@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.diary.constant;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "일기 감정 상태")
@@ -11,5 +12,10 @@ public enum DiaryEmotion {
 
   DiaryEmotion(String emotion) {
     this.emotion = emotion;
+  }
+
+  @JsonValue
+  public String getEmotion() {
+    return emotion;
   }
 }
