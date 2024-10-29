@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,17 +18,25 @@ public class JwtUtils {
   private static final String ROLE = "role";
   private static final String TYPE = "type";
   private static final String USERNAME = "username";
-  private static String JWT_SECRET_KEY;
   private static Long ACCESS_TOKEN_EXPIRE_TIME_MILLI_SECOND;
   private static Long REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND;
   private static SecretKey key;
 
-  private JwtUtils(
-      @Value("${jwt.secret-key}") String JWT_SECRET_KEY,
-      @Value("${jwt.access-expire-time}") Long ACCESS_TOKEN_EXPIRE_TIME_MILLI_SECOND,
-      @Value("${jwt.refresh-expire-time}") Long REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND) {
-    var keyBytes = Decoders.BASE64.decode(JWT_SECRET_KEY);
+  @Value("${jwt.secret-key}")
+  String jwtSecretKey;
+
+  @Value("${jwt.access-expire-time}")
+  Long accessTokenExpireTimeMilliSecond;
+
+  @Value("${jwt.refresh-expire-time}")
+  Long refreshTokenExpireTimeMilliSecond;
+
+  @PostConstruct
+  void setup() {
+    var keyBytes = Decoders.BASE64.decode(jwtSecretKey);
     key = Keys.hmacShaKeyFor(keyBytes);
+    ACCESS_TOKEN_EXPIRE_TIME_MILLI_SECOND = accessTokenExpireTimeMilliSecond;
+    REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND = refreshTokenExpireTimeMilliSecond;
   }
 
   public static String issueToken(TodakUser user, String type) {
