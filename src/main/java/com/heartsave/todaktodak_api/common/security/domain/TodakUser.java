@@ -1,6 +1,5 @@
 package com.heartsave.todaktodak_api.common.security.domain;
 
-import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,20 +12,18 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@Builder
 public class TodakUser implements UserDetails, OAuth2User, Serializable {
 
   private final Long id;
   private final String username;
   private final String role;
   private final Map<String, Object> attributes;
+  private String password;
 
-  public static TodakUser from(MemberEntity entity) {
-    return new TodakUser(entity.getId(), entity.getLoginId(), entity.getRole().name(), Map.of());
-  }
-
-  public static TodakUser of(
-      Long id, String username, String role, Map<String, Object> attributes) {
-    return new TodakUser(id, username, role, attributes);
+  // 인증 성공 후 컨트롤러 진입 전에 삭제
+  public void removePassword() {
+    password = "";
   }
 
   @Override
@@ -41,7 +38,7 @@ public class TodakUser implements UserDetails, OAuth2User, Serializable {
 
   @Override
   public String getPassword() {
-    return "";
+    return password;
   }
 
   @Override
