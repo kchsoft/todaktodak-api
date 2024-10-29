@@ -5,6 +5,7 @@ import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.member.domain.TodakRole;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,12 @@ public class TodakOauth2UserDetailsService extends DefaultOAuth2UserService {
       throw new OAuth2AuthenticationException(Oauth2ErrorConstant.DUPLICATED_EMAIL_ERROR);
     }
     // 저장 성공시 인증 정보 생성
-    return TodakUser.from(member);
+    return TodakUser.builder()
+        .id(member.getId())
+        .username(member.getLoginId())
+        .role(member.getRole().name())
+        .attributes(Map.of())
+        .build();
   }
 
   private MemberEntity getOrSave(TodakOauth2Attribute attribute) {
