@@ -3,11 +3,8 @@ package com.heartsave.todaktodak_api.diary.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.heartsave.todaktodak_api.common.BaseTestEntity;
-import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
-import com.heartsave.todaktodak_api.diary.entity.DiaryReactionEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.LocalDate;
@@ -33,13 +30,12 @@ public class DiaryRepositoryTest {
 
   @Autowired private DiaryRepository diaryRepository;
   @Autowired private MemberRepository memberRepository;
-  @Autowired private DiaryReactionRepository diaryReactionRepository;
 
   private MemberEntity member;
   private DiaryEntity diary;
 
   @BeforeEach
-  void setupAll() {
+  void setup() {
     member = BaseTestEntity.createMemberNoId();
     diary = BaseTestEntity.createDiaryNoIdWithMember(member);
     memberRepository.save(member);
@@ -175,118 +171,6 @@ public class DiaryRepositoryTest {
         diaryRepository.findByMemberIdAndDate(member.getId(), differentDate);
 
     assertThat(result).as("존재하지 않아야 할 날짜(%s)에 일기가 조회되었습니다.", differentDate).isEmpty();
-  }
-
-  @Test
-  @DisplayName("findReactionCountById - 반응이 있는 경우 성공적으로 조회")
-  void findReactionCountByIdSuccess() {
-    // Given
-    Long expectedLikes = 1L;
-    Long expectedSurprised = 3L;
-    Long expectedEmpathize = 14L;
-    Long expectedCheering = 100L;
-    MemberEntity testMember = BaseTestEntity.createMemberNoId();
-    memberRepository.save(testMember);
-    // LIKE 1개 생성
-    diaryReactionRepository.save(
-        DiaryReactionEntity.builder()
-            .memberEntity(testMember)
-            .diaryEntity(diary)
-            .reactionType(DiaryReactionType.LIKE)
-            .build());
-
-    // SURPRISED 3개 생성
-    for (int i = 0; i < expectedSurprised; i++) {
-      testMember = BaseTestEntity.createMemberNoId();
-      memberRepository.save(testMember);
-      diaryReactionRepository.save(
-          DiaryReactionEntity.builder()
-              .memberEntity(testMember)
-              .diaryEntity(diary)
-              .reactionType(DiaryReactionType.SURPRISED)
-              .build());
-    }
-
-    // EMPATHIZE 14개 생성
-    for (int i = 0; i < expectedEmpathize; i++) {
-      testMember = BaseTestEntity.createMemberNoId();
-      memberRepository.save(testMember);
-      diaryReactionRepository.save(
-          DiaryReactionEntity.builder()
-              .memberEntity(testMember)
-              .diaryEntity(diary)
-              .reactionType(DiaryReactionType.EMPATHIZE)
-              .build());
-    }
-
-    // CHEERING 100개 생성
-    for (int i = 0; i < expectedCheering; i++) {
-      testMember = BaseTestEntity.createMemberNoId();
-      memberRepository.save(testMember);
-      diaryReactionRepository.save(
-          DiaryReactionEntity.builder()
-              .memberEntity(testMember)
-              .diaryEntity(diary)
-              .reactionType(DiaryReactionType.CHEERING)
-              .build());
-    }
-
-    Optional<DiaryReactionCountProjection> result =
-        diaryReactionRepository.countByDiaryId(diary.getId());
-
-    assertThat(result).isPresent();
-    DiaryReactionCountProjection count = result.get();
-    assertThat(count.getLikes()).as("좋아요 수가 예상값과 다릅니다.").isEqualTo(expectedLikes);
-    assertThat(count.getSurprised()).as("놀라워요 수가 예상값과 다릅니다.").isEqualTo(expectedSurprised);
-    assertThat(count.getEmpathize()).as("공감해요 수가 예상값과 다릅니다.").isEqualTo(expectedEmpathize);
-    assertThat(count.getCheering()).as("응원해요 수가 예상값과 다릅니다.").isEqualTo(expectedCheering);
-  }
-
-  @Test
-  @DisplayName("findReactionCountById - 반응이 없는 경우")
-  void findReactionCountByIdEmpty() {
-    Optional<DiaryReactionCountProjection> result =
-        diaryReactionRepository.countByDiaryId(diary.getId());
-
-    assertThat(result).isPresent();
-    DiaryReactionCountProjection count = result.get();
-    assertThat(count.getLikes()).as("좋아요 수가 0이 아닙니다.").isEqualTo(0L);
-    assertThat(count.getSurprised()).as("놀라워요 수가 0이 아닙니다.").isEqualTo(0L);
-    assertThat(count.getEmpathize()).as("공감해요 수가 0이 아닙니다.").isEqualTo(0L);
-    assertThat(count.getCheering()).as("응원해요 수가 0이 아닙니다.").isEqualTo(0L);
-  }
-
-  @Test
-  @DisplayName("findReactionCountById - 일기가 없는 경우")
-  void findReactionCountByIdWithNoDiary() {
-    DiaryReactionEntity reaction1 =
-        DiaryReactionEntity.builder()
-            .memberEntity(member)
-            .diaryEntity(diary)
-            .reactionType(DiaryReactionType.LIKE)
-            .build();
-    DiaryReactionEntity reaction2 =
-        DiaryReactionEntity.builder()
-            .memberEntity(member)
-            .diaryEntity(diary)
-            .reactionType(DiaryReactionType.CHEERING)
-            .build();
-
-    diaryReactionRepository.save(reaction1);
-    diaryReactionRepository.save(reaction2);
-
-    diary.addReaction(reaction1);
-    diary.addReaction(reaction2);
-
-    diaryRepository.delete(diary);
-
-    Optional<DiaryReactionCountProjection> result =
-        diaryReactionRepository.countByDiaryId(diary.getId());
-
-    assertThat(result.get().getLikes()).as("삭제된 일기의 반응 수가 조회되었습니다.").isEqualTo(0);
-    assertThat(result.get().getCheering()).as("삭제된 일기의 반응 수가 조회되었습니다.").isEqualTo(0);
-    assertThat(result.get().getEmpathize()).as("삭제된 일기의 반응 수가 조회되었습니다.").isEqualTo(0);
-    assertThat(result.get().getSurprised()).as("삭제된 일기의 반응 수가 조회되었습니다.").isEqualTo(0);
   }
 
   @Test

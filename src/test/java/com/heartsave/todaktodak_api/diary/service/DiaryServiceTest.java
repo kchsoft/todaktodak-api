@@ -218,7 +218,7 @@ public class DiaryServiceTest {
 
     when(mockDiaryRepository.findByMemberIdAndDate(anyLong(), any(LocalDate.class)))
         .thenReturn(Optional.of(diary));
-    when(mockDiaryReactionRepository.countByDiaryId(anyLong()))
+    when(mockDiaryReactionRepository.countEachByDiaryId(anyLong()))
         .thenReturn(Optional.of(mockReactionCount));
 
     DiaryViewDetailResponse response = diaryService.getDetail(principal, requestDate);
@@ -241,7 +241,7 @@ public class DiaryServiceTest {
             });
 
     verify(mockDiaryRepository, times(1)).findByMemberIdAndDate(anyLong(), any(LocalDate.class));
-    verify(mockDiaryReactionRepository, times(1)).countByDiaryId(anyLong());
+    verify(mockDiaryReactionRepository, times(1)).countEachByDiaryId(anyLong());
   }
 
   @Test
@@ -258,6 +258,6 @@ public class DiaryServiceTest {
 
     assertThat(diaryException.getErrorSpec()).isEqualTo(DiaryErrorSpec.DIARY_NOT_FOUND);
     verify(mockDiaryRepository, times(1)).findByMemberIdAndDate(anyLong(), any(LocalDate.class));
-    verify(mockDiaryReactionRepository, times(0)).countByDiaryId(anyLong());
+    verify(mockDiaryReactionRepository, times(0)).countEachByDiaryId(anyLong());
   }
 }

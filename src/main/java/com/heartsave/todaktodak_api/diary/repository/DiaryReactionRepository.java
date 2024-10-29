@@ -14,22 +14,22 @@ public interface DiaryReactionRepository extends JpaRepository<DiaryReactionEnti
   @Query(
       value =
           """
-                    SELECT
-                      COUNT(CASE WHEN reaction_type = 'LIKE' THEN 1 END) as likes,
-                      COUNT(CASE WHEN reaction_type = 'SURPRISED' THEN 1 END) as surprised,
-                      COUNT(CASE WHEN reaction_type = 'EMPATHIZE' THEN 1 END) as empathize,
-                      COUNT(CASE WHEN reaction_type = 'CHEERING' THEN 1 END) as cheering
-                    FROM diary_reaction
-                    WHERE diary_id = :diaryId
-                    """,
+            SELECT
+              COUNT(CASE WHEN reaction_type = 'LIKE' THEN 1 END) as likes,
+              COUNT(CASE WHEN reaction_type = 'SURPRISED' THEN 1 END) as surprised,
+              COUNT(CASE WHEN reaction_type = 'EMPATHIZE' THEN 1 END) as empathize,
+              COUNT(CASE WHEN reaction_type = 'CHEERING' THEN 1 END) as cheering
+            FROM diary_reaction
+            WHERE diary_id = :diaryId
+          """,
       nativeQuery = true)
-  Optional<DiaryReactionCountProjection> countByDiaryId(Long diaryId);
+  Optional<DiaryReactionCountProjection> countEachByDiaryId(Long diaryId);
 
   @Modifying
   @Query(
       """
         DELETE FROM DiaryReactionEntity  dr WHERE dr.memberEntity.id = :memberId AND dr.diaryEntity.id = :diaryId AND dr.reactionType = :reactionType
-    """)
+      """)
   int deleteByMemberIdAndDiaryIdAndReactionType(
       @Param("memberId") Long memberId,
       @Param("diaryId") Long diaryId,

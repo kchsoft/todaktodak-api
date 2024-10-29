@@ -84,8 +84,10 @@ public class DiaryEntity extends BaseEntity {
   @OneToMany(
       fetch = FetchType.LAZY,
       mappedBy = "diaryEntity",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true)
+      cascade =
+          CascadeType
+              .ALL, // 현재는 JPA Level의 cascade -> Diary 삭제시, ReactionEntity에 대한 Del Query가 별도로 나간다.
+      orphanRemoval = true) // Todo : DB Level의 cascade를 설정하여 Diary Del Query 하나만 날려 cascade를 적용하자.
   @Builder.Default
   private List<DiaryReactionEntity> reactions = new ArrayList<>();
 
