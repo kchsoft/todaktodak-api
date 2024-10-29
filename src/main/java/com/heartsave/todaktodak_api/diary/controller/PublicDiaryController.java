@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.diary.controller;
 
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.service.PublicDiaryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +41,14 @@ public class PublicDiaryController {
     log.info("공개 일기 업로드 시작");
     publicDiaryService.write(principal, request.publicContent(), request.diaryId());
     log.info("공개 일기 업로드 성공");
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
+
+  @PostMapping("/reaction")
+  public ResponseEntity<Void> toggleReaction(
+      @AuthenticationPrincipal TodakUser principal,
+      @Valid @RequestBody PublicDiaryReactionRequest request) {
+    publicDiaryService.toggleReactionStatus(principal, request);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }
