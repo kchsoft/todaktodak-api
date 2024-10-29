@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.common.security.component.oauth2;
 
+import com.heartsave.todaktodak_api.common.security.constant.Oauth2ErrorConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.member.domain.TodakRole;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
@@ -30,9 +31,19 @@ public class TodakOauth2UserDetailsService extends DefaultOAuth2UserService {
     if (attribute == null) return null;
     logger.info("OAUTH2 RESOURCE - {}", attribute);
     // 회원 저장
-    MemberEntity member = memberRepository.save(createMember(attribute));
+    MemberEntity member = getOrSave(attribute);
+    if (!member.getAuthType().equals(attribute.getAuthType())) {
+      throw new OAuth2AuthenticationException(Oauth2ErrorConstant.DUPLICATED_EMAIL_ERROR);
+    }
     // 저장 성공시 인증 정보 생성
     return TodakUser.from(member);
+  }
+
+  private MemberEntity getOrSave(TodakOauth2Attribute attribute) {
+    MemberEntity retrievedMember =
+        memberRepository.findMemberEntityByEmail(attribute.getEmail()).orElse(null);
+    if (retrievedMember == null) return memberRepository.save(createMember(attribute));
+    return retrievedMember;
   }
 
   private MemberEntity createMember(TodakOauth2Attribute attribute) {
