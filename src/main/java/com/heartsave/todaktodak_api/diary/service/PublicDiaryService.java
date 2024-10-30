@@ -37,13 +37,17 @@ public class PublicDiaryService {
   public PublicDiaryViewDetailResponse get(
       TodakUser principal, Long publicDiaryId) { // Todo : 쿼리 최적화
     Pageable pageable = PageRequest.of(0, 5);
+    log.info("공개 일기 view를 조회합니다.");
     List<PublicDiaryViewProjection> publicDiaryViews = getPublicDiaryViews(publicDiaryId, pageable);
+    log.info("공개 일기 view를 조회를 마쳤습니다.");
 
     Long memberId = principal.getId();
     PublicDiaryViewDetailResponse response = new PublicDiaryViewDetailResponse();
-    for (PublicDiaryViewProjection view : publicDiaryViews) {
+
+    log.info("공개 일기 reaction을 조회합니다.");
+    for (PublicDiaryViewProjection view : publicDiaryViews)
       response.addViewDetail(getViewDetail(memberId, view));
-    }
+    log.info("공개 일기 reaction 조회를 마칩니다.");
     return response;
   }
 
