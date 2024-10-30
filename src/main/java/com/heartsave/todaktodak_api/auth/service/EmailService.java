@@ -2,6 +2,9 @@ package com.heartsave.todaktodak_api.auth.service;
 
 import com.heartsave.todaktodak_api.auth.dto.request.EmailCheckRequest;
 import com.heartsave.todaktodak_api.auth.dto.request.EmailOtpCheckRequest;
+import com.heartsave.todaktodak_api.auth.exception.AuthException;
+import com.heartsave.todaktodak_api.common.exception.errorspec.AuthErrorSpec;
+import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import jakarta.mail.MessagingException;
 import java.time.Duration;
 import java.util.Date;
@@ -16,21 +19,33 @@ import org.springframework.stereotype.Service;
 public class EmailService {
   private final JavaMailSender mailSender;
   private final RedisTemplate<String, String> redisTemplate;
+  private final MemberRepository memberRepository;
 
   private EmailService(
       JavaMailSender mailSender,
-      @Qualifier("otpRedisTemplate") RedisTemplate<String, String> redisTemplate) {
+      @Qualifier("otpRedisTemplate") RedisTemplate<String, String> redisTemplate,
+      MemberRepository memberRepository) {
     this.mailSender = mailSender;
     this.redisTemplate = redisTemplate;
+    this.memberRepository = memberRepository;
   }
 
-  public void sendOtp(EmailCheckRequest dto) throws MessagingException {
+  public void sendOtp(EmailCheckRequest dto) {
+    String email = dto.email();
+    // 중복 확인
+    if (memberRepository.existsByEmail(email))
+      throw new AuthException(AuthErrorSpec.BASE_DUPLICATED_EMAIL);
     var otp = createOtp();
     var message = mailSender.createMimeMessage();
-    var helper = new MimeMessageHelper(message, true, "UTF-8");
-    setMessageContent(helper, otp);
+    try {
+      var helper = new MimeMessageHelper(message, true, "UTF-8");
+      setMessageContent(helper, otp);
+    } catch (MessagingException e) {
+      throw new AuthException(AuthErrorSpec.EMAIL_OTP_SEND_FAIL);
+    }
+
     mailSender.send(message);
-    redisTemplate.opsForValue().set("OTP:" + dto.email(), otp, Duration.ofMinutes(3));
+    redisTemplate.opsForValue().set("OTP:" + email, otp, Duration.ofMinutes(3));
   }
 
   public boolean verifyOtp(EmailOtpCheckRequest dto) {
