@@ -16,6 +16,10 @@ spring:
           timeout: 5000
           starttls:
             enable: true
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 jwt:
   secret-key: ${JWT_SECRET_KEY:abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijkl}
   access-expire-time: ${ACCESS_EXPIRE_TIME:123456}
