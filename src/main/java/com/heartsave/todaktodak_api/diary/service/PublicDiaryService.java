@@ -4,6 +4,7 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
+import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryViewDetailResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.DiaryReactionEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
@@ -26,6 +27,11 @@ public class PublicDiaryService {
   private final DiaryRepository diaryRepository;
   private final PublicDiaryRepository publicDiaryRepository;
   private final DiaryReactionRepository diaryReactionRepository;
+
+  public PublicDiaryViewDetailResponse get(TodakUser principal, Long publicDiaryId) {
+
+    return null;
+  }
 
   public void write(TodakUser principal, String publicContent, Long diaryId) {
     Long memberId = principal.getId();
@@ -57,7 +63,7 @@ public class PublicDiaryService {
     }
   }
 
-  private static DiaryReactionEntity getDiaryReactionEntity(
+  private DiaryReactionEntity getDiaryReactionEntity(
       Long memberId, Long diaryId, DiaryReactionType reactionType) {
     DiaryReactionEntity reactionEntity =
         DiaryReactionEntity.builder()
