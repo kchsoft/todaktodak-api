@@ -3,6 +3,7 @@ package com.heartsave.todaktodak_api.diary.repository;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.entity.DiaryReactionEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -10,6 +11,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface DiaryReactionRepository extends JpaRepository<DiaryReactionEntity, Long> {
+
+  @Query(
+      """
+        SELECT dr.reactionType
+        FROM DiaryReactionEntity dr
+        WHERE dr.memberEntity.id = :memberId AND dr.diaryEntity.id = :diaryId
+      """)
+  List<DiaryReactionType> findReactionByMemberId(Long memberId, Long diaryId);
 
   @Query(
       value =
