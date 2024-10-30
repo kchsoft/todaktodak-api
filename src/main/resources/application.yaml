@@ -8,6 +8,9 @@ jwt:
   secret-key: ${JWT_SECRET_KEY:abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijkl}
   access-expire-time: ${ACCESS_EXPIRE_TIME:123456}
   refresh-expire-time: ${REFRESH_EXPIRE_TIME:12345678}
+base:
+  url: ${BASE_URL:http://localhost}
+  port: ${BASE_PORT:3000}
 ---
 spring:
   datasource:
@@ -23,23 +26,26 @@ spring:
             client-name: google
             client-id: ${GOOGLE_OAUTH_CLIENT_ID}
             client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET}
-            redirect-uri: ${${GOOGLE_OAUTH_REDIRECT_URI}}
+            redirect-uri: ${GOOGLE_OAUTH_REDIRECT_URI}
             authorization-grant-type: authorization_code
-            scope: email
+            scope:
+              - email
           naver:
             client-name: naver
             client-id: ${NAVER_OAUTH_CLIENT_ID}
             client-secret: ${NAVER_OAUTH_CLIENT_SECRET}
             redirect-uri: ${NAVER_OAUTH_REDIRECT_URI}
             authorization-grant-type: authorization_code
-            scope: email
+            scope:
+              - email
           kakao:
             client-name: kakao
             client-id: ${KAKAO_OAUTH_CLIENT_ID}
             client-secret: ${KAKAO_OAUTH_CLIENT_SECRET}
             redirect-uri: ${KAKAO_OAUTH_REDIRECT_URI}
             authorization-grant-type: authorization_code
-            scope: account_email
+            scope:
+              - account_email
             client-authentication-method: client_secret_post
         provider:
           naver:

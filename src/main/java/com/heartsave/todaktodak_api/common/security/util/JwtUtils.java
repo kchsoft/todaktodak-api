@@ -17,17 +17,18 @@ public class JwtUtils {
   private static final String ROLE = "role";
   private static final String TYPE = "type";
   private static final String USERNAME = "username";
-  private static String JWT_SECRET_KEY;
   private static Long ACCESS_TOKEN_EXPIRE_TIME_MILLI_SECOND;
   private static Long REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND;
   private static SecretKey key;
 
   private JwtUtils(
-      @Value("${jwt.secret-key}") String JWT_SECRET_KEY,
-      @Value("${jwt.access-expire-time}") Long ACCESS_TOKEN_EXPIRE_TIME_MILLI_SECOND,
-      @Value("${jwt.refresh-expire-time}") Long REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND) {
-    var keyBytes = Decoders.BASE64.decode(JWT_SECRET_KEY);
+      @Value("${jwt.secret-key}") String jwtSecretKey,
+      @Value("${jwt.access-expire-time}") Long accessTokenExpireTimeMilliSecond,
+      @Value("${jwt.refresh-expire-time}") Long refreshTokenExpireTimeMilliSecond) {
+    var keyBytes = Decoders.BASE64.decode(jwtSecretKey);
     key = Keys.hmacShaKeyFor(keyBytes);
+    ACCESS_TOKEN_EXPIRE_TIME_MILLI_SECOND = accessTokenExpireTimeMilliSecond;
+    REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND = refreshTokenExpireTimeMilliSecond;
   }
 
   public static String issueToken(TodakUser user, String type) {
@@ -47,16 +48,20 @@ public class JwtUtils {
         .compact();
   }
 
-  private static String extractRole(String token) {
+  public static String extractRole(String token) {
     return extractAllClaims(token).get(ROLE, String.class);
+  }
+
+  public static String extractUsername(String token) {
+    return extractAllClaims(token).get(USERNAME, String.class);
   }
 
   public static String extractType(String token) {
     return extractAllClaims(token).get(TYPE, String.class);
   }
 
-  public static String extractSubject(String token) {
-    return extractAllClaims(token).getSubject();
+  public static Long extractSubject(String token) {
+    return Long.valueOf(extractAllClaims(token).getSubject());
   }
 
   public static Claims extractAllClaims(String token) {
