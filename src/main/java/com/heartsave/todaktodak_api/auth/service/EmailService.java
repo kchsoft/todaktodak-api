@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.util.Date;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -20,6 +21,9 @@ public class EmailService {
   private final JavaMailSender mailSender;
   private final RedisTemplate<String, String> redisTemplate;
   private final MemberRepository memberRepository;
+
+  @Value("${spring.mail.username}")
+  private String provider;
 
   private EmailService(
       JavaMailSender mailSender,
@@ -39,7 +43,7 @@ public class EmailService {
     var message = mailSender.createMimeMessage();
     try {
       var helper = new MimeMessageHelper(message, true, "UTF-8");
-      setMessageContent(helper, otp);
+      setMessageContent(helper, email, otp);
     } catch (MessagingException e) {
       throw new AuthException(AuthErrorSpec.EMAIL_OTP_SEND_FAIL);
     }
@@ -63,7 +67,10 @@ public class EmailService {
     return RandomStringUtils.randomAlphanumeric(8);
   }
 
-  private void setMessageContent(MimeMessageHelper helper, String otp) throws MessagingException {
+  private void setMessageContent(MimeMessageHelper helper, String email, String otp)
+      throws MessagingException {
+    helper.setFrom(provider);
+    helper.setTo(email);
     helper.setSubject("토닥토닥 이메일 인증번호");
     helper.setSentDate(new Date());
     helper.setText(
@@ -94,6 +101,7 @@ public class EmailService {
         </body>
         </html>
             """,
-            otp));
+            otp),
+        true);
   }
 }
