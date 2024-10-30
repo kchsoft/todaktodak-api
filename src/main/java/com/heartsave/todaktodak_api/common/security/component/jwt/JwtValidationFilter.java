@@ -1,11 +1,11 @@
 package com.heartsave.todaktodak_api.common.security.component.jwt;
 
 import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.*;
+import static com.heartsave.todaktodak_api.common.security.util.JwtUtils.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
 import com.heartsave.todaktodak_api.common.exception.errorspec.TokenErrorSpec;
-import com.heartsave.todaktodak_api.common.security.TodakUserDetailsService;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.security.util.JwtUtils;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -30,7 +30,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 @RequiredArgsConstructor
 public class JwtValidationFilter extends OncePerRequestFilter {
-  private final TodakUserDetailsService userDetailsService;
   private final ObjectMapper objectMapper;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -90,12 +89,15 @@ public class JwtValidationFilter extends OncePerRequestFilter {
   }
 
   private Authentication getAuthentication(String token) {
-    TodakUser user = getUser(token);
-    user.removePassword();
+    TodakUser user = extractUserFromToken(token);
     return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
   }
 
-  private TodakUser getUser(String token) {
-    return (TodakUser) userDetailsService.loadUserByUsername(JwtUtils.extractUsername(token));
+  private TodakUser extractUserFromToken(String token) {
+    return TodakUser.builder()
+        .id(extractSubject(token))
+        .username(extractUsername(token))
+        .role(extractRole(token))
+        .build();
   }
 }
