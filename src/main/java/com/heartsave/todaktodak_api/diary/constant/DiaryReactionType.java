@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.diary.constant;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "일기 반응 타입")
@@ -20,5 +21,10 @@ public enum DiaryReactionType {
 
   DiaryReactionType(String reaction) {
     this.reaction = reaction;
+  }
+
+  @JsonValue
+  public String getReaction() {
+    return reaction;
   }
 }
