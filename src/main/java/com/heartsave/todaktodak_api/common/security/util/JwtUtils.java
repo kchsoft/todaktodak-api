@@ -6,7 +6,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,17 +21,10 @@ public class JwtUtils {
   private static Long REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND;
   private static SecretKey key;
 
-  @Value("${jwt.secret-key}")
-  String jwtSecretKey;
-
-  @Value("${jwt.access-expire-time}")
-  Long accessTokenExpireTimeMilliSecond;
-
-  @Value("${jwt.refresh-expire-time}")
-  Long refreshTokenExpireTimeMilliSecond;
-
-  @PostConstruct
-  void setup() {
+  private JwtUtils(
+      @Value("${jwt.secret-key}") String jwtSecretKey,
+      @Value("${jwt.access-expire-time}") Long accessTokenExpireTimeMilliSecond,
+      @Value("${jwt.refresh-expire-time}") Long refreshTokenExpireTimeMilliSecond) {
     var keyBytes = Decoders.BASE64.decode(jwtSecretKey);
     key = Keys.hmacShaKeyFor(keyBytes);
     ACCESS_TOKEN_EXPIRE_TIME_MILLI_SECOND = accessTokenExpireTimeMilliSecond;
