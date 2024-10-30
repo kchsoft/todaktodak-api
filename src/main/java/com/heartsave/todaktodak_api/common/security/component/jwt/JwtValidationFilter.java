@@ -91,6 +91,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
 
   private Authentication getAuthentication(String token) {
     TodakUser user = getUser(token);
+    user.removePassword();
     return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
   }
 
