@@ -34,8 +34,14 @@ public class PublicDiaryController {
 
   private final PublicDiaryService publicDiaryService;
 
+  @Operation(summary = "공개 일기 조회", description = "공개 일기의 상세 내용을 조회합니다. after 파라미터를 통해 페이징을 처리합니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "공개 일기 조회 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청")
+      })
   @GetMapping
-  public ResponseEntity<PublicDiaryViewDetailResponse> toggleReaction(
+  public ResponseEntity<PublicDiaryViewDetailResponse> getPublicDiaryViewDetail(
       @AuthenticationPrincipal TodakUser principal,
       @Valid @Min(0L) @RequestParam(name = "after", defaultValue = "0", required = false)
           Long publicDiaryId) {

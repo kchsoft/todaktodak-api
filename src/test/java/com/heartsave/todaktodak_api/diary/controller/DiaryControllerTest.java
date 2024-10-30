@@ -186,7 +186,7 @@ public class DiaryControllerTest {
             .build();
 
     // when
-    when(diaryService.getDetail(any(TodakUser.class), any(LocalDate.class)))
+    when(diaryService.getViewDetail(any(TodakUser.class), any(LocalDate.class)))
         .thenReturn(mockResponse);
 
     // then

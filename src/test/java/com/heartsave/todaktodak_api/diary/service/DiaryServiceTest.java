@@ -221,7 +221,7 @@ public class DiaryServiceTest {
     when(mockDiaryReactionRepository.countEachByDiaryId(anyLong()))
         .thenReturn(Optional.of(mockReactionCount));
 
-    DiaryViewDetailResponse response = diaryService.getDetail(principal, requestDate);
+    DiaryViewDetailResponse response = diaryService.getViewDetail(principal, requestDate);
 
     assertThat(response)
         .satisfies(
@@ -254,7 +254,7 @@ public class DiaryServiceTest {
 
     DiaryException diaryException =
         assertThrows(
-            DiaryNotFoundException.class, () -> diaryService.getDetail(principal, requestDate));
+            DiaryNotFoundException.class, () -> diaryService.getViewDetail(principal, requestDate));
 
     assertThat(diaryException.getErrorSpec()).isEqualTo(DiaryErrorSpec.DIARY_NOT_FOUND);
     verify(mockDiaryRepository, times(1)).findByMemberIdAndDate(anyLong(), any(LocalDate.class));

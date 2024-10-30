@@ -107,7 +107,7 @@ public class DiaryController {
         @ApiResponse(responseCode = "404", description = "해당 날짜의 일기를 찾을 수 없음")
       })
   @GetMapping("/detail")
-  public ResponseEntity<DiaryViewDetailResponse> getDiaryDetail(
+  public ResponseEntity<DiaryViewDetailResponse> getDiaryViewDetail(
       @AuthenticationPrincipal TodakUser principal,
       @Parameter(
               name = "date",
@@ -121,6 +121,6 @@ public class DiaryController {
           @DateTimeFormat(pattern = "yyyy-MM-dd")
           LocalDate requestDate) {
     return ResponseEntity.status(HttpStatus.OK)
-        .body(diaryService.getDetail(principal, requestDate));
+        .body(diaryService.getViewDetail(principal, requestDate));
   }
 }
