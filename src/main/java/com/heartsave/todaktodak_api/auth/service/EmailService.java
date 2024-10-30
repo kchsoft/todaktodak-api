@@ -3,17 +3,26 @@ package com.heartsave.todaktodak_api.auth.service;
 import com.heartsave.todaktodak_api.auth.dto.request.EmailCheckRequest;
 import com.heartsave.todaktodak_api.auth.dto.request.EmailOtpCheckRequest;
 import jakarta.mail.MessagingException;
+import java.time.Duration;
 import java.util.Date;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class EmailService {
   private final JavaMailSender mailSender;
+  private final RedisTemplate<String, String> redisTemplate;
+
+  private EmailService(
+      JavaMailSender mailSender,
+      @Qualifier("otpRedisTemplate") RedisTemplate<String, String> redisTemplate) {
+    this.mailSender = mailSender;
+    this.redisTemplate = redisTemplate;
+  }
 
   public void sendOtp(EmailCheckRequest dto) throws MessagingException {
     var otp = createOtp();
@@ -21,12 +30,18 @@ public class EmailService {
     var helper = new MimeMessageHelper(message, true, "UTF-8");
     setMessageContent(helper, otp);
     mailSender.send(message);
-
-    // TODO: OTP 캐싱
+    redisTemplate.opsForValue().set("OTP:" + dto.email(), otp, Duration.ofMinutes(3));
   }
 
   public boolean verifyOtp(EmailOtpCheckRequest dto) {
-    return true;
+    var key = "OTP:" + dto.email();
+    String actualOtp = redisTemplate.opsForValue().get(key);
+
+    if (actualOtp != null && actualOtp.equals(dto.emailOtp())) {
+      redisTemplate.delete(key);
+      return true;
+    }
+    return false;
   }
 
   private String createOtp() {
