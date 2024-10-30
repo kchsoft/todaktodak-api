@@ -29,11 +29,6 @@ public class TodakUser implements UserDetails, OAuth2User, Serializable {
     this.password = password;
   }
 
-  // 인증 성공 후 컨트롤러 진입 전에 삭제
-  public void removePassword() {
-    password = "";
-  }
-
   @Override
   public Map<String, Object> getAttributes() {
     return attributes;
