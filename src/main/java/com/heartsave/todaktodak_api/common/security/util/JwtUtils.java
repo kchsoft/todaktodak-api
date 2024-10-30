@@ -56,7 +56,7 @@ public class JwtUtils {
         .compact();
   }
 
-  private static String extractRole(String token) {
+  public static String extractRole(String token) {
     return extractAllClaims(token).get(ROLE, String.class);
   }
 
@@ -68,8 +68,8 @@ public class JwtUtils {
     return extractAllClaims(token).get(TYPE, String.class);
   }
 
-  public static String extractSubject(String token) {
-    return extractAllClaims(token).getSubject();
+  public static Long extractSubject(String token) {
+    return Long.valueOf(extractAllClaims(token).getSubject());
   }
 
   public static Claims extractAllClaims(String token) {
