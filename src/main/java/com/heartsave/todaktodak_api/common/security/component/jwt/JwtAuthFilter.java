@@ -59,7 +59,6 @@ public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
       Authentication authentication)
       throws IOException {
     TodakUser user = (TodakUser) authentication.getPrincipal();
-    user.removePassword();
     var accessToken = JwtUtils.issueToken(user, ACCESS_TYPE);
     var refreshToken = JwtUtils.issueToken(user, REFRESH_TYPE);
     var refreshCookie = CookieUtils.createValidCookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken);
