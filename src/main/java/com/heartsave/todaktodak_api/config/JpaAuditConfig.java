@@ -21,6 +21,7 @@ public class JpaAuditConfig {
             .map(SecurityContext::getAuthentication)
             .filter(Authentication::isAuthenticated)
             .map(Authentication::getPrincipal)
+            .filter(principal -> principal instanceof TodakUser)
             .map(TodakUser.class::cast)
             .map(TodakUser::getId);
   }

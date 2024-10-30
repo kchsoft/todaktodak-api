@@ -18,8 +18,8 @@ public class WithMockTodakUserSecurityContextFactory
     String username = annotation.username();
     long id = annotation.id();
     String role = annotation.role();
-
-    TodakUser user = TodakUser.of(id, username, role, Map.of());
+    TodakUser user =
+        TodakUser.builder().id(id).username(username).role(role).attributes(Map.of()).build();
 
     UsernamePasswordAuthenticationToken token =
         new UsernamePasswordAuthenticationToken(

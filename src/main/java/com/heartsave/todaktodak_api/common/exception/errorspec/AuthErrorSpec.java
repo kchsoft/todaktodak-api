@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 public enum AuthErrorSpec implements ErrorSpec {
   INCORRECT_USERNAME_PASSWORD(
       HttpStatus.UNAUTHORIZED, "AUTH-001", "아이디 또는 비밀번호가 틀렸습니다.", "로그인이 실패됐습니다."),
-  DUPLICATED_INFORMATION(HttpStatus.CONFLICT, "AUTH-002", "중복된 정보가 있습니다.", "회원가입 요청 실패");
+  DUPLICATED_INFORMATION(HttpStatus.CONFLICT, "AUTH-002", "중복된 정보가 있습니다.", "회원가입 요청 실패"),
+  OAUTH_LOGIN_FAIL(HttpStatus.UNAUTHORIZED, "AUTH-003", "소셜 로그인이 실패됐습니다.", "OAuth2 로그인 실패"),
+  OAUTH_DUPLICATED_EMAIL(HttpStatus.UNAUTHORIZED, "AUTH-004", "이미 가입된 계정입니다.", "OAuth2 중복 회원가입 시도");
 
   private final HttpStatus status;
   private final String code;

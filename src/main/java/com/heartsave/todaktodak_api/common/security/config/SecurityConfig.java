@@ -1,11 +1,15 @@
 package com.heartsave.todaktodak_api.common.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.heartsave.todaktodak_api.common.security.TodakUserDetailsService;
+import com.heartsave.todaktodak_api.common.security.component.AccessDeniedHandlerImpl;
+import com.heartsave.todaktodak_api.common.security.component.AuthenticationEntryPointImpl;
 import com.heartsave.todaktodak_api.common.security.component.jwt.JwtAuthFilter;
 import com.heartsave.todaktodak_api.common.security.component.jwt.JwtLogoutFilter;
 import com.heartsave.todaktodak_api.common.security.component.jwt.JwtValidationFilter;
 import com.heartsave.todaktodak_api.common.security.component.oauth2.OAuth2SuccessHandler;
 import com.heartsave.todaktodak_api.common.security.component.oauth2.Oauth2FailureHandler;
+import com.heartsave.todaktodak_api.common.security.component.oauth2.TodakOauth2UserDetailsService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,11 +20,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -31,12 +31,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
-  private final AuthenticationEntryPoint authenticationEntryPoint;
-  private final AccessDeniedHandler accessDeniedHandler;
+  private final AuthenticationEntryPointImpl authenticationEntryPoint;
+  private final AccessDeniedHandlerImpl accessDeniedHandler;
   private final OAuth2SuccessHandler oAuth2SuccessHandler;
   private final Oauth2FailureHandler oauth2FailureHandler;
-  private final UserDetailsService userDetailsService;
-  private final DefaultOAuth2UserService oauth2UserDetailsService;
+  private final TodakUserDetailsService userDetailsService;
+  private final TodakOauth2UserDetailsService oauth2UserDetailsService;
   private final JwtLogoutFilter jwtLogoutFilter;
   private final ObjectMapper objectMapper;
 
@@ -70,8 +70,7 @@ public class SecurityConfig {
         .sessionManagement(
             sessionManagement ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(
-            new JwtValidationFilter(userDetailsService, objectMapper), JwtAuthFilter.class)
+        .addFilterBefore(new JwtValidationFilter(objectMapper), JwtAuthFilter.class)
         .addFilterBefore(
             new JwtAuthFilter(authenticationManager, objectMapper),
             UsernamePasswordAuthenticationFilter.class)

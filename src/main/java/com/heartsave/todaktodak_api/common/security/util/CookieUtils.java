@@ -11,7 +11,9 @@ import org.springframework.stereotype.Component;
 public class CookieUtils {
   private static Long MAX_AGE;
 
-  private CookieUtils(@Value("${jwt.refresh-expire-time}") Long MAX_AGE) {}
+  private CookieUtils(@Value("${jwt.refresh-expire-time}") Long refreshTokenExpireTimeMilliSecond) {
+    MAX_AGE = refreshTokenExpireTimeMilliSecond;
+  }
 
   public static Cookie createValidCookie(String key, String value) {
     Cookie cookie = new Cookie(key, value);
