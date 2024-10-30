@@ -2,7 +2,6 @@ package com.heartsave.todaktodak_api.diary.repository;
 
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,18 +39,4 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
           " SELECT d FROM DiaryEntity  d WHERE d.memberEntity.id = :memberId AND CAST (d.diaryCreatedTime as DATE) = :diaryDate ")
   Optional<DiaryEntity> findByMemberIdAndDate(
       @Param("memberId") Long memberId, @Param("diaryDate") LocalDate diaryDate);
-
-  @Query(
-      value =
-          """
-            SELECT
-              COUNT(CASE WHEN reaction_type = 'LIKE' THEN 1 END) as likes,
-              COUNT(CASE WHEN reaction_type = 'SURPRISED' THEN 1 END) as surprised,
-              COUNT(CASE WHEN reaction_type = 'EMPATHIZE' THEN 1 END) as empathize,
-              COUNT(CASE WHEN reaction_type = 'CHEERING' THEN 1 END) as cheering
-            FROM diary_reaction
-            WHERE diary_id = :diaryId
-            """,
-      nativeQuery = true)
-  Optional<DiaryReactionCountProjection> findReactionCountById(Long diaryId);
 }

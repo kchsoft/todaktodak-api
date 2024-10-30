@@ -1,9 +1,12 @@
 package com.heartsave.todaktodak_api.diary.controller;
 
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.service.PublicDiaryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,10 +39,30 @@ public class PublicDiaryController {
   @PostMapping
   public ResponseEntity<Void> writePublicContent(
       @AuthenticationPrincipal TodakUser principal,
-      @Valid @RequestBody PublicDiaryWriteRequest request) {
+      @Parameter(description = "일기 공개 업로드 요청 데이터", required = true) @Valid @RequestBody
+          PublicDiaryWriteRequest request) {
     log.info("공개 일기 업로드 시작");
     publicDiaryService.write(principal, request.publicContent(), request.diaryId());
     log.info("공개 일기 업로드 성공");
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
+
+  @Operation(
+      summary = "일기 반응 토글",
+      description = "공개 일기에 대한 반응(좋아요 등)을 토글합니다. 이미 있는 반응은 제거되고, 없는 반응은 추가됩니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "204", description = "반응 토글 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content),
+      })
+  @PostMapping("/reaction")
+  public ResponseEntity<Void> toggleReaction(
+      @Parameter(hidden = true) @AuthenticationPrincipal TodakUser principal,
+      @Parameter(description = "일기 반응 요청 데이터", required = true) @Valid @RequestBody
+          PublicDiaryReactionRequest request) {
+    log.info("일기장 반응 토글을 요청합니다");
+    publicDiaryService.toggleReactionStatus(principal, request);
+    log.info("일기장 반응 토글을 성공적으로 마쳤습니다.");
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }

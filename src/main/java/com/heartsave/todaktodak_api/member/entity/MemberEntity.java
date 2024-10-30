@@ -48,4 +48,8 @@ public class MemberEntity extends BaseEntity {
   private TodakRole role;
 
   private Integer characterSeed;
+
+  public static MemberEntity createById(Long id) {
+    return MemberEntity.builder().id(id).build();
+  }
 }

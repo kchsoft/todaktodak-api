@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +32,13 @@ import lombok.NoArgsConstructor;
     sequenceName = "DIARY_REACTION_SEQ",
     initialValue = 1,
     allocationSize = 100)
-@Table(name = "diary_reaction")
+@Table(
+    name = "diary_reaction",
+    uniqueConstraints = {
+      @UniqueConstraint(
+          columnNames = {"member_id", "diary_id", "reaction_type"},
+          name = "uk_member_diary_reaction")
+    })
 public class DiaryReactionEntity extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DIARY_REACTION_SEQ_GENERATOR")
