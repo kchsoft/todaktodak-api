@@ -16,13 +16,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import javax.security.sasl.AuthenticationException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -31,7 +32,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtValidationFilter extends OncePerRequestFilter {
   private final ObjectMapper objectMapper;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
-  private final String LOGIN_URL = "/api/v1/auth/login";
+  private final AuthenticationEntryPoint authenticationEntryPoint;
 
   @Override
   protected void doFilterInternal(
@@ -40,6 +41,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
     var token = extractToken(request);
 
     if (token == null) {
+      logger.error("토큰이 없습니다");
       filterChain.doFilter(request, response);
       return;
     }
@@ -47,25 +49,24 @@ public class JwtValidationFilter extends OncePerRequestFilter {
       JwtUtils.extractAllClaims(token);
       if (!isValidTokenType(token)) {
         logger.error("유효하지 않은 토큰 유형입니다. {}", token);
-        throw new AuthenticationException(TokenErrorSpec.INVALID_TOKEN.name());
+        authenticationEntryPoint.commence(
+            request, response, new BadCredentialsException(TokenErrorSpec.INVALID_TOKEN.name()));
+      } else {
+        setAuthentication(token);
+        filterChain.doFilter(request, response);
       }
-      setAuthentication(token);
     } catch (ExpiredJwtException e) {
       logger.error("토큰이 만료됐습니다. {}", token);
-      throw new AuthenticationException(TokenErrorSpec.EXPIRED_TOKEN.name());
+      authenticationEntryPoint.commence(
+          request, response, new BadCredentialsException(TokenErrorSpec.EXPIRED_TOKEN.name()));
     } catch (SecurityException
         | MalformedJwtException
         | UnsupportedJwtException
         | IllegalArgumentException e) {
       logger.error("유효하지 않은 토큰입니다. {}", token);
-      throw new AuthenticationException(TokenErrorSpec.INVALID_TOKEN.name());
+      authenticationEntryPoint.commence(
+          request, response, new BadCredentialsException(TokenErrorSpec.INVALID_TOKEN.name()));
     }
-    filterChain.doFilter(request, response);
-  }
-
-  @Override
-  protected boolean shouldNotFilter(HttpServletRequest request) {
-    return request.getServletPath().equals(LOGIN_URL);
   }
 
   private String extractToken(HttpServletRequest request) {
@@ -81,6 +82,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
   private void setAuthentication(String token) {
     var authentication = getAuthentication(token);
     SecurityContextHolder.getContext().setAuthentication(authentication);
+    logger.info("인증 정보 구성 완료: {}", authentication);
   }
 
   private Authentication getAuthentication(String token) {

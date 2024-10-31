@@ -1,7 +1,6 @@
 package com.heartsave.todaktodak_api.common.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.heartsave.todaktodak_api.common.security.TodakUserDetailsService;
 import com.heartsave.todaktodak_api.common.security.component.AccessDeniedHandlerImpl;
 import com.heartsave.todaktodak_api.common.security.component.AuthenticationEntryPointImpl;
 import com.heartsave.todaktodak_api.common.security.component.jwt.JwtAuthFilter;
@@ -35,7 +34,6 @@ public class SecurityConfig {
   private final AccessDeniedHandlerImpl accessDeniedHandler;
   private final OAuth2SuccessHandler oAuth2SuccessHandler;
   private final Oauth2FailureHandler oauth2FailureHandler;
-  private final TodakUserDetailsService userDetailsService;
   private final TodakOauth2UserDetailsService oauth2UserDetailsService;
   private final JwtLogoutFilter jwtLogoutFilter;
   private final ObjectMapper objectMapper;
@@ -48,18 +46,17 @@ public class SecurityConfig {
       HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
     return http.csrf(AbstractHttpConfigurer::disable)
         .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
-        .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
-        .exceptionHandling(
-            (eh) ->
-                eh.authenticationEntryPoint(authenticationEntryPoint)
-                    .accessDeniedHandler(accessDeniedHandler))
         .oauth2Login(
             (oauth2) ->
                 oauth2
                     .userInfoEndpoint((config) -> config.userService(oauth2UserDetailsService))
                     .successHandler(oAuth2SuccessHandler)
                     .failureHandler(oauth2FailureHandler))
+        .exceptionHandling(
+            (eh) ->
+                eh.authenticationEntryPoint(authenticationEntryPoint)
+                    .accessDeniedHandler(accessDeniedHandler))
         .authorizeHttpRequests(
             authorize ->
                 authorize
@@ -70,7 +67,8 @@ public class SecurityConfig {
         .sessionManagement(
             sessionManagement ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(new JwtValidationFilter(objectMapper), JwtAuthFilter.class)
+        .addFilterBefore(
+            new JwtValidationFilter(objectMapper, authenticationEntryPoint), JwtAuthFilter.class)
         .addFilterBefore(
             new JwtAuthFilter(authenticationManager, objectMapper),
             UsernamePasswordAuthenticationFilter.class)
