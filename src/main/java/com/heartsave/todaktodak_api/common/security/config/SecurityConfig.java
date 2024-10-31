@@ -46,6 +46,11 @@ public class SecurityConfig {
       HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
     return http.csrf(AbstractHttpConfigurer::disable)
         .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
+        .anonymous(AbstractHttpConfigurer::disable)
+        .exceptionHandling(
+            (eh) ->
+                eh.authenticationEntryPoint(authenticationEntryPoint)
+                    .accessDeniedHandler(accessDeniedHandler))
         .httpBasic(AbstractHttpConfigurer::disable)
         .oauth2Login(
             (oauth2) ->
@@ -53,10 +58,6 @@ public class SecurityConfig {
                     .userInfoEndpoint((config) -> config.userService(oauth2UserDetailsService))
                     .successHandler(oAuth2SuccessHandler)
                     .failureHandler(oauth2FailureHandler))
-        .exceptionHandling(
-            (eh) ->
-                eh.authenticationEntryPoint(authenticationEntryPoint)
-                    .accessDeniedHandler(accessDeniedHandler))
         .authorizeHttpRequests(
             authorize ->
                 authorize
@@ -67,8 +68,7 @@ public class SecurityConfig {
         .sessionManagement(
             sessionManagement ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(
-            new JwtValidationFilter(objectMapper, authenticationEntryPoint), JwtAuthFilter.class)
+        .addFilterBefore(new JwtValidationFilter(authenticationEntryPoint), JwtAuthFilter.class)
         .addFilterBefore(
             new JwtAuthFilter(authenticationManager, objectMapper),
             UsernamePasswordAuthenticationFilter.class)
