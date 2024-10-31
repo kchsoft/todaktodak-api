@@ -41,12 +41,13 @@ public class PublicDiaryController {
         @ApiResponse(responseCode = "400", description = "잘못된 요청")
       })
   @GetMapping
-  public ResponseEntity<PublicDiaryViewDetailResponse> getPublicDiaryViewDetail(
+  public ResponseEntity<PublicDiaryViewDetailResponse> getPublicDiaries(
       @AuthenticationPrincipal TodakUser principal,
       @Valid @Min(0L) @RequestParam(name = "after", defaultValue = "0", required = false)
           Long publicDiaryId) {
     log.info("공개 일기를 조회를 요청합니다. after = {}", publicDiaryId);
-    PublicDiaryViewDetailResponse response = publicDiaryService.get(principal, publicDiaryId);
+    PublicDiaryViewDetailResponse response =
+        publicDiaryService.getPublicDiaryViewDetail(principal, publicDiaryId);
     log.info("공개 일기 조회를 성공적으로 마쳤습니다.");
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }

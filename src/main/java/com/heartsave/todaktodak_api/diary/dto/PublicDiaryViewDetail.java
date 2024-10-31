@@ -2,7 +2,6 @@ package com.heartsave.todaktodak_api.diary.dto;
 
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryViewProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.List;
@@ -29,8 +28,7 @@ public class PublicDiaryViewDetail {
   @Schema(description = "공개된 일기 내용", example = "오늘은 행복한 하루였습니다...")
   private final String publicContent;
 
-  @Schema(description = "웹툰 이미지 URL", example = "https://example.com/webtoon/123.jpg")
-  private final String webtoonUrl;
+  private final List<String> webtoonUrls;
 
   @Schema(description = "배경음악 URL", example = "https://example.com/bgm/123.mp3")
   private final String bgmUrl;
@@ -44,21 +42,19 @@ public class PublicDiaryViewDetail {
   @Schema(description = "현재 사용자의 반응 목록")
   private final List<DiaryReactionType> myReaction;
 
-  public static PublicDiaryViewDetail of(
-      PublicDiaryViewProjection view,
+  public PublicDiaryViewDetail(
+      PublicDiaryView view,
       DiaryReactionCountProjection reactionCount,
       List<DiaryReactionType> memberReaction) {
-    return PublicDiaryViewDetail.builder()
-        .publicDiaryId(view.getPublicDiaryId())
-        .diaryId(view.getDiaryId())
-        .characterImageUrl(view.getCharacterImageUrl())
-        .nickname(view.getNickname())
-        .publicContent(view.getPublicContent())
-        .webtoonUrl(view.getWebtoonImageUrl())
-        .bgmUrl(view.getBgmUrl())
-        .date(view.getDate())
-        .reactionCount(reactionCount)
-        .myReaction(memberReaction)
-        .build();
+    this.publicDiaryId = view.getPublicDiaryId();
+    this.diaryId = view.getDiaryId();
+    this.characterImageUrl = view.getCharacterImageUrl();
+    this.nickname = view.getNickname();
+    this.publicContent = view.getPublicContent();
+    this.webtoonUrls = view.getWebtoonUrls();
+    this.bgmUrl = view.getBgmUrl();
+    this.date = view.getDate();
+    this.reactionCount = reactionCount;
+    this.myReaction = memberReaction;
   }
 }
