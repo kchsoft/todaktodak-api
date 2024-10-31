@@ -4,6 +4,7 @@ import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.
 import static com.heartsave.todaktodak_api.common.security.util.JwtUtils.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.heartsave.todaktodak_api.common.exception.errorspec.TokenErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.security.util.JwtUtils;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -46,16 +47,18 @@ public class JwtValidationFilter extends OncePerRequestFilter {
       JwtUtils.extractAllClaims(token);
       if (!isValidTokenType(token)) {
         logger.error("유효하지 않은 토큰 유형입니다. {}", token);
-        throw new AuthenticationException(INVALID_TOKEN_ERROR_DETAIL);
+        throw new AuthenticationException(TokenErrorSpec.INVALID_TOKEN.name());
       }
       setAuthentication(token);
     } catch (ExpiredJwtException e) {
       logger.error("토큰이 만료됐습니다. {}", token);
+      throw new AuthenticationException(TokenErrorSpec.EXPIRED_TOKEN.name());
     } catch (SecurityException
         | MalformedJwtException
         | UnsupportedJwtException
         | IllegalArgumentException e) {
       logger.error("유효하지 않은 토큰입니다. {}", token);
+      throw new AuthenticationException(TokenErrorSpec.INVALID_TOKEN.name());
     }
     filterChain.doFilter(request, response);
   }
