@@ -5,11 +5,9 @@ import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountPr
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
 
 @Schema(description = "공개 일기 상세 정보")
-@Builder
 @Getter
 public class PublicDiaryViewDetail {
 

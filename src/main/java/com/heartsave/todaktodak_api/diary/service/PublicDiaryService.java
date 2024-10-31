@@ -41,7 +41,7 @@ public class PublicDiaryService {
       TodakUser principal, Long publicDiaryId) { // Todo : 쿼리 최적화
     log.info("공개 일기 view를 조회합니다.");
     List<PublicDiaryView> diaryViews = getDiaryViews(publicDiaryId);
-    log.info("공개 일기 view를 조회를 마쳤습니다.");
+    log.info("공개 일기 view 조회를 마쳤습니다.");
 
     Long memberId = principal.getId();
     PublicDiaryViewDetailResponse response = new PublicDiaryViewDetailResponse();
@@ -81,7 +81,7 @@ public class PublicDiaryService {
     DiaryReactionCountProjection reactionCount =
         diaryReactionRepository.countEachByDiaryId(view.getDiaryId()).get();
     List<DiaryReactionType> memberReaction =
-        diaryReactionRepository.findReactionByMemberId(memberId, view.getDiaryId());
+        diaryReactionRepository.findReactionByMemberAndDiaryId(memberId, view.getDiaryId());
     return new PublicDiaryViewDetail(view, reactionCount, memberReaction);
   }
 

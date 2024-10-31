@@ -3,18 +3,26 @@ package com.heartsave.todaktodak_api.diary.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
+import com.heartsave.todaktodak_api.diary.dto.PublicDiaryViewDetail;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryWriteRequest;
+import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryViewDetailResponse;
 import com.heartsave.todaktodak_api.diary.service.PublicDiaryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -35,6 +43,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @AutoConfigureMockMvc(addFilters = false)
 public class PublicDiaryControllerTest {
 
+  @Mock private S3FileStorageService s3FileStorageService;
   @MockBean private PublicDiaryService publicDiaryService;
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
@@ -137,6 +146,73 @@ public class PublicDiaryControllerTest {
             post("/api/v1/diary/public/reaction")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRequest))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("공개 일기 조회 성공")
+  @WithMockTodakUser
+  void getPublicDiaries_Success() throws Exception {
+    Long publicDiaryId = 1L;
+    PublicDiaryViewDetailResponse response = new PublicDiaryViewDetailResponse();
+    PublicDiaryViewDetail viewDetail1 = mock(PublicDiaryViewDetail.class);
+    PublicDiaryViewDetail viewDetail2 = mock(PublicDiaryViewDetail.class);
+    response.addViewDetail(viewDetail1);
+    response.addViewDetail(viewDetail2);
+    when(publicDiaryService.getPublicDiaryViewDetail(any(TodakUser.class), eq(publicDiaryId)))
+        .thenReturn(response);
+
+    mockMvc
+        .perform(
+            get("/api/v1/diary/public")
+                .param("after", String.valueOf(publicDiaryId))
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(content().json(objectMapper.writeValueAsString(response)));
+  }
+
+  @Test
+  @DisplayName("공개 일기 조회 성공 - after 파라미터 미입력시 기본값 0 사용")
+  @WithMockTodakUser
+  void getPublicDiaries_Success_DefaultAfterParameter() throws Exception {
+    PublicDiaryViewDetailResponse response = new PublicDiaryViewDetailResponse();
+    when(publicDiaryService.getPublicDiaryViewDetail(any(TodakUser.class), eq(0L)))
+        .thenReturn(response);
+
+    mockMvc
+        .perform(get("/api/v1/diary/public").contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(content().json(objectMapper.writeValueAsString(response)));
+  }
+
+  @Test
+  @DisplayName("공개 일기 조회 실패 - 음수 after 파라미터")
+  @WithMockTodakUser
+  void getPublicDiaries_Fail_NegativeAfterParameter() throws Exception {
+    // given
+    Long invalidPublicDiaryId = -1L;
+
+    // when & then
+    mockMvc
+        .perform(
+            get("/api/v1/diary/public")
+                .param("after", String.valueOf(invalidPublicDiaryId))
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("공개 일기 조회 실패 - 잘못된 형식의 after 파라미터")
+  @WithMockTodakUser
+  void getPublicDiaries_Fail_InvalidAfterParameterFormat() throws Exception {
+    // when & then
+    mockMvc
+        .perform(
+            get("/api/v1/diary/public")
+                .param("after", "invalid-id")
+                .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isBadRequest());
   }
 }

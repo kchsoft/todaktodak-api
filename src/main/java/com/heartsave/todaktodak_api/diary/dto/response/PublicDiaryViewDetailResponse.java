@@ -2,6 +2,7 @@ package com.heartsave.todaktodak_api.diary.dto.response;
 
 import com.heartsave.todaktodak_api.diary.dto.PublicDiaryViewDetail;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 
@@ -16,7 +17,8 @@ public class PublicDiaryViewDetailResponse {
   private Long after;
 
   public PublicDiaryViewDetailResponse() {
-    after = Long.MAX_VALUE;
+    this.diaries = new ArrayList<>();
+    this.after = Long.MAX_VALUE;
   }
 
   public void addViewDetail(PublicDiaryViewDetail viewDetail) {
