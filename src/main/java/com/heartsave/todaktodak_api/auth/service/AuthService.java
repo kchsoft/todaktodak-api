@@ -37,40 +37,18 @@ public class AuthService {
 
   public TokenReissueResponse reissueToken(
       HttpServletRequest request, HttpServletResponse response) {
-    var retrievedRefreshTokenCookie =
-        CookieUtils.extractCookie(request, JwtConstant.REFRESH_TOKEN_COOKIE_KEY);
-    if (retrievedRefreshTokenCookie == null) throw new AuthException(AuthErrorSpec.ABNORMAL_ACCESS);
+    // 토큰 유효성 검사
+    var refreshToken = extractRefreshToken(request);
+    validateToken(refreshToken);
 
-    var token = retrievedRefreshTokenCookie.getValue();
-    logger.info("리프레시 토큰: {}", token);
-    if (token == null) throw new AuthException(AuthErrorSpec.RE_LOGIN_REQUIRED);
-    try {
-      JwtUtils.extractAllClaims(token);
-      if (!isRefreshTokenType(token)) throw new AuthException(AuthErrorSpec.RE_LOGIN_REQUIRED);
-    } catch (ExpiredJwtException e) {
-      logger.error("토큰이 만료됐습니다. {}", token);
-      throw new AuthException(AuthErrorSpec.RE_LOGIN_REQUIRED);
-    } catch (Exception e) {
-      logger.error("유효하지 않은 토큰입니다. {}", token);
-      throw new AuthException(AuthErrorSpec.RE_LOGIN_REQUIRED);
-    }
+    // 인증 정보 생성
+    Long id = JwtUtils.extractSubject(refreshToken);
+    TodakUser user = createAuthenticationFromMember(id);
 
-    Long id = JwtUtils.extractSubject(token);
-    MemberEntity member =
-        memberRepository.findById(id).orElseThrow(() -> new AuthException(AuthErrorSpec.AUTH_FAIL));
-    var user =
-        TodakUser.builder()
-            .id(member.getId())
-            .username(member.getLoginId())
-            .role(member.getRole().name())
-            .build();
+    // 토큰 재발급 및 쿠키 갱신
     var accessToken = JwtUtils.issueToken(user, ACCESS_TYPE);
-    var refreshToken = JwtUtils.issueToken(user, REFRESH_TYPE);
-    var refreshCookie = CookieUtils.createValidCookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken);
-    response.setContentType(APPLICATION_JSON_VALUE);
-    response.setCharacterEncoding(UTF_8.name());
-    response.addCookie(refreshCookie);
-    response.setStatus(SC_OK);
+    var newRefreshToken = JwtUtils.issueToken(user, REFRESH_TYPE);
+    updateRefreshTokenCookie(response, newRefreshToken);
 
     return TokenReissueResponse.builder().accessToken(accessToken).build();
   }
@@ -89,6 +67,52 @@ public class AuthService {
             .build();
 
     memberRepository.save(newMember);
+  }
+
+  private String extractRefreshToken(HttpServletRequest request) {
+    var refreshTokenCookie =
+        CookieUtils.extractCookie(request, JwtConstant.REFRESH_TOKEN_COOKIE_KEY);
+    if (refreshTokenCookie == null) {
+      throw new AuthException(AuthErrorSpec.ABNORMAL_ACCESS);
+    }
+    String token = refreshTokenCookie.getValue();
+    if (token == null) {
+      throw new AuthException(AuthErrorSpec.RE_LOGIN_REQUIRED);
+    }
+    return token;
+  }
+
+  private void validateToken(String token) {
+    try {
+      JwtUtils.extractAllClaims(token);
+      if (!isRefreshTokenType(token)) {
+        throw new AuthException(AuthErrorSpec.RE_LOGIN_REQUIRED);
+      }
+    } catch (ExpiredJwtException e) {
+      logger.error("토큰이 만료됐습니다. {}", token);
+      throw new AuthException(AuthErrorSpec.RE_LOGIN_REQUIRED);
+    } catch (Exception e) {
+      logger.error("유효하지 않은 토큰입니다. {}", token);
+      throw new AuthException(AuthErrorSpec.RE_LOGIN_REQUIRED);
+    }
+  }
+
+  private TodakUser createAuthenticationFromMember(Long id) {
+    MemberEntity member =
+        memberRepository.findById(id).orElseThrow(() -> new AuthException(AuthErrorSpec.AUTH_FAIL));
+    return TodakUser.builder()
+        .id(member.getId())
+        .username(member.getLoginId())
+        .role(member.getRole().name())
+        .build();
+  }
+
+  private void updateRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+    var refreshCookie = CookieUtils.createValidCookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken);
+    response.setContentType(APPLICATION_JSON_VALUE);
+    response.setCharacterEncoding(UTF_8.name());
+    response.addCookie(refreshCookie);
+    response.setStatus(SC_OK);
   }
 
   private boolean isRefreshTokenType(String token) {

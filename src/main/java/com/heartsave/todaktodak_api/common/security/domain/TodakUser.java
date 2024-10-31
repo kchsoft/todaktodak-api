@@ -17,7 +17,7 @@ public class TodakUser implements UserDetails, OAuth2User, Serializable {
   private final String username;
   private final String role;
   private final Map<String, Object> attributes;
-  private String password;
+  private final String password;
 
   @Builder
   private TodakUser(
