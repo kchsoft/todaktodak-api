@@ -32,6 +32,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtValidationFilter extends OncePerRequestFilter {
   private final ObjectMapper objectMapper;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private final String LOGIN_URL = "/api/v1/auth/login";
 
   @Override
   protected void doFilterInternal(
@@ -65,6 +66,11 @@ public class JwtValidationFilter extends OncePerRequestFilter {
       setErrorResponse(response, TokenErrorSpec.INVALID_TOKEN);
     }
     filterChain.doFilter(request, response);
+  }
+
+  @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    return request.getServletPath().equals(LOGIN_URL);
   }
 
   private void setErrorResponse(HttpServletResponse response, TokenErrorSpec errorSpec)
