@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum TokenErrorSpec implements ErrorSpec {
   EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN-001", "로그인 정보가 만료되었습니다.", "회원의 토큰이 만료되었습니다."),
-  INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN-002", "유효하지 않은 로그인 정보 입니다.", "회원의 토큰이 유효하지 않습니다.");
+  INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN-002", "유효하지 않은 로그인 정보 입니다.", "회원의 토큰이 유효하지 않습니다."),
+  NON_EXISTENT_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN-003", "로그인이 필요합니다.", "액세스 토큰이 없는 요청입니다.");
 
   private final HttpStatus status;
   private final String code;
