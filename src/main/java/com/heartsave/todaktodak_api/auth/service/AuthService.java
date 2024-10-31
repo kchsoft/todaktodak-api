@@ -86,14 +86,14 @@ public class AuthService {
     try {
       JwtUtils.extractAllClaims(token);
       if (!isRefreshTokenType(token)) {
-        throw new AuthException(AuthErrorSpec.RE_LOGIN_REQUIRED);
+        throw new AuthException(AuthErrorSpec.ABNORMAL_ACCESS);
       }
     } catch (ExpiredJwtException e) {
       logger.error("토큰이 만료됐습니다. {}", token);
       throw new AuthException(AuthErrorSpec.RE_LOGIN_REQUIRED);
     } catch (Exception e) {
       logger.error("유효하지 않은 토큰입니다. {}", token);
-      throw new AuthException(AuthErrorSpec.RE_LOGIN_REQUIRED);
+      throw new AuthException(AuthErrorSpec.ABNORMAL_ACCESS);
     }
   }
 
