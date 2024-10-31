@@ -77,7 +77,7 @@ public class AuthService {
     }
     String token = refreshTokenCookie.getValue();
     if (token == null) {
-      throw new AuthException(AuthErrorSpec.RE_LOGIN_REQUIRED);
+      throw new AuthException(AuthErrorSpec.ABNORMAL_ACCESS);
     }
     return token;
   }
