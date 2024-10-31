@@ -11,6 +11,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SecurityException;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -73,17 +74,13 @@ public class JwtValidationFilter extends OncePerRequestFilter {
     if (request.getCookies() != null
         && Arrays.stream(request.getCookies())
             .anyMatch(p -> p.getName().equals(REFRESH_TOKEN_COOKIE_KEY))) {
-      if (request.getCookies() != null)
-        logger.warn(
-            String.valueOf(
-                Arrays.stream(request.getCookies())
-                    .anyMatch(p -> p.getName().equals(REFRESH_TOKEN_COOKIE_KEY))));
       request.setAttribute(NO_TOKEN_REQUEST_ATTRIBUTE_KEY, TokenErrorSpec.NON_EXISTENT_TOKEN);
     } else {
       request.setAttribute(NO_TOKEN_REQUEST_ATTRIBUTE_KEY, AuthErrorSpec.ABNORMAL_ACCESS);
     }
   }
 
+  @Nullable
   private String extractToken(HttpServletRequest request) {
     String value = request.getHeader(HEADER_KEY);
     if (value == null || !value.contains(TOKEN_PREFIX)) return null;
