@@ -40,7 +40,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
     var token = extractToken(request);
 
     if (token == null) {
-      logger.error("NO TOKEN: {}", token);
+      setErrorResponse(response, TokenErrorSpec.NON_EXISTENT_TOKEN);
       filterChain.doFilter(request, response);
       return;
     }
@@ -64,6 +64,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
       logger.error("유효하지 않은 토큰입니다.");
       setErrorResponse(response, TokenErrorSpec.INVALID_TOKEN);
     }
+    filterChain.doFilter(request, response);
   }
 
   private void setErrorResponse(HttpServletResponse response, TokenErrorSpec errorSpec)
