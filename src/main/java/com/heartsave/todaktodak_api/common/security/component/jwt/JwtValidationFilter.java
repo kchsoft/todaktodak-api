@@ -3,7 +3,7 @@ package com.heartsave.todaktodak_api.common.security.component.jwt;
 import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.*;
 import static com.heartsave.todaktodak_api.common.security.util.JwtUtils.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.heartsave.todaktodak_api.common.exception.errorspec.AuthErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.TokenErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.security.util.JwtUtils;
@@ -16,6 +16,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 @RequiredArgsConstructor
 public class JwtValidationFilter extends OncePerRequestFilter {
-  private final ObjectMapper objectMapper;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final AuthenticationEntryPoint authenticationEntryPoint;
 
@@ -41,7 +41,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
     var token = extractToken(request);
 
     if (token == null) {
-      logger.error("토큰이 없습니다");
+      setInvalidRequestAttribute(request);
       filterChain.doFilter(request, response);
       return;
     }
@@ -66,6 +66,21 @@ public class JwtValidationFilter extends OncePerRequestFilter {
       logger.error("유효하지 않은 토큰입니다. {}", token);
       authenticationEntryPoint.commence(
           request, response, new BadCredentialsException(TokenErrorSpec.INVALID_TOKEN.name()));
+    }
+  }
+
+  private void setInvalidRequestAttribute(HttpServletRequest request) {
+    if (request.getCookies() != null
+        && Arrays.stream(request.getCookies())
+            .anyMatch(p -> p.getName().equals(REFRESH_TOKEN_COOKIE_KEY))) {
+      if (request.getCookies() != null)
+        logger.warn(
+            String.valueOf(
+                Arrays.stream(request.getCookies())
+                    .anyMatch(p -> p.getName().equals(REFRESH_TOKEN_COOKIE_KEY))));
+      request.setAttribute(NO_TOKEN_REQUEST_ATTRIBUTE_KEY, TokenErrorSpec.NON_EXISTENT_TOKEN);
+    } else {
+      request.setAttribute(NO_TOKEN_REQUEST_ATTRIBUTE_KEY, AuthErrorSpec.ABNORMAL_ACCESS);
     }
   }
 
