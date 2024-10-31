@@ -23,6 +23,9 @@ public class PublicDiaryView {
   @Schema(description = "공개된 일기 내용", example = "오늘은 행복한 하루였습니다...")
   private final String publicContent;
 
+  @Schema(
+      description = "일기 내용을 기반으로 생성된 웹툰 이미지 URL 목록",
+      example = "[\"https://example.com/webtoon/1.jpg\", \"https://example.com/webtoon/2.jpg\"]")
   private final List<String> webtoonUrls;
 
   @Schema(description = "배경음악 URL", example = "https://example.com/bgm/123.mp3")
