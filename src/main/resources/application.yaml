@@ -4,6 +4,22 @@ server:
 spring:
   profiles:
     active: "local"
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 jwt:
   secret-key: ${JWT_SECRET_KEY:abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijkl}
   access-expire-time: ${ACCESS_EXPIRE_TIME:123456}
