@@ -12,6 +12,7 @@ public record SignUpRequest(
     @NotBlank(message = "Blank data")
         @Pattern(regexp = "^[^@.]+@[^@.]+\\.[^@.]+$", message = "올바른 이메일 형식이 아닙니다")
         @Size(max = EMAIL_MAX_SIZE, message = "Exceed size")
+        @Schema(example = "todak@kakao.com")
         String email,
     @NotBlank(message = "Blank data") @Size(max = NICKNAME_MAX_SIZE, message = "Exceed size")
         String nickname,
