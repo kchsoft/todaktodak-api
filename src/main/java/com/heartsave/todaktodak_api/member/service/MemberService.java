@@ -10,8 +10,6 @@ import com.heartsave.todaktodak_api.member.entity.projection.MemberProfileProjec
 import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MemberService {
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final MemberRepository memberRepository;
 
   @Transactional
@@ -31,17 +28,21 @@ public class MemberService {
 
   public MemberProfileResponse getMemberProfile(TodakUser principal) {
     MemberProfileProjection memberProfile = getMemberProfile(principal.getId());
-    logger.info("프로필: {}", memberProfile);
-    // TODO: presigned url 생성
+
     String characterPreSignedUrl =
-        memberProfile.getCharacterImageUrl() == null
-            ? "TODO"
-            : memberProfile.getCharacterImageUrl();
+        createCharacterPreSignedUrl(memberProfile.getCharacterImageUrl());
+
     return MemberProfileResponse.builder()
         .nickname(memberProfile.getNickname())
         .email(memberProfile.getEmail())
         .characterImageUrl(characterPreSignedUrl)
         .build();
+  }
+
+  private MemberEntity findMemberById(Long id) {
+    return memberRepository
+        .findById(id)
+        .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, id));
   }
 
   private MemberProfileProjection getMemberProfile(Long id) {
@@ -50,9 +51,8 @@ public class MemberService {
         .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, id));
   }
 
-  private MemberEntity findMemberById(Long id) {
-    return memberRepository
-        .findById(id)
-        .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, id));
+  private String createCharacterPreSignedUrl(String originUrl) {
+    // TODO: presigned url 생성
+    return originUrl == null ? "TODO" : originUrl;
   }
 }
