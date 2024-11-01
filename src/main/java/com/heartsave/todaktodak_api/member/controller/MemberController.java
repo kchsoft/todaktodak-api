@@ -2,6 +2,7 @@ package com.heartsave.todaktodak_api.member.controller;
 
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.member.dto.request.NicknameUpdateRequest;
+import com.heartsave.todaktodak_api.member.dto.response.MemberProfileResponse;
 import com.heartsave.todaktodak_api.member.dto.response.NicknameUpdateResponse;
 import com.heartsave.todaktodak_api.member.service.MemberService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,10 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "회원", description = "회원 API")
 @RestController
@@ -32,5 +30,16 @@ public class MemberController {
   public ResponseEntity<NicknameUpdateResponse> updateNickname(
       @AuthenticationPrincipal TodakUser user, @Valid @RequestBody NicknameUpdateRequest dto) {
     return ResponseEntity.ok(memberService.updateNickname(user, dto));
+  }
+
+  @GetMapping("/profile")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "회원 프로필 조회"),
+        @ApiResponse(responseCode = "404", description = "회원 조회 실패")
+      })
+  public ResponseEntity<MemberProfileResponse> getMemberProfile(
+      @AuthenticationPrincipal TodakUser user) {
+    return ResponseEntity.ok(memberService.getMemberProfile(user));
   }
 }
