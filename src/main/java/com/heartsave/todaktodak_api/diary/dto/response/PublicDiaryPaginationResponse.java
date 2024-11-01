@@ -21,8 +21,8 @@ public class PublicDiaryPaginationResponse {
     this.after = Long.MAX_VALUE;
   }
 
-  public void addPublicDiary(PublicDiary viewDetail) {
-    diaries.add(viewDetail);
-    after = Math.min(viewDetail.getPublicDiaryId(), after);
+  public void addPublicDiary(PublicDiary publicDiary) {
+    diaries.add(publicDiary);
+    after = Math.min(publicDiary.getPublicDiaryId(), after);
   }
 }

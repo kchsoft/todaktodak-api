@@ -19,7 +19,7 @@ import com.heartsave.todaktodak_api.diary.common.TestDiaryObjectFactory;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
-import com.heartsave.todaktodak_api.diary.dto.response.DiaryViewDetailResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
@@ -190,7 +190,7 @@ public class DiaryServiceTest {
 
   @Test
   @DisplayName("일기 상세 조회 성공")
-  void getDiaryDetailSuccess() {
+  void getDiarySuccess() {
     // given
     LocalDate requestDate = NOW_DATE_TIME.toLocalDate();
     DiaryReactionCountProjection mockReactionCount =
@@ -221,7 +221,7 @@ public class DiaryServiceTest {
     when(mockDiaryReactionRepository.countEachByDiaryId(anyLong()))
         .thenReturn(Optional.of(mockReactionCount));
 
-    DiaryViewDetailResponse response = diaryService.getViewDetail(principal, requestDate);
+    DiaryResponse response = diaryService.getDiary(principal, requestDate);
 
     assertThat(response)
         .satisfies(
@@ -246,7 +246,7 @@ public class DiaryServiceTest {
 
   @Test
   @DisplayName("일기 상세 조회 실패 - 일기를 찾을 수 없음")
-  void getDiaryDetailFail() {
+  void getDiaryFail() {
     LocalDate requestDate = NOW_DATE_TIME.toLocalDate();
 
     when(mockDiaryRepository.findByMemberIdAndDate(anyLong(), any(LocalDate.class)))
@@ -254,7 +254,7 @@ public class DiaryServiceTest {
 
     DiaryException diaryException =
         assertThrows(
-            DiaryNotFoundException.class, () -> diaryService.getViewDetail(principal, requestDate));
+            DiaryNotFoundException.class, () -> diaryService.getDiary(principal, requestDate));
 
     assertThat(diaryException.getErrorSpec()).isEqualTo(DiaryErrorSpec.DIARY_NOT_FOUND);
     verify(mockDiaryRepository, times(1)).findByMemberIdAndDate(anyLong(), any(LocalDate.class));

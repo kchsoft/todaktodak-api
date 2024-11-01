@@ -3,7 +3,7 @@ package com.heartsave.todaktodak_api.diary.controller;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
-import com.heartsave.todaktodak_api.diary.dto.response.DiaryViewDetailResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.service.DiaryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -107,7 +107,7 @@ public class DiaryController {
         @ApiResponse(responseCode = "404", description = "해당 날짜의 일기를 찾을 수 없음")
       })
   @GetMapping("/detail")
-  public ResponseEntity<DiaryViewDetailResponse> getDiaryViewDetail(
+  public ResponseEntity<DiaryResponse> getDiary(
       @AuthenticationPrincipal TodakUser principal,
       @Parameter(
               name = "date",
@@ -120,7 +120,6 @@ public class DiaryController {
           @RequestParam("date")
           @DateTimeFormat(pattern = "yyyy-MM-dd")
           LocalDate requestDate) {
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(diaryService.getViewDetail(principal, requestDate));
+    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getDiary(principal, requestDate));
   }
 }
