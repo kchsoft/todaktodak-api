@@ -7,15 +7,20 @@ import com.heartsave.todaktodak_api.common.BaseTestEntity;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Slf4j
 @DataJpaTest
@@ -24,11 +29,18 @@ public class PublicDiaryRepositoryTest {
   @Autowired private PublicDiaryRepository publicDiaryRepository;
   @Autowired private MemberRepository memberRepository;
   @Autowired private DiaryRepository diaryRepository;
+  @Autowired private TestEntityManager tem;
 
   private MemberEntity member;
+  private MemberEntity member1;
+  private MemberEntity member2;
   private DiaryEntity diary;
+  private DiaryEntity diary1;
+  private DiaryEntity diary2;
   private PublicDiaryEntity publicDiary;
   private final String PUBLIC_CONTENT = "테스트 공개 일기 내용";
+  private PublicDiaryEntity publicDiary1;
+  private PublicDiaryEntity publicDiary2;
 
   @BeforeEach
   void setup() {
@@ -44,6 +56,34 @@ public class PublicDiaryRepositoryTest {
             .memberEntity(member)
             .publicContent(PUBLIC_CONTENT)
             .build();
+
+    member1 = BaseTestEntity.createMemberNoId();
+    diary1 = BaseTestEntity.createDiaryNoIdWithMember(member1);
+    memberRepository.save(member1);
+    diary1 = diaryRepository.save(diary1);
+    publicDiary1 =
+        PublicDiaryEntity.builder()
+            .diaryEntity(diary1)
+            .memberEntity(member1)
+            .publicContent("첫 번째 공개 일기")
+            .build();
+    publicDiaryRepository.save(publicDiary1);
+
+    member2 = BaseTestEntity.createMemberNoId();
+    diary2 = BaseTestEntity.createDiaryNoIdWithMember(member2);
+    memberRepository.save(member2);
+    diary2 = diaryRepository.save(diary2);
+    publicDiary2 =
+        PublicDiaryEntity.builder()
+            .diaryEntity(diary2)
+            .memberEntity(member2)
+            .publicContent("두 번째 공개 일기")
+            .build();
+    publicDiaryRepository.save(publicDiary2);
+
+    tem.flush();
+    tem.clear();
+    log.info("==== flush setup jpa method ====");
   }
 
   @Test
@@ -103,5 +143,38 @@ public class PublicDiaryRepositoryTest {
     assertThat(foundPublicDiary.getMemberEntity().getId())
         .as("조회된 공개 일기의 작성자 ID가 원본 작성자 ID와 일치해야 합니다")
         .isEqualTo(member.getId());
+  }
+
+  @Test
+  @DisplayName("최신 공개 일기 ID 조회 성공")
+  void findLatestId_Success() {
+    diary2 = diaryRepository.findById(diary2.getId()).get();
+    Long latestId = publicDiaryRepository.findLatestId().get();
+
+    PublicDiaryEntity findPublicDiary = publicDiaryRepository.findById(latestId).orElse(null);
+    assertThat(latestId)
+        .as("최신 공개 일기 ID는 조회된 공개 일기의 ID와 일치해야 합니다.")
+        .isEqualTo(findPublicDiary.getId());
+
+    assertThat(latestId)
+        .as("최신 공개 일기 ID는 diary2의 공개 일기 ID와 일치해야 합니다.")
+        .isEqualTo(diary2.getPublicDiaryEntity().getId());
+  }
+
+  @Test
+  @DisplayName("특정 ID 이하의 공개 일기 ContentOnly 조회 성공")
+  void findContentOnlyById_Success() {
+
+    Pageable pageable = PageRequest.of(0, 5);
+
+    List<PublicDiaryContentOnlyProjection> contentOnly2 =
+        publicDiaryRepository.findNextContentOnlyById(publicDiary2.getId() + 1, pageable);
+
+    List<PublicDiaryContentOnlyProjection> contentOnly1 =
+        publicDiaryRepository.findNextContentOnlyById(publicDiary1.getId() + 1, pageable);
+    assertThat(contentOnly1.size()).isNotEqualTo(contentOnly2.size());
+    assertThat(contentOnly2).hasSize(2);
+    assertThat(contentOnly2.get(0).getPublicContent()).isEqualTo(publicDiary2.getPublicContent());
+    assertThat(contentOnly2.get(1).getPublicContent()).isEqualTo(publicDiary1.getPublicContent());
   }
 }

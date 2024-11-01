@@ -21,7 +21,7 @@ import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
-import com.heartsave.todaktodak_api.diary.dto.response.DiaryViewDetailResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
 import com.heartsave.todaktodak_api.diary.service.DiaryService;
@@ -175,18 +175,18 @@ public class DiaryControllerTest {
   @Test
   @DisplayName("일기 상세 조회 요청 성공")
   @WithMockTodakUser
-  void getDiaryDetailSuccess() throws Exception {
+  void getDiarySuccess() throws Exception {
     // given
     LocalDate validDate = LocalDate.now().minusDays(1); // 어제 날짜
-    DiaryViewDetailResponse mockResponse =
-        DiaryViewDetailResponse.builder()
+    DiaryResponse mockResponse =
+        DiaryResponse.builder()
             .content("테스트 일기 내용")
             .emotion(DiaryEmotion.JOY)
             .date(validDate)
             .build();
 
     // when
-    when(diaryService.getDetail(any(TodakUser.class), any(LocalDate.class)))
+    when(diaryService.getDiary(any(TodakUser.class), any(LocalDate.class)))
         .thenReturn(mockResponse);
 
     // then
@@ -206,7 +206,7 @@ public class DiaryControllerTest {
   @Test
   @DisplayName("일기 상세 조회 실패 - 미래 날짜 요청")
   @WithMockTodakUser
-  void getDiaryDetailFailFutureDate() throws Exception {
+  void getDiaryFailFutureDate() throws Exception {
     LocalDate futureDate = LocalDate.now().plusDays(1); // 내일 날짜
 
     mockMvc
@@ -228,7 +228,7 @@ public class DiaryControllerTest {
         "abcd-ef-gh", // 문자열
         "2024-03" // 불완전한 형식
       })
-  void getDiaryDetailFailInvalidDateFormat(String invalidDate) throws Exception {
+  void getDiaryFailInvalidDateFormat(String invalidDate) throws Exception {
     mockMvc
         .perform(get("/api/v1/diary/my/detail").param("date", invalidDate))
         .andExpect(status().isBadRequest())
