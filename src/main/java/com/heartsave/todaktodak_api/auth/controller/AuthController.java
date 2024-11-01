@@ -3,11 +3,14 @@ package com.heartsave.todaktodak_api.auth.controller;
 import com.heartsave.todaktodak_api.auth.dto.request.LoginIdCheckRequest;
 import com.heartsave.todaktodak_api.auth.dto.request.NicknameCheckRequest;
 import com.heartsave.todaktodak_api.auth.dto.request.SignUpRequest;
+import com.heartsave.todaktodak_api.auth.dto.response.TokenReissueResponse;
 import com.heartsave.todaktodak_api.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -62,5 +65,17 @@ public class AuthController {
   public ResponseEntity<Void> signUp(@Valid @RequestBody SignUpRequest dto) {
     authService.signUp(dto);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
+
+  @Operation(summary = "토큰 재발급")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "토큰 재발급 성공"),
+        @ApiResponse(responseCode = "401", description = "토큰 재발급 실패")
+      })
+  @PostMapping("/refresh-token")
+  public ResponseEntity<TokenReissueResponse> reissueToken(
+      HttpServletRequest request, HttpServletResponse response) {
+    return ResponseEntity.ok(authService.reissueToken(request, response));
   }
 }
