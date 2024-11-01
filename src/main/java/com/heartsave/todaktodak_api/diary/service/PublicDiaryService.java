@@ -58,7 +58,7 @@ public class PublicDiaryService {
     List<PublicDiaryView> views = new ArrayList<>();
     for (PublicDiaryViewProjection projection : projections) {
       List<String> webtoonUrls =
-          s3FileStorageService.preSignedWebtoonUrlFrom(projection.getWebtoonImageUrl());
+          s3FileStorageService.preSignedWebtoonUrlFrom(projection.getWebtoonImageUrls());
       String characterImageUrl =
           s3FileStorageService.preSignedCharacterImageUrlFrom(projection.getCharacterImageUrl());
       String bgmUrl = s3FileStorageService.preSignedBgmUrlFrom(projection.getBgmUrl());

@@ -194,7 +194,7 @@ class PublicDiaryServiceTest {
     PublicDiaryViewProjection projection = mock(PublicDiaryViewProjection.class);
     when(projection.getPublicDiaryId()).thenReturn(publicDiaryId);
     when(projection.getDiaryId()).thenReturn(diary.getId());
-    when(projection.getWebtoonImageUrl()).thenReturn("webtoon/image.jpg");
+    when(projection.getWebtoonImageUrls()).thenReturn(List.of("webtoon/image.jpg"));
     when(projection.getCharacterImageUrl()).thenReturn("character/image.jpg");
     when(projection.getBgmUrl()).thenReturn("bgm/music.mp3");
     when(projection.getNickname()).thenReturn("nickname");
