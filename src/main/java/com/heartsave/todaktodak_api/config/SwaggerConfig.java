@@ -30,7 +30,7 @@ public class SwaggerConfig {
   private SecurityScheme baseSecurityScheme() {
     return new SecurityScheme()
         .name("baseLogin")
-        .description("기본 로그인")
+        .description("로그인 후 토큰을 입력하세요")
         .type(SecurityScheme.Type.HTTP)
         .scheme("bearer")
         .bearerFormat("JWT")
