@@ -168,10 +168,10 @@ public class PublicDiaryRepositoryTest {
     Pageable pageable = PageRequest.of(0, 5);
 
     List<PublicDiaryContentOnlyProjection> contentOnly2 =
-        publicDiaryRepository.findContentOnlyById(publicDiary2.getId() + 1, pageable);
+        publicDiaryRepository.findNextContentOnlyById(publicDiary2.getId() + 1, pageable);
 
     List<PublicDiaryContentOnlyProjection> contentOnly1 =
-        publicDiaryRepository.findContentOnlyById(publicDiary1.getId() + 1, pageable);
+        publicDiaryRepository.findNextContentOnlyById(publicDiary1.getId() + 1, pageable);
     assertThat(contentOnly1.size()).isNotEqualTo(contentOnly2.size());
     assertThat(contentOnly2).hasSize(2);
     assertThat(contentOnly2.get(0).getPublicContent()).isEqualTo(publicDiary2.getPublicContent());

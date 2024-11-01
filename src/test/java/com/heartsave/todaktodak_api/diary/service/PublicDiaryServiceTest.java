@@ -209,7 +209,7 @@ class PublicDiaryServiceTest {
     when(mocksS3FileStorageService.preSignedBgmUrlFrom(any())).thenReturn("presigned-bgm-url");
 
     // Repository mock 설정
-    when(mockPublicDiaryRepository.findContentOnlyById(anyLong(), any(PageRequest.class)))
+    when(mockPublicDiaryRepository.findNextContentOnlyById(anyLong(), any(PageRequest.class)))
         .thenReturn(List.of(content));
 
     // 반응 정보 mock
@@ -247,7 +247,7 @@ class PublicDiaryServiceTest {
             });
 
     // 메서드 호출 검증
-    verify(mockPublicDiaryRepository).findContentOnlyById(anyLong(), any(PageRequest.class));
+    verify(mockPublicDiaryRepository).findNextContentOnlyById(anyLong(), any(PageRequest.class));
     verify(mockDiaryReactionRepository).countEachByDiaryId(diary.getId());
     verify(mockDiaryReactionRepository).findReactionByMemberAndDiaryId(memberId, diary.getId());
     verify(mocksS3FileStorageService).preSignedWebtoonUrlFrom(any());
@@ -264,7 +264,8 @@ class PublicDiaryServiceTest {
     // given
     Long latestId = 100L;
     when(mockPublicDiaryRepository.findLatestId()).thenReturn(Optional.of(latestId));
-    when(mockPublicDiaryRepository.findContentOnlyById(eq(latestId + 1), any(PageRequest.class)))
+    when(mockPublicDiaryRepository.findNextContentOnlyById(
+            eq(latestId + 1), any(PageRequest.class)))
         .thenReturn(List.of());
 
     // when
@@ -273,14 +274,15 @@ class PublicDiaryServiceTest {
 
     // then
     verify(mockPublicDiaryRepository).findLatestId();
-    verify(mockPublicDiaryRepository).findContentOnlyById(eq(latestId + 1), any(PageRequest.class));
+    verify(mockPublicDiaryRepository)
+        .findNextContentOnlyById(eq(latestId + 1), any(PageRequest.class));
   }
 
   @Test
   @DisplayName("getPublicDiaryPaginationResponse - 조회 결과가 없는 경우")
   void getPublicDiaryPaginationResponse_EmptyResult() {
     Long publicDiaryId = 999L;
-    when(mockPublicDiaryRepository.findContentOnlyById(anyLong(), any(PageRequest.class)))
+    when(mockPublicDiaryRepository.findNextContentOnlyById(anyLong(), any(PageRequest.class)))
         .thenReturn(List.of());
 
     PublicDiaryPaginationResponse response =

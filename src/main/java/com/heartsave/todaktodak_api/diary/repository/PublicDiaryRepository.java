@@ -32,6 +32,6 @@ public interface PublicDiaryRepository extends JpaRepository<PublicDiaryEntity, 
         WHERE pd.id < :publicDiaryId
         ORDER BY pd.id DESC
         """)
-  List<PublicDiaryContentOnlyProjection> findContentOnlyById(
+  List<PublicDiaryContentOnlyProjection> findNextContentOnlyById(
       @Param("publicDiaryId") Long publicDiaryId, Pageable pageable);
 }

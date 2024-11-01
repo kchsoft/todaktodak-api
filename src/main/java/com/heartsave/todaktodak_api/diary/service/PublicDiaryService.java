@@ -47,20 +47,18 @@ public class PublicDiaryService {
 
   private List<PublicDiaryContentOnlyProjection> fetchDiaryContents(Long publicDiaryId) {
     log.info("공개 일기 content 정보를 조회합니다.");
-    Long nextId = getNextId(publicDiaryId);
-    return publicDiaryRepository.findContentOnlyById(nextId, PageRequest.of(0, 5));
+    if (publicDiaryId == 0) publicDiaryId = getMaxId(); // 공개 일기 조회 API 첫 호출
+    return publicDiaryRepository.findNextContentOnlyById(
+        publicDiaryId, PageRequest.of(0, 5)); // 현재 ID 제외, 다음 ID 포함 5개 조회
   }
 
-  private Long getNextId(Long publicDiaryId) {
-    if (publicDiaryId > 0) return publicDiaryId;
-
-    return publicDiaryRepository // publicDiaryId == 0
+  private Long getMaxId() {
+    return publicDiaryRepository
         .findLatestId()
         .map(id -> id + 1)
         .orElseThrow(
             () ->
-                new PublicDiaryNotFoundException(
-                    PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, publicDiaryId));
+                new PublicDiaryNotFoundException(PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, 0L));
   }
 
   private void replaceWithPreSignedUrls(List<PublicDiaryContentOnlyProjection> diaryContents) {
