@@ -185,21 +185,21 @@ class PublicDiaryServiceTest {
   }
 
   @Test
-  @DisplayName("getPublicDiaryViewDetail - 공개 일기 조회 성공")
-  void getPublicDiaryViewDetail_Success() {
+  @DisplayName("getPublicDiaryPaginationResponse - 공개 일기 조회 성공")
+  void getPublicDiaryPaginationResponse_Success() {
     Long publicDiaryId = 1L;
     Long memberId = principal.getId();
 
     // Projection mock 데이터 준비
-    PublicDiaryContentOnlyProjection projection = mock(PublicDiaryContentOnlyProjection.class);
-    when(projection.getPublicDiaryId()).thenReturn(publicDiaryId);
-    when(projection.getDiaryId()).thenReturn(diary.getId());
-    when(projection.getWebtoonImageUrls()).thenReturn(List.of("webtoon/image.jpg"));
-    when(projection.getCharacterImageUrl()).thenReturn("character/image.jpg");
-    when(projection.getBgmUrl()).thenReturn("bgm/music.mp3");
-    when(projection.getNickname()).thenReturn("nickname");
-    when(projection.getPublicContent()).thenReturn("content");
-    when(projection.getDate()).thenReturn(LocalDate.now());
+    PublicDiaryContentOnlyProjection content = mock(PublicDiaryContentOnlyProjection.class);
+    when(content.getPublicDiaryId()).thenReturn(publicDiaryId);
+    when(content.getDiaryId()).thenReturn(diary.getId());
+    when(content.getWebtoonImageUrls()).thenReturn(List.of("webtoon/image.jpg"));
+    when(content.getCharacterImageUrl()).thenReturn("character/image.jpg");
+    when(content.getBgmUrl()).thenReturn("bgm/music.mp3");
+    when(content.getNickname()).thenReturn("nickname");
+    when(content.getPublicContent()).thenReturn("content");
+    when(content.getDate()).thenReturn(LocalDate.now());
 
     // S3 URL 생성 mock
     List<String> mockWebtoonUrls = List.of("presigned-webtoon-url");
@@ -209,8 +209,8 @@ class PublicDiaryServiceTest {
     when(mocksS3FileStorageService.preSignedBgmUrlFrom(any())).thenReturn("presigned-bgm-url");
 
     // Repository mock 설정
-    when(mockPublicDiaryRepository.findViewsById(anyLong(), any(PageRequest.class)))
-        .thenReturn(List.of(projection));
+    when(mockPublicDiaryRepository.findContentOnlyById(anyLong(), any(PageRequest.class)))
+        .thenReturn(List.of(content));
 
     // 반응 정보 mock
     DiaryReactionCountProjection reactionCount = mock(DiaryReactionCountProjection.class);
@@ -226,41 +226,45 @@ class PublicDiaryServiceTest {
     // then
     assertThat(response).as("응답이 null이 아니어야 합니다").isNotNull();
 
-    List<PublicDiary> viewDetails = response.getDiaries();
-    assertThat(viewDetails).as("조회된 일기 목록이 비어있지 않아야 합니다").isNotNull();
-    assertThat(viewDetails.size()).as("조회된 일기 목록이 비어있지 않아야 합니다").isGreaterThan(0);
+    List<PublicDiary> publicDairies = response.getDiaries();
+    assertThat(publicDairies).as("조회된 일기 목록이 비어있지 않아야 합니다").isNotNull();
+    assertThat(publicDairies.size()).as("조회된 일기 목록이 비어있지 않아야 합니다").isGreaterThan(0);
 
-    PublicDiary viewDetail = viewDetails.get(0);
-    assertThat(viewDetail)
+    PublicDiary publicDiary = publicDairies.get(0);
+    assertThat(publicDiary)
         .as("조회된 일기의 상세 정보가 올바르게 매핑되어야 합니다")
         .satisfies(
-            detail -> {
-              assertThat(detail.getPublicDiaryId()).isEqualTo(publicDiaryId);
-              assertThat(detail.getDiaryId()).isEqualTo(diary.getId());
-              assertThat(detail.getCharacterImageUrl()).isEqualTo("presigned-character-url");
-              assertThat(detail.getNickname()).isEqualTo("nickname");
-              assertThat(detail.getPublicContent()).isEqualTo("content");
-              assertThat(detail.getWebtoonUrls()).isEqualTo(mockWebtoonUrls);
-              assertThat(detail.getBgmUrl()).isEqualTo("presigned-bgm-url");
-              assertThat(detail.getMyReaction().getFirst()).isEqualTo(DiaryReactionType.LIKE);
+            diary -> {
+              assertThat(diary.getPublicDiaryId()).isEqualTo(publicDiaryId);
+              assertThat(diary.getDiaryId()).isEqualTo(this.diary.getId());
+              assertThat(diary.getCharacterImageUrl()).isEqualTo("character/image.jpg");
+              assertThat(diary.getWebtoonUrls().getFirst()).isEqualTo("webtoon/image.jpg");
+              assertThat(diary.getWebtoonUrls().size()).isEqualTo(1);
+              assertThat(diary.getBgmUrl()).isEqualTo("bgm/music.mp3");
+              assertThat(diary.getNickname()).isEqualTo("nickname");
+              assertThat(diary.getPublicContent()).isEqualTo("content");
+              assertThat(diary.getMyReaction().getFirst()).isEqualTo(DiaryReactionType.LIKE);
             });
 
     // 메서드 호출 검증
-    verify(mockPublicDiaryRepository).findViewsById(anyLong(), any(PageRequest.class));
+    verify(mockPublicDiaryRepository).findContentOnlyById(anyLong(), any(PageRequest.class));
     verify(mockDiaryReactionRepository).countEachByDiaryId(diary.getId());
     verify(mockDiaryReactionRepository).findReactionByMemberAndDiaryId(memberId, diary.getId());
     verify(mocksS3FileStorageService).preSignedWebtoonUrlFrom(any());
     verify(mocksS3FileStorageService).preSignedCharacterImageUrlFrom(any());
     verify(mocksS3FileStorageService).preSignedBgmUrlFrom(any());
+    verify(content).replaceBgmUrl(any());
+    verify(content).replaceCharacterImageUrl(any());
+    verify(content).replaceCharacterImageUrl(any());
   }
 
   @Test
-  @DisplayName("getPublicDiaryViewDetail - 최신 일기 조회 (publicDiaryId = 0)")
-  void getPublicDiaryViewDetail_LatestDiary() {
+  @DisplayName("getPublicDiaryPaginationResponse - 최신 일기 조회 (publicDiaryId = 0)")
+  void getPublicDiaryPaginationResponse_LatestDiary() {
     // given
     Long latestId = 100L;
     when(mockPublicDiaryRepository.findLatestId()).thenReturn(Optional.of(latestId));
-    when(mockPublicDiaryRepository.findViewsById(eq(latestId + 1), any(PageRequest.class)))
+    when(mockPublicDiaryRepository.findContentOnlyById(eq(latestId + 1), any(PageRequest.class)))
         .thenReturn(List.of());
 
     // when
@@ -269,14 +273,14 @@ class PublicDiaryServiceTest {
 
     // then
     verify(mockPublicDiaryRepository).findLatestId();
-    verify(mockPublicDiaryRepository).findViewsById(eq(latestId + 1), any(PageRequest.class));
+    verify(mockPublicDiaryRepository).findContentOnlyById(eq(latestId + 1), any(PageRequest.class));
   }
 
   @Test
-  @DisplayName("getPublicDiaryViewDetail - 조회 결과가 없는 경우")
-  void getPublicDiaryViewDetail_EmptyResult() {
+  @DisplayName("getPublicDiaryPaginationResponse - 조회 결과가 없는 경우")
+  void getPublicDiaryPaginationResponse_EmptyResult() {
     Long publicDiaryId = 999L;
-    when(mockPublicDiaryRepository.findViewsById(anyLong(), any(PageRequest.class)))
+    when(mockPublicDiaryRepository.findContentOnlyById(anyLong(), any(PageRequest.class)))
         .thenReturn(List.of());
 
     PublicDiaryPaginationResponse response =

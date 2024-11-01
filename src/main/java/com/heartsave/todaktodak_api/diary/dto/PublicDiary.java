@@ -2,6 +2,7 @@ package com.heartsave.todaktodak_api.diary.dto;
 
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.List;
@@ -43,18 +44,25 @@ public class PublicDiary {
   @Schema(description = "현재 사용자의 반응 목록")
   private final List<DiaryReactionType> myReaction;
 
-  public PublicDiary(
-      PublicDiaryContentlyOnly view,
+  public static PublicDiary of(
+      PublicDiaryContentOnlyProjection content,
       DiaryReactionCountProjection reactionCount,
       List<DiaryReactionType> memberReaction) {
-    this.publicDiaryId = view.getPublicDiaryId();
-    this.diaryId = view.getDiaryId();
-    this.characterImageUrl = view.getCharacterImageUrl();
-    this.nickname = view.getNickname();
-    this.publicContent = view.getPublicContent();
-    this.webtoonUrls = view.getWebtoonUrls();
-    this.bgmUrl = view.getBgmUrl();
-    this.date = view.getDate();
+    return new PublicDiary(content, reactionCount, memberReaction);
+  }
+
+  private PublicDiary(
+      PublicDiaryContentOnlyProjection content,
+      DiaryReactionCountProjection reactionCount,
+      List<DiaryReactionType> memberReaction) {
+    this.publicDiaryId = content.getPublicDiaryId();
+    this.diaryId = content.getDiaryId();
+    this.characterImageUrl = content.getCharacterImageUrl();
+    this.nickname = content.getNickname();
+    this.publicContent = content.getPublicContent();
+    this.webtoonUrls = content.getWebtoonImageUrls();
+    this.bgmUrl = content.getBgmUrl();
+    this.date = content.getDate();
     this.reactionCount = reactionCount;
     this.myReaction = memberReaction;
   }

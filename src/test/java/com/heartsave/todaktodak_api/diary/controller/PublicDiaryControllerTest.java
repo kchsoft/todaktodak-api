@@ -152,13 +152,13 @@ public class PublicDiaryControllerTest {
   @Test
   @DisplayName("공개 일기 조회 성공")
   @WithMockTodakUser
-  void getPublicDiaries_Success() throws Exception {
+  void getPublicDiaryPagination_Success() throws Exception {
     Long publicDiaryId = 1L;
     PublicDiaryPaginationResponse response = new PublicDiaryPaginationResponse();
-    PublicDiary viewDetail1 = mock(PublicDiary.class);
-    PublicDiary viewDetail2 = mock(PublicDiary.class);
-    response.addPublicDiary(viewDetail1);
-    response.addPublicDiary(viewDetail2);
+    PublicDiary publicDiary1 = mock(PublicDiary.class);
+    PublicDiary publicDiary2 = mock(PublicDiary.class);
+    response.addPublicDiary(publicDiary1);
+    response.addPublicDiary(publicDiary2);
     when(publicDiaryService.getPublicDiaryPagination(any(TodakUser.class), eq(publicDiaryId)))
         .thenReturn(response);
 
@@ -175,7 +175,7 @@ public class PublicDiaryControllerTest {
   @Test
   @DisplayName("공개 일기 조회 성공 - after 파라미터 미입력시 기본값 0 사용")
   @WithMockTodakUser
-  void getPublicDiaries_Success_DefaultAfterParameter() throws Exception {
+  void getPublicDiaryPagination_Success_DefaultAfterParameter() throws Exception {
     PublicDiaryPaginationResponse response = new PublicDiaryPaginationResponse();
     when(publicDiaryService.getPublicDiaryPagination(any(TodakUser.class), eq(0L)))
         .thenReturn(response);
@@ -190,7 +190,7 @@ public class PublicDiaryControllerTest {
   @Test
   @DisplayName("공개 일기 조회 실패 - 음수 after 파라미터")
   @WithMockTodakUser
-  void getPublicDiaries_Fail_NegativeAfterParameter() throws Exception {
+  void getPublicDiaryPagination_Fail_NegativeAfterParameter() throws Exception {
     // given
     Long invalidPublicDiaryId = -1L;
 
@@ -206,7 +206,7 @@ public class PublicDiaryControllerTest {
   @Test
   @DisplayName("공개 일기 조회 실패 - 잘못된 형식의 after 파라미터")
   @WithMockTodakUser
-  void getPublicDiaries_Fail_InvalidAfterParameterFormat() throws Exception {
+  void getPublicDiaryPagination_Fail_InvalidAfterParameterFormat() throws Exception {
     // when & then
     mockMvc
         .perform(

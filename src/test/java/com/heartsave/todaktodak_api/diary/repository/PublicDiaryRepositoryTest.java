@@ -162,19 +162,19 @@ public class PublicDiaryRepositoryTest {
   }
 
   @Test
-  @DisplayName("특정 ID 이하의 공개 일기 View 조회 성공")
-  void findViewsById_Success() {
+  @DisplayName("특정 ID 이하의 공개 일기 ContentOnly 조회 성공")
+  void findContentOnlyById_Success() {
 
     Pageable pageable = PageRequest.of(0, 5);
 
-    List<PublicDiaryContentOnlyProjection> views2 =
-        publicDiaryRepository.findViewsById(publicDiary2.getId() + 1, pageable);
+    List<PublicDiaryContentOnlyProjection> contentOnly2 =
+        publicDiaryRepository.findContentOnlyById(publicDiary2.getId() + 1, pageable);
 
-    List<PublicDiaryContentOnlyProjection> views1 =
-        publicDiaryRepository.findViewsById(publicDiary1.getId() + 1, pageable);
-    assertThat(views1.size()).isNotEqualTo(views2.size());
-    assertThat(views2).hasSize(2);
-    assertThat(views2.get(0).getPublicContent()).isEqualTo(publicDiary2.getPublicContent());
-    assertThat(views2.get(1).getPublicContent()).isEqualTo(publicDiary1.getPublicContent());
+    List<PublicDiaryContentOnlyProjection> contentOnly1 =
+        publicDiaryRepository.findContentOnlyById(publicDiary1.getId() + 1, pageable);
+    assertThat(contentOnly1.size()).isNotEqualTo(contentOnly2.size());
+    assertThat(contentOnly2).hasSize(2);
+    assertThat(contentOnly2.get(0).getPublicContent()).isEqualTo(publicDiary2.getPublicContent());
+    assertThat(contentOnly2.get(1).getPublicContent()).isEqualTo(publicDiary1.getPublicContent());
   }
 }

@@ -53,4 +53,16 @@ public class PublicDiaryContentOnlyProjection {
     this.bgmUrl = bgmUrl;
     this.date = date;
   }
+
+  public void replaceWebtoonImageUrls(List<String> webtoonImageUrls) {
+    this.webtoonImageUrls = webtoonImageUrls;
+  }
+
+  public void replaceCharacterImageUrl(String characterImageUrl) {
+    this.characterImageUrl = characterImageUrl;
+  }
+
+  public void replaceBgmUrl(String bgmUrl) {
+    this.bgmUrl = bgmUrl;
+  }
 }
