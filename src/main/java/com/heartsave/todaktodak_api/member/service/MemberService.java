@@ -53,6 +53,6 @@ public class MemberService {
 
   private String createCharacterPreSignedUrl(String originUrl) {
     // TODO: presigned url 생성
-    return originUrl == null ? "TODO" : originUrl;
+    return originUrl == null ? "DEFAULT" : "CHANGED";
   }
 }
