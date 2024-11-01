@@ -7,7 +7,7 @@ import com.heartsave.todaktodak_api.common.BaseTestEntity;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
-import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryViewProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
@@ -167,10 +167,10 @@ public class PublicDiaryRepositoryTest {
 
     Pageable pageable = PageRequest.of(0, 5);
 
-    List<PublicDiaryViewProjection> views2 =
+    List<PublicDiaryContentOnlyProjection> views2 =
         publicDiaryRepository.findViewsById(publicDiary2.getId() + 1, pageable);
 
-    List<PublicDiaryViewProjection> views1 =
+    List<PublicDiaryContentOnlyProjection> views1 =
         publicDiaryRepository.findViewsById(publicDiary1.getId() + 1, pageable);
     assertThat(views1.size()).isNotEqualTo(views2.size());
     assertThat(views2).hasSize(2);

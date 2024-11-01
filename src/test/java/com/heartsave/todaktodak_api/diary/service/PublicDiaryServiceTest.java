@@ -15,14 +15,14 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
-import com.heartsave.todaktodak_api.diary.dto.PublicDiaryViewDetail;
+import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
-import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryViewDetailResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.DiaryReactionEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryViewProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
@@ -191,7 +191,7 @@ class PublicDiaryServiceTest {
     Long memberId = principal.getId();
 
     // Projection mock 데이터 준비
-    PublicDiaryViewProjection projection = mock(PublicDiaryViewProjection.class);
+    PublicDiaryContentOnlyProjection projection = mock(PublicDiaryContentOnlyProjection.class);
     when(projection.getPublicDiaryId()).thenReturn(publicDiaryId);
     when(projection.getDiaryId()).thenReturn(diary.getId());
     when(projection.getWebtoonImageUrls()).thenReturn(List.of("webtoon/image.jpg"));
@@ -220,17 +220,17 @@ class PublicDiaryServiceTest {
         .thenReturn(List.of(DiaryReactionType.LIKE));
 
     // when
-    PublicDiaryViewDetailResponse response =
-        publicDiaryService.getPublicDiaryViewDetail(principal, publicDiaryId);
+    PublicDiaryPaginationResponse response =
+        publicDiaryService.getPublicDiaryPagination(principal, publicDiaryId);
 
     // then
     assertThat(response).as("응답이 null이 아니어야 합니다").isNotNull();
 
-    List<PublicDiaryViewDetail> viewDetails = response.getDiaries();
+    List<PublicDiary> viewDetails = response.getDiaries();
     assertThat(viewDetails).as("조회된 일기 목록이 비어있지 않아야 합니다").isNotNull();
     assertThat(viewDetails.size()).as("조회된 일기 목록이 비어있지 않아야 합니다").isGreaterThan(0);
 
-    PublicDiaryViewDetail viewDetail = viewDetails.get(0);
+    PublicDiary viewDetail = viewDetails.get(0);
     assertThat(viewDetail)
         .as("조회된 일기의 상세 정보가 올바르게 매핑되어야 합니다")
         .satisfies(
@@ -264,8 +264,8 @@ class PublicDiaryServiceTest {
         .thenReturn(List.of());
 
     // when
-    PublicDiaryViewDetailResponse response =
-        publicDiaryService.getPublicDiaryViewDetail(principal, 0L);
+    PublicDiaryPaginationResponse response =
+        publicDiaryService.getPublicDiaryPagination(principal, 0L);
 
     // then
     verify(mockPublicDiaryRepository).findLatestId();
@@ -279,8 +279,8 @@ class PublicDiaryServiceTest {
     when(mockPublicDiaryRepository.findViewsById(anyLong(), any(PageRequest.class)))
         .thenReturn(List.of());
 
-    PublicDiaryViewDetailResponse response =
-        publicDiaryService.getPublicDiaryViewDetail(principal, publicDiaryId);
+    PublicDiaryPaginationResponse response =
+        publicDiaryService.getPublicDiaryPagination(principal, publicDiaryId);
 
     assertThat(response.getDiaries().size()).as("조회 결과가 없는 경우 빈 목록이 반환되어야 합니다").isEqualTo(0);
   }

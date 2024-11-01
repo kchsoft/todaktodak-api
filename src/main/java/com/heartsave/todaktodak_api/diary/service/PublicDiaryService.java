@@ -4,15 +4,15 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
-import com.heartsave.todaktodak_api.diary.dto.PublicDiaryView;
-import com.heartsave.todaktodak_api.diary.dto.PublicDiaryViewDetail;
+import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
+import com.heartsave.todaktodak_api.diary.dto.PublicDiaryContentlyOnly;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
-import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryViewDetailResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.DiaryReactionEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryViewProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
@@ -37,39 +37,39 @@ public class PublicDiaryService {
   private final DiaryReactionRepository diaryReactionRepository;
   private final S3FileStorageService s3FileStorageService;
 
-  public PublicDiaryViewDetailResponse getPublicDiaryViewDetail(
+  public PublicDiaryPaginationResponse getPublicDiaryPagination(
       TodakUser principal, Long publicDiaryId) { // Todo : 쿼리 최적화
-    log.info("공개 일기 view를 조회합니다.");
-    List<PublicDiaryView> diaryViews = getDiaryViews(publicDiaryId);
-    log.info("공개 일기 view 조회를 마쳤습니다.");
+    log.info("공개 일기 content only를 조회합니다.");
+    List<PublicDiaryContentlyOnly> manyOfContentOnly = getContentOnly(publicDiaryId);
+    log.info("공개 일기 content only 조회를 마쳤습니다.");
 
     Long memberId = principal.getId();
-    PublicDiaryViewDetailResponse response = new PublicDiaryViewDetailResponse();
+    PublicDiaryPaginationResponse response = new PublicDiaryPaginationResponse();
 
     log.info("공개 일기 reaction을 조회합니다.");
-    for (PublicDiaryView diaryView : diaryViews)
-      response.addViewDetail(getViewDetail(memberId, diaryView));
+    for (PublicDiaryContentlyOnly contentOnly : manyOfContentOnly)
+      response.addPublicDiary(getPublicDiary(memberId, contentOnly));
     log.info("공개 일기 reaction 조회를 마칩니다.");
     return response;
   }
 
-  private List<PublicDiaryView> getDiaryViews(Long publicDiaryId) {
-    List<PublicDiaryViewProjection> projections = getViewsProjection(publicDiaryId);
-    List<PublicDiaryView> views = new ArrayList<>();
-    for (PublicDiaryViewProjection projection : projections) {
+  private List<PublicDiaryContentlyOnly> getContentOnly(Long publicDiaryId) {
+    List<PublicDiaryContentOnlyProjection> projections = getViewsProjection(publicDiaryId);
+    List<PublicDiaryContentlyOnly> views = new ArrayList<>();
+    for (PublicDiaryContentOnlyProjection projection : projections) {
       List<String> webtoonUrls =
           s3FileStorageService.preSignedWebtoonUrlFrom(projection.getWebtoonImageUrls());
       String characterImageUrl =
           s3FileStorageService.preSignedCharacterImageUrlFrom(projection.getCharacterImageUrl());
       String bgmUrl = s3FileStorageService.preSignedBgmUrlFrom(projection.getBgmUrl());
-      PublicDiaryView view =
-          new PublicDiaryView(projection, webtoonUrls, characterImageUrl, bgmUrl);
+      PublicDiaryContentlyOnly view =
+          new PublicDiaryContentlyOnly(projection, webtoonUrls, characterImageUrl, bgmUrl);
       views.add(view);
     }
     return views;
   }
 
-  private List<PublicDiaryViewProjection> getViewsProjection(Long publicDiaryId) {
+  private List<PublicDiaryContentOnlyProjection> getViewsProjection(Long publicDiaryId) {
     if (publicDiaryId == 0) {
       Long latestId = publicDiaryRepository.findLatestId().get();
       publicDiaryId = latestId + 1;
@@ -77,12 +77,12 @@ public class PublicDiaryService {
     return publicDiaryRepository.findViewsById(publicDiaryId, PageRequest.of(0, 5));
   }
 
-  private PublicDiaryViewDetail getViewDetail(Long memberId, PublicDiaryView view) {
+  private PublicDiary getPublicDiary(Long memberId, PublicDiaryContentlyOnly content) {
     DiaryReactionCountProjection reactionCount =
-        diaryReactionRepository.countEachByDiaryId(view.getDiaryId()).get();
+        diaryReactionRepository.countEachByDiaryId(content.getDiaryId()).get();
     List<DiaryReactionType> memberReaction =
-        diaryReactionRepository.findReactionByMemberAndDiaryId(memberId, view.getDiaryId());
-    return new PublicDiaryViewDetail(view, reactionCount, memberReaction);
+        diaryReactionRepository.findReactionByMemberAndDiaryId(memberId, content.getDiaryId());
+    return new PublicDiary(content, reactionCount, memberReaction);
   }
 
   public void write(TodakUser principal, String publicContent, Long diaryId) {

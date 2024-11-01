@@ -15,10 +15,10 @@ import com.heartsave.todaktodak_api.common.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
-import com.heartsave.todaktodak_api.diary.dto.PublicDiaryViewDetail;
+import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryWriteRequest;
-import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryViewDetailResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.service.PublicDiaryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -154,12 +154,12 @@ public class PublicDiaryControllerTest {
   @WithMockTodakUser
   void getPublicDiaries_Success() throws Exception {
     Long publicDiaryId = 1L;
-    PublicDiaryViewDetailResponse response = new PublicDiaryViewDetailResponse();
-    PublicDiaryViewDetail viewDetail1 = mock(PublicDiaryViewDetail.class);
-    PublicDiaryViewDetail viewDetail2 = mock(PublicDiaryViewDetail.class);
-    response.addViewDetail(viewDetail1);
-    response.addViewDetail(viewDetail2);
-    when(publicDiaryService.getPublicDiaryViewDetail(any(TodakUser.class), eq(publicDiaryId)))
+    PublicDiaryPaginationResponse response = new PublicDiaryPaginationResponse();
+    PublicDiary viewDetail1 = mock(PublicDiary.class);
+    PublicDiary viewDetail2 = mock(PublicDiary.class);
+    response.addPublicDiary(viewDetail1);
+    response.addPublicDiary(viewDetail2);
+    when(publicDiaryService.getPublicDiaryPagination(any(TodakUser.class), eq(publicDiaryId)))
         .thenReturn(response);
 
     mockMvc
@@ -176,8 +176,8 @@ public class PublicDiaryControllerTest {
   @DisplayName("공개 일기 조회 성공 - after 파라미터 미입력시 기본값 0 사용")
   @WithMockTodakUser
   void getPublicDiaries_Success_DefaultAfterParameter() throws Exception {
-    PublicDiaryViewDetailResponse response = new PublicDiaryViewDetailResponse();
-    when(publicDiaryService.getPublicDiaryViewDetail(any(TodakUser.class), eq(0L)))
+    PublicDiaryPaginationResponse response = new PublicDiaryPaginationResponse();
+    when(publicDiaryService.getPublicDiaryPagination(any(TodakUser.class), eq(0L)))
         .thenReturn(response);
 
     mockMvc

@@ -1,16 +1,13 @@
 package com.heartsave.todaktodak_api.diary.dto;
 
-import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Getter;
 
-@Schema(description = "공개 일기 상세 정보")
 @Getter
-public class PublicDiaryViewDetail {
-
+public class PublicDiaryContentlyOnly {
   @Schema(description = "공개 일기 ID", example = "1")
   private final Long publicDiaryId;
 
@@ -37,25 +34,18 @@ public class PublicDiaryViewDetail {
   @Schema(description = "일기 작성 날짜", example = "2024-10-26", type = "string", format = "date")
   private final LocalDate date;
 
-  @Schema(description = "일기에 대한 반응 수 정보")
-  private final DiaryReactionCountProjection reactionCount;
-
-  @Schema(description = "현재 사용자의 반응 목록")
-  private final List<DiaryReactionType> myReaction;
-
-  public PublicDiaryViewDetail(
-      PublicDiaryView view,
-      DiaryReactionCountProjection reactionCount,
-      List<DiaryReactionType> memberReaction) {
-    this.publicDiaryId = view.getPublicDiaryId();
-    this.diaryId = view.getDiaryId();
-    this.characterImageUrl = view.getCharacterImageUrl();
-    this.nickname = view.getNickname();
-    this.publicContent = view.getPublicContent();
-    this.webtoonUrls = view.getWebtoonUrls();
-    this.bgmUrl = view.getBgmUrl();
-    this.date = view.getDate();
-    this.reactionCount = reactionCount;
-    this.myReaction = memberReaction;
+  public PublicDiaryContentlyOnly(
+      PublicDiaryContentOnlyProjection projection,
+      List<String> webtoonUrls,
+      String characterImageUrl,
+      String bgmUrl) {
+    this.publicDiaryId = projection.getPublicDiaryId();
+    this.diaryId = projection.getDiaryId();
+    this.characterImageUrl = characterImageUrl;
+    this.nickname = projection.getNickname();
+    this.publicContent = projection.getPublicContent();
+    this.webtoonUrls = webtoonUrls;
+    this.bgmUrl = bgmUrl;
+    this.date = projection.getDate();
   }
 }

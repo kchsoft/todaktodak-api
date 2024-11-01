@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.diary.repository;
 
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
-import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryViewProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +16,7 @@ public interface PublicDiaryRepository extends JpaRepository<PublicDiaryEntity, 
 
   @Query(
       """
-        SELECT new com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryViewProjection(
+        SELECT new com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection(
             pd.id,
             d.id,
             m.characterImageUrl,
@@ -32,6 +32,6 @@ public interface PublicDiaryRepository extends JpaRepository<PublicDiaryEntity, 
         WHERE pd.id < :publicDiaryId
         ORDER BY pd.id DESC
         """)
-  List<PublicDiaryViewProjection> findViewsById(
+  List<PublicDiaryContentOnlyProjection> findViewsById(
       @Param("publicDiaryId") Long publicDiaryId, Pageable pageable);
 }

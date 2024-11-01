@@ -3,7 +3,7 @@ package com.heartsave.todaktodak_api.diary.controller;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryWriteRequest;
-import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryViewDetailResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.service.PublicDiaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,13 +41,13 @@ public class PublicDiaryController {
         @ApiResponse(responseCode = "400", description = "잘못된 요청")
       })
   @GetMapping
-  public ResponseEntity<PublicDiaryViewDetailResponse> getPublicDiaries(
+  public ResponseEntity<PublicDiaryPaginationResponse> getPublicDiaries(
       @AuthenticationPrincipal TodakUser principal,
       @Valid @Min(0L) @RequestParam(name = "after", defaultValue = "0", required = false)
           Long publicDiaryId) {
     log.info("공개 일기를 조회를 요청합니다. after = {}", publicDiaryId);
-    PublicDiaryViewDetailResponse response =
-        publicDiaryService.getPublicDiaryViewDetail(principal, publicDiaryId);
+    PublicDiaryPaginationResponse response =
+        publicDiaryService.getPublicDiaryPagination(principal, publicDiaryId);
     log.info("공개 일기 조회를 성공적으로 마쳤습니다.");
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
