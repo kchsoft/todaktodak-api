@@ -25,6 +25,7 @@ public class MemberController {
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "닉네임 변경 성공"),
+        @ApiResponse(responseCode = "400", description = "유효성 검사 실패"),
         @ApiResponse(responseCode = "404", description = "회원 조회 실패")
       })
   public ResponseEntity<NicknameUpdateResponse> updateNickname(
