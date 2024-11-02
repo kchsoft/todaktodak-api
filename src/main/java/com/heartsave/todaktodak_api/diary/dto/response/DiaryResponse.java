@@ -10,7 +10,7 @@ import lombok.Getter;
 @Schema(description = "일기 상세 조회 응답")
 @Getter
 @Builder
-public class DiaryViewDetailResponse {
+public class DiaryResponse {
 
   @Schema(description = "일기 ID", example = "1")
   private Long diaryId;

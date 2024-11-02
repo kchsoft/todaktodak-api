@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.auth.controller;
 
 import com.heartsave.todaktodak_api.auth.dto.request.LoginIdCheckRequest;
+import com.heartsave.todaktodak_api.auth.dto.request.LoginRequest;
 import com.heartsave.todaktodak_api.auth.dto.request.NicknameCheckRequest;
 import com.heartsave.todaktodak_api.auth.dto.request.SignUpRequest;
 import com.heartsave.todaktodak_api.auth.dto.response.TokenReissueResponse;
@@ -15,10 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "인증", description = "인증 API")
 @RestController
@@ -78,4 +76,13 @@ public class AuthController {
       HttpServletRequest request, HttpServletResponse response) {
     return ResponseEntity.ok(authService.reissueToken(request, response));
   }
+
+  @Operation(summary = "로그인")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "로그인 성공"),
+        @ApiResponse(responseCode = "401", description = "로그인 실패")
+      })
+  @PostMapping("/login")
+  public void login(@Valid @RequestBody LoginRequest request) {}
 }
