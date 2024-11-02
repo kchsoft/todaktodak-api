@@ -63,7 +63,7 @@ public class AuthService {
             .nickname(dto.nickname())
             .loginId(dto.loginId())
             .password(passwordEncoder.encode(dto.password()))
-            .role(TodakRole.ROLE_USER)
+            .role(TodakRole.ROLE_TEMP)
             .build();
 
     memberRepository.save(newMember);
