@@ -13,6 +13,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -63,7 +64,19 @@ final class JwtUtilsTest {
 
   @Test
   @DisplayName("발급한 리프레시 토큰의 페이로드 확인")
-  void issueRefreshToken_extractAllClaimsTest() {
+  void issueRefreshToken_extractAllClaimsTest() throws Exception {
+    // reflection
+    Field typeField = JwtUtils.class.getDeclaredField("TYPE");
+    Field roleField = JwtUtils.class.getDeclaredField("ROLE");
+    Field usernameField = JwtUtils.class.getDeclaredField("USERNAME");
+
+    typeField.setAccessible(true);
+    roleField.setAccessible(true);
+    usernameField.setAccessible(true);
+
+    String TYPE = (String) typeField.get(null);
+    String ROLE = (String) roleField.get(null);
+    String USERNAME = (String) usernameField.get(null);
     // given
     String token = JwtUtils.issueToken(user, JwtConstant.REFRESH_TYPE);
 
@@ -73,9 +86,9 @@ final class JwtUtilsTest {
     // then
     assertThat(claims).isNotNull();
     assertThat(claims.getSubject()).isEqualTo("1");
-    assertThat(claims.get("username")).isEqualTo("todak");
-    assertThat(claims.get("role")).isEqualTo(TodakRole.ROLE_USER.name());
-    assertThat(claims.get("type")).isEqualTo(JwtConstant.REFRESH_TYPE);
+    assertThat(claims.get(USERNAME)).isEqualTo("todak");
+    assertThat(claims.get(ROLE)).isEqualTo(TodakRole.ROLE_USER.name());
+    assertThat(claims.get(TYPE)).isEqualTo(JwtConstant.REFRESH_TYPE);
   }
 
   @Test
