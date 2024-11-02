@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -15,6 +17,7 @@ import com.heartsave.todaktodak_api.ai.service.AiService;
 import com.heartsave.todaktodak_api.common.BaseTestEntity;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.common.TestDiaryObjectFactory;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
@@ -23,7 +26,6 @@ import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryException;
@@ -55,6 +57,7 @@ public class DiaryServiceTest {
   @Mock private DiaryRepository mockDiaryRepository;
   @Mock private DiaryReactionRepository mockDiaryReactionRepository;
   @Mock private AiService mockAiService;
+  @Mock private S3FileStorageService s3FileStorageService;
   @InjectMocks private DiaryService diaryService;
   private TodakUser principal;
   private MemberEntity member;
@@ -193,33 +196,13 @@ public class DiaryServiceTest {
   void getDiarySuccess() {
     // given
     LocalDate requestDate = NOW_DATE_TIME.toLocalDate();
-    DiaryReactionCountProjection mockReactionCount =
-        new DiaryReactionCountProjection() {
-          @Override
-          public Long getLikes() {
-            return 1L;
-          }
-
-          @Override
-          public Long getSurprised() {
-            return 2L;
-          }
-
-          @Override
-          public Long getEmpathize() {
-            return 3L;
-          }
-
-          @Override
-          public Long getCheering() {
-            return 4L;
-          }
-        };
-
     when(mockDiaryRepository.findByMemberIdAndDate(anyLong(), any(LocalDate.class)))
         .thenReturn(Optional.of(diary));
-    when(mockDiaryReactionRepository.countEachByDiaryId(anyLong()))
-        .thenReturn(Optional.of(mockReactionCount));
+    List<String> preSignedWebtoon = List.of("pre-sigend-webtoon");
+    String preSignedBgm = "pre-sigend-bgm";
+
+    when(s3FileStorageService.preSignedWebtoonUrlFrom(anyList())).thenReturn(preSignedWebtoon);
+    when(s3FileStorageService.preSignedBgmUrlFrom(anyString())).thenReturn(preSignedBgm);
 
     DiaryResponse response = diaryService.getDiary(principal, requestDate);
 
@@ -229,19 +212,13 @@ public class DiaryServiceTest {
               assertThat(r.getDiaryId()).isEqualTo(diary.getId());
               assertThat(r.getEmotion()).isEqualTo(diary.getEmotion());
               assertThat(r.getContent()).isEqualTo(diary.getContent());
-              assertThat(r.getWebtoonImageUrl()).isEqualTo(diary.getWebtoonImageUrl());
-              assertThat(r.getBgmUrl()).isEqualTo(diary.getBgmUrl());
+              assertThat(r.getWebtoonImageUrls()).isEqualTo(preSignedWebtoon);
+              assertThat(r.getBgmUrl()).isEqualTo(preSignedBgm);
               assertThat(r.getAiComment()).isEqualTo(diary.getAiComment());
               assertThat(r.getDate()).isEqualTo(diary.getDiaryCreatedTime().toLocalDate());
-
-              assertThat(r.getReactionCount().getLikes()).isEqualTo(1L);
-              assertThat(r.getReactionCount().getSurprised()).isEqualTo(2L);
-              assertThat(r.getReactionCount().getEmpathize()).isEqualTo(3L);
-              assertThat(r.getReactionCount().getCheering()).isEqualTo(4L);
             });
 
     verify(mockDiaryRepository, times(1)).findByMemberIdAndDate(anyLong(), any(LocalDate.class));
-    verify(mockDiaryReactionRepository, times(1)).countEachByDiaryId(anyLong());
   }
 
   @Test
