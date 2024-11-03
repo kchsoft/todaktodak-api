@@ -2,6 +2,7 @@ package com.heartsave.todaktodak_api.member.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.heartsave.todaktodak_api.common.BaseTestEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,5 +59,33 @@ class MemberRepositoryTest {
 
     // Then
     assertThat(retrievedMember.isPresent()).isEqualTo(true);
+  }
+
+  @Test
+  @DisplayName("중복 이메일 확인")
+  void getDupliactedEmailTest() {
+    // Given
+    MemberEntity member = memberRepository.save(BaseTestEntity.createMemberNoId());
+
+    // When
+    boolean isExisted = memberRepository.existsByEmail(member.getEmail());
+
+    // Then
+    assertThat(isExisted).isEqualTo(true);
+  }
+
+  @Test
+  @DisplayName("회원 프로필 조회")
+  void getMemberProfileProjectionTest() {
+    // Given
+    MemberEntity member = memberRepository.save(BaseTestEntity.createMemberNoId());
+
+    // When
+    var memberProfile = memberRepository.findProjectedById(member.getId()).orElse(null);
+
+    // Then
+    assertThat(memberProfile).isNotNull();
+    assertThat(memberProfile.getNickname()).isEqualTo(member.getNickname());
+    assertThat(memberProfile.getEmail()).isEqualTo(member.getEmail());
   }
 }
