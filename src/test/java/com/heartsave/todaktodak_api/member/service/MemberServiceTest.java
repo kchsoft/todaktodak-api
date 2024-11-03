@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.heartsave.todaktodak_api.common.BaseTestEntity;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
 import com.heartsave.todaktodak_api.member.dto.request.NicknameUpdateRequest;
 import com.heartsave.todaktodak_api.member.dto.response.MemberProfileResponse;
 import com.heartsave.todaktodak_api.member.dto.response.NicknameUpdateResponse;
@@ -23,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 final class MemberServiceTest {
   @Mock private MemberRepository memberRepository;
+  @Mock private S3FileStorageService s3Service;
   @InjectMocks private MemberService memberService;
   private MemberEntity member;
   private MemberProfileProjection memberProfileProjection;

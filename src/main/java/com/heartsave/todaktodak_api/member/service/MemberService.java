@@ -2,6 +2,7 @@ package com.heartsave.todaktodak_api.member.service;
 
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
 import com.heartsave.todaktodak_api.member.dto.request.NicknameUpdateRequest;
 import com.heartsave.todaktodak_api.member.dto.response.MemberProfileResponse;
 import com.heartsave.todaktodak_api.member.dto.response.NicknameUpdateResponse;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class MemberService {
   private final MemberRepository memberRepository;
+  private final S3FileStorageService s3Service;
 
   @Transactional
   public NicknameUpdateResponse updateNickname(TodakUser principal, NicknameUpdateRequest dto) {
@@ -52,7 +54,6 @@ public class MemberService {
   }
 
   private String createCharacterPreSignedUrl(String originUrl) {
-    // TODO: presigned url 생성
-    return originUrl == null ? "DEFAULT" : "CHANGED";
+    return originUrl == null ? "DEFAULT" : s3Service.preSignedCharacterImageUrlFrom(originUrl);
   }
 }
