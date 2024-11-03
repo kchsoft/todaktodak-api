@@ -34,11 +34,11 @@ public class MySharedDiaryService {
 
   private List<MySharedDiaryPreviewProjection> fetchPreviews(Long memberId, Long publicDiaryId) {
     log.info("나의 공개된 일기 preview 정보를 조회합니다.");
-    if (publicDiaryId == 0L) publicDiaryId = getMaxId(memberId); // 공개 일기 조회 API 첫 호출
+    if (publicDiaryId == 0L) publicDiaryId = getFirstPreviewId(memberId); // 공개 일기 조회 API 첫 호출
     return mySharedDiaryRepository.findNextPreviews(memberId, publicDiaryId, PageRequest.of(0, 12));
   }
 
-  private Long getMaxId(Long memberId) {
+  private Long getFirstPreviewId(Long memberId) {
     return mySharedDiaryRepository
         .findLatestId(memberId)
         .map(id -> id + 1L)

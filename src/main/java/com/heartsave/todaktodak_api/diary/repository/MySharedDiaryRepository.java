@@ -16,15 +16,21 @@ public interface MySharedDiaryRepository extends JpaRepository<PublicDiaryEntity
           """
             SELECT MAX(pd.id)
             FROM PublicDiaryEntity pd
+            WHERE pd.memberEntity.id = :memberId
 """)
-  Optional<Long> findLatestId(Long memberId);
+  Optional<Long> findLatestId(@Param("memberId") Long memberId);
 
   @Query(
       value =
           """
-                      SELECT pd.id, d.webtoonImageUrl, pd.createdTime
-                      FROM PublicDiaryEntity pd JOIN DiaryEntity d ON pd.diaryEntity.id = d.id
-                      WHERE pd.memberEntity.id = :mamberId AND pd.id < :publicDiaryId
+                      SELECT
+                       new com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection(
+                       pd.id,
+                       d.webtoonImageUrl,
+                       CAST (pd.createdTime AS Localdate)
+                       )
+                      FROM PublicDiaryEntity pd JOIN pd.diaryEntity d
+                      WHERE pd.memberEntity.id = :memberId AND pd.id < :publicDiaryId
                       ORDER BY pd.id DESC
           """)
   List<MySharedDiaryPreviewProjection> findNextPreviews(
