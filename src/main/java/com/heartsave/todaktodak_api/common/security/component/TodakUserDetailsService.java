@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.common.security;
+package com.heartsave.todaktodak_api.common.security.component;
 
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;

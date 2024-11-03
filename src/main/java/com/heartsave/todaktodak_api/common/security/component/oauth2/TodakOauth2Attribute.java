@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.common.security.component.oauth2;
 
-import static com.heartsave.todaktodak_api.common.security.constant.ConstraintConstant.Member.LOGIN_ID_MAX_SIZE;
+import static com.heartsave.todaktodak_api.common.constant.ConstraintConstant.Member.LOGIN_ID_MAX_SIZE;
 
 import com.heartsave.todaktodak_api.common.security.domain.AuthType;
 import java.util.Map;
