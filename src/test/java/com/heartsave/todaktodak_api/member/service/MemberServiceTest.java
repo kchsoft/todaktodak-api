@@ -75,7 +75,7 @@ final class MemberServiceTest {
         .thenReturn(Optional.of(memberProfileProjection));
 
     // when
-    MemberProfileResponse response = memberService.getMemberProfile(principal);
+    MemberProfileResponse response = memberService.getMemberProfileById(principal);
 
     // then
     assertThat(response.nickname()).isEqualTo(member.getNickname());

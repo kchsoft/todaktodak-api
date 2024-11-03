@@ -26,8 +26,8 @@ public class MemberService {
     return NicknameUpdateResponse.builder().nickname(retrievedMember.getNickname()).build();
   }
 
-  public MemberProfileResponse getMemberProfile(TodakUser principal) {
-    MemberProfileProjection memberProfile = getMemberProfile(principal.getId());
+  public MemberProfileResponse getMemberProfileById(TodakUser principal) {
+    MemberProfileProjection memberProfile = getMemberProfileById(principal.getId());
 
     String characterPreSignedUrl =
         createCharacterPreSignedUrl(memberProfile.getCharacterImageUrl());
@@ -45,7 +45,7 @@ public class MemberService {
         .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, id));
   }
 
-  private MemberProfileProjection getMemberProfile(Long id) {
+  private MemberProfileProjection getMemberProfileById(Long id) {
     return memberRepository
         .findProjectedById(id)
         .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, id));

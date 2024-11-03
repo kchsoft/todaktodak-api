@@ -41,6 +41,6 @@ public class MemberController {
       })
   public ResponseEntity<MemberProfileResponse> getMemberProfile(
       @AuthenticationPrincipal TodakUser user) {
-    return ResponseEntity.ok(memberService.getMemberProfile(user));
+    return ResponseEntity.ok(memberService.getMemberProfileById(user));
   }
 }

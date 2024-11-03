@@ -147,7 +147,7 @@ final class MemberControllerTest {
             .build();
 
     // when
-    doReturn(response).when(memberService).getMemberProfile(any(TodakUser.class));
+    doReturn(response).when(memberService).getMemberProfileById(any(TodakUser.class));
 
     // then
     mockMvc
@@ -158,7 +158,7 @@ final class MemberControllerTest {
         .andExpect(jsonPath("$.characterImageUrl").value("presigned-url"))
         .andDo(print());
 
-    verify(memberService, times(1)).getMemberProfile(any(TodakUser.class));
+    verify(memberService, times(1)).getMemberProfileById(any(TodakUser.class));
   }
 
   @Test
@@ -172,7 +172,7 @@ final class MemberControllerTest {
     // when
     doThrow(new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, mockUser.getId()))
         .when(memberService)
-        .getMemberProfile(any(TodakUser.class));
+        .getMemberProfileById(any(TodakUser.class));
 
     // then
     mockMvc
@@ -181,6 +181,6 @@ final class MemberControllerTest {
         .andExpect(jsonPath("$.title").value(MemberErrorSpec.NOT_FOUND.name()))
         .andDo(print());
 
-    verify(memberService, times(1)).getMemberProfile(any(TodakUser.class));
+    verify(memberService, times(1)).getMemberProfileById(any(TodakUser.class));
   }
 }
