@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.config;
+package com.heartsave.todaktodak_api.common.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
