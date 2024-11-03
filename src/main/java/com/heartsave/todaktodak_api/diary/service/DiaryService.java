@@ -5,17 +5,16 @@ import com.heartsave.todaktodak_api.ai.service.AiService;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
-import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
@@ -38,8 +37,8 @@ public class DiaryService {
 
   private final AiService aiService;
   private final DiaryRepository diaryRepository;
-  private final DiaryReactionRepository diaryReactionRepository;
   private final MemberRepository memberRepository;
+  private final S3FileStorageService s3FileStorageService;
 
   public DiaryWriteResponse write(TodakUser principal, DiaryWriteRequest request) {
     DiaryEntity diary = createDiaryEntity(principal, request);
@@ -96,19 +95,17 @@ public class DiaryService {
                 () ->
                     new DiaryNotFoundException(
                         DiaryErrorSpec.DIARY_NOT_FOUND, memberId, requestDate));
-    DiaryReactionCountProjection reactionCount =
-        diaryReactionRepository.countEachByDiaryId(diary.getId()).get();
     log.info("사용자의 나의 일기 정보를 성공적으로 가져왔습니다.");
 
     return DiaryResponse.builder()
         .diaryId(diary.getId())
         .emotion(diary.getEmotion())
         .content(diary.getContent())
-        .webtoonImageUrl(diary.getWebtoonImageUrl())
-        .bgmUrl(diary.getBgmUrl())
+        .webtoonImageUrls(
+            s3FileStorageService.preSignedWebtoonUrlFrom(List.of(diary.getWebtoonImageUrl())))
+        .bgmUrl(s3FileStorageService.preSignedBgmUrlFrom(diary.getBgmUrl()))
         .aiComment(diary.getAiComment())
         .date(diary.getDiaryCreatedTime().toLocalDate())
-        .reactionCount(reactionCount)
         .build();
   }
 
