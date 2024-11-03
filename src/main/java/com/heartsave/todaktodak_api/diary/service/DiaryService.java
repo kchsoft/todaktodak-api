@@ -9,6 +9,7 @@ import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
@@ -124,5 +125,9 @@ public class DiaryService {
         .content(request.getContent())
         .diaryCreatedTime((request.getDate()))
         .build();
+  }
+
+  public MySharedDiaryPaginationResponse getMySharedDiaryPagination(Long publicDiaryId) {
+    return null;
   }
 }

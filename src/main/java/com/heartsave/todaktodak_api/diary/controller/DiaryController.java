@@ -5,6 +5,7 @@ import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.service.DiaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -121,5 +122,12 @@ public class DiaryController {
           @DateTimeFormat(pattern = "yyyy-MM-dd")
           LocalDate requestDate) {
     return ResponseEntity.status(HttpStatus.OK).body(diaryService.getDiary(principal, requestDate));
+  }
+
+  @GetMapping("/shared")
+  public ResponseEntity<MySharedDiaryPaginationResponse> getMySharedDiaryPreviews(
+      @Valid @Min(0L) @RequestParam(name = "after", defaultValue = "0") Long publicDiaryId) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(diaryService.getMySharedDiaryPagination(publicDiaryId));
   }
 }
