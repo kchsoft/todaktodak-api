@@ -24,9 +24,11 @@ public class MySharedDiaryService {
   private final S3FileStorageService s3FileStorageService;
 
   public MySharedDiaryPaginationResponse getPagination(TodakUser principal, Long publicDiaryId) {
+    log.info("나의 공개된 일기 정보를 요청합니다.");
     Long memberId = principal.getId();
     List<MySharedDiaryPreviewProjection> previews = fetchPreviews(memberId, publicDiaryId);
     replaceWithPreSignedUrls(previews);
+    log.info("나의 공개된 일기 정보 요청을 성공적으로 마쳤습니다.");
     return MySharedDiaryPaginationResponse.of(previews);
   }
 
@@ -46,6 +48,7 @@ public class MySharedDiaryService {
   }
 
   private void replaceWithPreSignedUrls(List<MySharedDiaryPreviewProjection> previews) {
+    log.info("나의 공개된 일기 이미지 URL pre-signed 과정을 시작합니다.");
     for (MySharedDiaryPreviewProjection preview : previews) {
       preview.replaceWebtoonImageUrl(
           s3FileStorageService.preSignedFirstWebtoonUrlFrom(preview.getWebtoonImageUrl()));
