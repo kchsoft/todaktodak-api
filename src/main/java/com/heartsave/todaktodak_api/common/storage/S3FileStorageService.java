@@ -10,6 +10,10 @@ public class S3FileStorageService { // Todo : S3 SDK 연동 및 pre-signed url �
     return new ArrayList<>();
   }
 
+  public String preSignedFirstWebtoonUrlFrom(String s3FileUrl) {
+    return "";
+  }
+
   public String preSignedCharacterImageUrlFrom(String s3FileUrl) {
     return "";
   }

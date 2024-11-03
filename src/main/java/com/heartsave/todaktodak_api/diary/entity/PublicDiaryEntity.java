@@ -2,6 +2,7 @@ package com.heartsave.todaktodak_api.diary.entity;
 
 import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.PUBLIC_DIARY_CONTENT_MAX_SIZE;
 
+import com.heartsave.todaktodak_api.common.entity.BaseEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,7 +33,7 @@ import lombok.NoArgsConstructor;
     initialValue = 1,
     allocationSize = 50)
 @Table(name = "public_diary")
-public class PublicDiaryEntity {
+public class PublicDiaryEntity extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PUBLIC_DIARY_SEQ_GENERATOR")
