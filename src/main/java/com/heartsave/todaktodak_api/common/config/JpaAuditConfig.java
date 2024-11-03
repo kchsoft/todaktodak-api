@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.config;
+package com.heartsave.todaktodak_api.common.config;
 
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import java.util.Optional;
