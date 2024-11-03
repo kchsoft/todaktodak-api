@@ -83,8 +83,6 @@ final class MemberControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.nickname").value(NEW_NICKNAME))
-        // 전체 JSON 검증
-        // .andExpect(content().json(objectMapper.writeValueAsString(response)))
         .andReturn();
     verify(memberService, times(1))
         .updateNickname(any(TodakUser.class), any(NicknameUpdateRequest.class));
