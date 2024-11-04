@@ -52,7 +52,7 @@ public interface MySharedDiaryRepository extends JpaRepository<PublicDiaryEntity
             )
             FROM PublicDiaryEntity pd
             JOIN pd.diaryEntity d
-            WHERE  pd.memberEntity.id = :memberId AND CAST(pd.createdTime AS LocalDate) = :publicDiaryDate
+            WHERE  pd.memberEntity.id = :memberId AND CAST(d.diaryCreatedTime AS LocalDate) = :publicDiaryDate
             """)
   Optional<MySharedDiaryContentOnlyProjection> findContentOnly(
       @Param("memberId") Long memberId, @Param("publicDiaryDate") LocalDate publicDiaryDate);

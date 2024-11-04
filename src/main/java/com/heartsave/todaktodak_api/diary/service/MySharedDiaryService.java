@@ -71,7 +71,7 @@ public class MySharedDiaryService {
     DiaryReactionCountProjection reactionCount =
         reactionRepository.countEachByDiaryId(contentOnly.getDiaryId());
     List<DiaryReactionType> memberReaction =
-        reactionRepository.findReactionByMemberAndDiaryId(memberId, contentOnly.getDiaryId());
+        reactionRepository.findMemberReaction(memberId, contentOnly.getDiaryId());
     log.info("나의 공개된 일기 상세 정보 요청을 성공적으로 마쳤습니다.");
     return MySharedDiaryResponse.of(contentOnly, reactionCount, memberReaction);
   }

@@ -47,7 +47,7 @@ public class MySharedDiaryResponse {
     this.bgmUrl = content.getBgmUrl();
     this.reactionCount = reactionCount;
     this.myReaction = myReaction;
-    this.diaryCreatedDate = content.getPublicDiaryCreatedDate();
+    this.diaryCreatedDate = content.getDiaryCreatedDate();
   }
 
   public static MySharedDiaryResponse of(

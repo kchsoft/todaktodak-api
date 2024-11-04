@@ -27,7 +27,7 @@ public class MySharedDiaryContentOnlyProjection {
   private String bgmUrl;
 
   @Schema(description = "공개된 일기 작성 날짜", example = "2024-01-01", type = "string", format = "date")
-  private final LocalDate publicDiaryCreatedDate;
+  private final LocalDate diaryCreatedDate;
 
   public MySharedDiaryContentOnlyProjection(
       Long publicDiaryId,
@@ -35,13 +35,13 @@ public class MySharedDiaryContentOnlyProjection {
       String publicContent,
       String webtoonImageUrl,
       String bgmUrl,
-      LocalDate publicDiaryCreatedDate) {
+      LocalDate diaryCreatedDate) {
     this.publicDiaryId = publicDiaryId;
     this.diaryId = diaryId;
     this.publicContent = publicContent;
     this.webtoonImageUrls = List.of(webtoonImageUrl);
     this.bgmUrl = bgmUrl;
-    this.publicDiaryCreatedDate = publicDiaryCreatedDate;
+    this.diaryCreatedDate = diaryCreatedDate;
   }
 
   public void replaceWebtoonImageUrls(List<String> urls) {

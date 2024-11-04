@@ -5,8 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.heartsave.todaktodak_api.common.BaseTestEntity;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentOnlyProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +46,9 @@ class MySharedDiaryRepositoryTest {
   private List<PublicDiaryEntity> createTestPublicDiaries() {
     List<PublicDiaryEntity> publicDiaries = new ArrayList<>();
     for (int i = 0; i < TEST_PUBLIC_DIARY_SIZE; i++) {
-      DiaryEntity diary = BaseTestEntity.createDiaryNoIdWithMember(member);
+      DiaryEntity diary =
+          BaseTestEntity.createDiaryNoIdWithMemberAndCreatedDateTime(
+              member, LocalDateTime.now().minusDays(TEST_PUBLIC_DIARY_SIZE - (i + 1)));
       PublicDiaryEntity publicDiary =
           PublicDiaryEntity.builder()
               .diaryEntity(diary)
@@ -144,5 +149,51 @@ class MySharedDiaryRepositoryTest {
 
     // then
     assertThat(previews).as("더 이상 조회할 데이터가 없는 경우 빈 리스트를 반환해야 합니다").isEmpty();
+  }
+
+  @Test
+  @DisplayName("날짜로 공유된 일기 내용을 성공적으로 조회한다")
+  void findContentOnly_Success() {
+    PublicDiaryEntity expected = publicDiaries.get(3);
+    Long memberId = expected.getMemberEntity().getId();
+    LocalDate requestDate = expected.getDiaryEntity().getDiaryCreatedTime().toLocalDate();
+    System.out.println("requestDate = " + requestDate);
+
+    Optional<MySharedDiaryContentOnlyProjection> Optional_actual =
+        mySharedDiaryRepository.findContentOnly(memberId, requestDate);
+
+    assertThat(Optional_actual).as("조회된 결과가 존재해야 합니다").isPresent();
+
+    MySharedDiaryContentOnlyProjection actual = Optional_actual.get();
+    assertThat(actual.getPublicDiaryId()).as("공개된 일기 ID가 일치해야 합니다").isEqualTo(expected.getId());
+    assertThat(actual.getDiaryId())
+        .as("원본 일기 ID가 일치해야 합니다")
+        .isEqualTo(expected.getDiaryEntity().getId());
+    assertThat(actual.getPublicContent())
+        .as("공개된 일기 내용이 일치해야 합니다")
+        .isEqualTo(expected.getPublicContent());
+    assertThat(actual.getWebtoonImageUrls())
+        .as("웹툰 이미지 URL이 일치해야 합니다")
+        .contains(expected.getDiaryEntity().getWebtoonImageUrl());
+    assertThat(actual.getBgmUrl())
+        .as("BGM URL이 일치해야 합니다")
+        .contains(expected.getDiaryEntity().getBgmUrl());
+    assertThat(actual.getDiaryCreatedDate())
+        .as("일기 작성 날짜가 일치해야 합니다")
+        .isEqualTo(expected.getDiaryEntity().getDiaryCreatedTime().toLocalDate());
+  }
+
+  @Test
+  @DisplayName("존재하지 않는 날짜의 공유된 일기를 조회하면 빈 Optional을 반환한다")
+  void findContentOnly_ReturnEmpty_WhenNotFound() {
+    LocalDate nonExistentDate = LocalDate.of(3024, 1, 1);
+    Long memberId = member.getId();
+
+    Optional<MySharedDiaryContentOnlyProjection> result =
+        mySharedDiaryRepository.findContentOnly(memberId, nonExistentDate);
+    assertThat(result).as("존재하지 않는 날짜로 일기 조회 시 빈 Optional이 반환되어야 합니다").isEmpty();
+
+    result = mySharedDiaryRepository.findContentOnly(1000L, LocalDate.now());
+    assertThat(result).as("존재하지 않는 memberId로 일기 조회 시 빈 Optional이 반환되어야 합니다").isEmpty();
   }
 }

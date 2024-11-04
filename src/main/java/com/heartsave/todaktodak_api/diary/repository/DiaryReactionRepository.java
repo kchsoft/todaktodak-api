@@ -17,7 +17,7 @@ public interface DiaryReactionRepository extends JpaRepository<DiaryReactionEnti
         FROM DiaryReactionEntity dr
         WHERE dr.memberEntity.id = :memberId AND dr.diaryEntity.id = :diaryId
       """)
-  List<DiaryReactionType> findReactionByMemberAndDiaryId(Long memberId, Long diaryId);
+  List<DiaryReactionType> findMemberReaction(Long memberId, Long diaryId);
 
   @Query(
       value =

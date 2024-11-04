@@ -93,7 +93,7 @@ public class PublicDiaryService {
   }
 
   private List<DiaryReactionType> fetchMemberReactions(Long memberId, Long diaryId) {
-    return diaryReactionRepository.findReactionByMemberAndDiaryId(memberId, diaryId);
+    return diaryReactionRepository.findMemberReaction(memberId, diaryId);
   }
 
   public void write(TodakUser principal, String publicContent, Long diaryId) {

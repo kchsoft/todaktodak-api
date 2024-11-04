@@ -215,7 +215,7 @@ class PublicDiaryServiceTest {
     // 반응 정보 mock
     DiaryReactionCountProjection reactionCount = mock(DiaryReactionCountProjection.class);
     when(mockDiaryReactionRepository.countEachByDiaryId(diary.getId())).thenReturn(reactionCount);
-    when(mockDiaryReactionRepository.findReactionByMemberAndDiaryId(memberId, diary.getId()))
+    when(mockDiaryReactionRepository.findMemberReaction(memberId, diary.getId()))
         .thenReturn(List.of(DiaryReactionType.LIKE));
 
     // when
@@ -248,7 +248,7 @@ class PublicDiaryServiceTest {
     // 메서드 호출 검증
     verify(mockPublicDiaryRepository).findNextContentOnlyById(anyLong(), any(PageRequest.class));
     verify(mockDiaryReactionRepository).countEachByDiaryId(diary.getId());
-    verify(mockDiaryReactionRepository).findReactionByMemberAndDiaryId(memberId, diary.getId());
+    verify(mockDiaryReactionRepository).findMemberReaction(memberId, diary.getId());
     verify(mocksS3FileStorageService).preSignedWebtoonUrlFrom(any());
     verify(mocksS3FileStorageService).preSignedCharacterImageUrlFrom(any());
     verify(mocksS3FileStorageService).preSignedBgmUrlFrom(any());
