@@ -54,6 +54,8 @@ public class MemberService {
   }
 
   private String createCharacterPreSignedUrl(String originUrl) {
-    return originUrl == null ? "DEFAULT" : s3Service.preSignedCharacterImageUrlFrom(originUrl);
+    return originUrl == null
+        ? s3Service.preSignedCharacterImageUrlFrom("spring-test/default-todak")
+        : s3Service.preSignedCharacterImageUrlFrom(originUrl);
   }
 }
