@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.ai.dto;
+package com.heartsave.todaktodak_api.ai.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

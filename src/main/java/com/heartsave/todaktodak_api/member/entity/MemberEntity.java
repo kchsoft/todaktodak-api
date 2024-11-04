@@ -56,4 +56,8 @@ public class MemberEntity extends BaseEntity {
   public void updateNickname(String newNickName) {
     nickname = newNickName;
   }
+
+  public void updateRole(String role) {
+    this.role = TodakRole.valueOf(role);
+  }
 }

@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.ai.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.heartsave.todaktodak_api.ai.dto.AiContentResponse;
+import com.heartsave.todaktodak_api.ai.dto.response.AiContentResponse;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;

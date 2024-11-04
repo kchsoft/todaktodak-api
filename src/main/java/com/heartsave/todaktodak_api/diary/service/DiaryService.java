@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.diary.service;
 
-import com.heartsave.todaktodak_api.ai.dto.AiContentResponse;
+import com.heartsave.todaktodak_api.ai.dto.response.AiContentResponse;
 import com.heartsave.todaktodak_api.ai.service.AiService;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
