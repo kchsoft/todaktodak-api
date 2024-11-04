@@ -37,7 +37,7 @@ public class MySharedDiaryController {
         @ApiResponse(responseCode = "400", description = "잘못된 요청")
       })
   @GetMapping
-  public ResponseEntity<MySharedDiaryPaginationResponse> getMySharedDiaryPreviews(
+  public ResponseEntity<MySharedDiaryPaginationResponse> getMySharedDiaryPagination(
       @AuthenticationPrincipal TodakUser principal,
       @Parameter(
               name = "after",
