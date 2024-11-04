@@ -25,43 +25,6 @@ public class AiService {
 
   private final WebClient webClient;
 
-  public void callCharacter(MultipartFile image, AiCharacterRequest request) {
-    webClient
-        .post()
-        .uri("/character")
-        .contentType(MediaType.MULTIPART_FORM_DATA)
-        .body(BodyInserters.fromMultipartData(createMultipartBody(image, request)))
-        .retrieve()
-        .bodyToMono(Void.class)
-        .doOnSuccess(result -> log.info("캐릭터 생성 요청을 성공적으로 보냈습니다."))
-        .doOnError(error -> log.error("캐릭터 생성 요청에 오류가 발생했습니다.", error))
-        .subscribe();
-  }
-
-  private MultiValueMap<String, HttpEntity<?>> createMultipartBody(
-      MultipartFile image, AiCharacterRequest request) {
-    MultiValueMap<String, HttpEntity<?>> multipartBody = new LinkedMultiValueMap<>();
-
-    // 요청 json
-    multipartBody.add("memberId", new HttpEntity<>(request.memberId()));
-    multipartBody.add("characterStyle", new HttpEntity<>(request.characterStyle()));
-
-    // 이미지
-    try {
-      ByteArrayResource imageResource =
-          new ByteArrayResource(image.getBytes()) {
-            @Override
-            public String getFilename() {
-              return image.getOriginalFilename();
-            }
-          };
-      multipartBody.add("userImage", new HttpEntity<>(imageResource));
-    } catch (Exception e) {
-      throw new AiException(AiErrorSpec.IMAGE_PROCESS_FAIL, image.getOriginalFilename());
-    }
-    return multipartBody;
-  }
-
   public AiContentResponse callAiContent(DiaryEntity diary) {
     AiContentRequest request = getAiContentRequest(diary);
     callWebtoon(request);
@@ -112,5 +75,42 @@ public class AiService {
         .doOnSuccess(result -> log.info("AI 코멘트 생성 요청을 성공적으로 보냈습니다."))
         .doOnError(error -> log.error("AI 코멘트 생성 요청에 오류가 발생했습니다."))
         .block();
+  }
+
+  public void callCharacter(MultipartFile image, AiCharacterRequest request) {
+    webClient
+        .post()
+        .uri("/character")
+        .contentType(MediaType.MULTIPART_FORM_DATA)
+        .body(BodyInserters.fromMultipartData(createMultipartBody(image, request)))
+        .retrieve()
+        .bodyToMono(Void.class)
+        .doOnSuccess(result -> log.info("캐릭터 생성 요청을 성공적으로 보냈습니다."))
+        .doOnError(error -> log.error("캐릭터 생성 요청에 오류가 발생했습니다.", error))
+        .subscribe();
+  }
+
+  private MultiValueMap<String, HttpEntity<?>> createMultipartBody(
+      MultipartFile image, AiCharacterRequest request) {
+    MultiValueMap<String, HttpEntity<?>> multipartBody = new LinkedMultiValueMap<>();
+
+    // 요청 json
+    multipartBody.add("memberId", new HttpEntity<>(request.memberId()));
+    multipartBody.add("characterStyle", new HttpEntity<>(request.characterStyle()));
+
+    // 이미지
+    try {
+      ByteArrayResource imageResource =
+          new ByteArrayResource(image.getBytes()) {
+            @Override
+            public String getFilename() {
+              return image.getOriginalFilename();
+            }
+          };
+      multipartBody.add("userImage", new HttpEntity<>(imageResource));
+    } catch (Exception e) {
+      throw new AiException(AiErrorSpec.IMAGE_PROCESS_FAIL, image.getOriginalFilename());
+    }
+    return multipartBody;
   }
 }
