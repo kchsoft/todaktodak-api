@@ -64,7 +64,7 @@ public class MySharedDiaryController {
         @ApiResponse(responseCode = "404", description = "해당 날짜의 일기를 찾을 수 없음")
       })
   @GetMapping("/detail")
-  public ResponseEntity<MySharedDiaryResponse> getMySharedDiaryDetail(
+  public ResponseEntity<MySharedDiaryResponse> getMySharedDiary(
       @AuthenticationPrincipal TodakUser principal,
       @Parameter(
               name = "date",

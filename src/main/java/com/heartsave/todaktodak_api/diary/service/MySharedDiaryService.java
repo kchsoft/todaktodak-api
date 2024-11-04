@@ -63,6 +63,7 @@ public class MySharedDiaryService {
   }
 
   public MySharedDiaryResponse getDiary(TodakUser principal, LocalDate requestDate) {
+    log.info("나의 공개된 일기 상세 정보를 요청합니다.");
     Long memberId = principal.getId();
     MySharedDiaryContentOnlyProjection contentOnly = fetchContentOnly(requestDate, memberId);
     replaceWithPreSignedUrls(contentOnly);
@@ -71,11 +72,12 @@ public class MySharedDiaryService {
         reactionRepository.countEachByDiaryId(contentOnly.getDiaryId());
     List<DiaryReactionType> memberReaction =
         reactionRepository.findReactionByMemberAndDiaryId(memberId, contentOnly.getDiaryId());
-
+    log.info("나의 공개된 일기 상세 정보 요청을 성공적으로 마쳤습니다.");
     return MySharedDiaryResponse.of(contentOnly, reactionCount, memberReaction);
   }
 
   private void replaceWithPreSignedUrls(MySharedDiaryContentOnlyProjection contentOnly) {
+    log.info("나의 공개된 일기 URL pre-signed 과정을 시작합니다.");
     contentOnly.replaceWebtoonImageUrls(
         s3FileStorageService.preSignedWebtoonUrlFrom(contentOnly.getWebtoonImageUrls()));
     contentOnly.replaceBgmUrl(s3FileStorageService.preSignedBgmUrlFrom(contentOnly.getBgmUrl()));
@@ -83,6 +85,7 @@ public class MySharedDiaryService {
 
   private MySharedDiaryContentOnlyProjection fetchContentOnly(
       LocalDate requestDate, Long memberId) {
+    log.info("나의 공개된 일기 content only 를 요청합니다.");
     MySharedDiaryContentOnlyProjection contentOnly =
         mySharedDiaryRepository
             .findContentOnly(memberId, requestDate)
