@@ -13,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
-import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
@@ -22,7 +21,6 @@ import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPaginationResp
 import com.heartsave.todaktodak_api.diary.service.PublicDiaryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -43,7 +41,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @AutoConfigureMockMvc(addFilters = false)
 public class PublicDiaryControllerTest {
 
-  @Mock private S3FileStorageService s3FileStorageService;
   @MockBean private PublicDiaryService publicDiaryService;
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
