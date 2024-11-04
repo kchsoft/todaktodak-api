@@ -15,7 +15,7 @@ public class PublicDiaryContentOnlyProjection {
   @Schema(description = "원본 일기 ID", example = "1")
   private final Long diaryId;
 
-  @Schema(description = "작성자 캐릭터 이미지 URL", example = "https://example.com/character/123.jpg")
+  @Schema(description = "작성자 캐릭터 이미지 URL", example = "character/123")
   private String characterImageUrl;
 
   @Schema(description = "작성자 닉네임", example = "Todak")
