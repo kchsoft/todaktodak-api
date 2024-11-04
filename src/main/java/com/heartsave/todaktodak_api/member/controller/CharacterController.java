@@ -39,7 +39,7 @@ public class CharacterController {
         @ApiResponse(responseCode = "404", description = "회원 조회 실패")
       })
   @PostMapping
-  public ResponseEntity<Void> getPastCharacterImage(
+  public ResponseEntity<Void> createCharacterImage(
       @AuthenticationPrincipal TodakUser principal,
       @RequestParam("uploadImage") MultipartFile file,
       AiCharacterRequest dto) {
