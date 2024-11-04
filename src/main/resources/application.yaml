@@ -30,6 +30,7 @@ aws:
   secret-key: ${AWS_SECRET_KEY:secret}
   s3:
     bucket-name: ${AWS_S3_BUCKET_NAME:bucket}
+    presign-duration: ${AWS_S3_PRESIGN_DURATION}
 base:
   url: ${BASE_URL:http://localhost}
   port: ${BASE_PORT:3000}
@@ -85,7 +86,7 @@ spring:
             user-name-attribute: id
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:

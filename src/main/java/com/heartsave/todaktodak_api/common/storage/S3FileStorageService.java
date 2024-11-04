@@ -17,6 +17,9 @@ public class S3FileStorageService {
   @Value("${aws.s3.bucket-name}")
   private String BUCKET_NAME;
 
+  @Value("${aws.s3.presign-duration}")
+  private Long PRE_SIGN_DURATION;
+
   public List<String> preSignedWebtoonUrlFrom(List<String> s3FolderUrl) {
     return s3FolderUrl.stream().map(this::preSign).toList();
   }
@@ -34,12 +37,12 @@ public class S3FileStorageService {
   }
 
   private String preSign(String url) {
-    var presignRequest =
+    var preSignRequest =
         GetObjectPresignRequest.builder()
-            .signatureDuration(Duration.ofSeconds(60))
+            .signatureDuration(Duration.ofSeconds(PRE_SIGN_DURATION))
             .getObjectRequest(GetObjectRequest.builder().bucket(BUCKET_NAME).key(url).build())
             .build();
 
-    return s3Presigner.presignGetObject(presignRequest).url().toString();
+    return s3Presigner.presignGetObject(preSignRequest).url().toString();
   }
 }
