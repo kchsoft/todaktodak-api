@@ -4,7 +4,6 @@ import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.entity.DiaryReactionEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,7 +17,7 @@ public interface DiaryReactionRepository extends JpaRepository<DiaryReactionEnti
         FROM DiaryReactionEntity dr
         WHERE dr.memberEntity.id = :memberId AND dr.diaryEntity.id = :diaryId
       """)
-  List<DiaryReactionType> findReactionByMemberAndDiaryId(Long memberId, Long diaryId);
+  List<DiaryReactionType> findMemberReaction(Long memberId, Long diaryId);
 
   @Query(
       value =
@@ -32,7 +31,7 @@ public interface DiaryReactionRepository extends JpaRepository<DiaryReactionEnti
             WHERE diary_id = :diaryId
           """,
       nativeQuery = true)
-  Optional<DiaryReactionCountProjection> countEachByDiaryId(Long diaryId);
+  DiaryReactionCountProjection countEachByDiaryId(Long diaryId);
 
   @Modifying
   @Query(

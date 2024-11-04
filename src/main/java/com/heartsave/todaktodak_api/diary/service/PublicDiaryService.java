@@ -89,11 +89,11 @@ public class PublicDiaryService {
   }
 
   private DiaryReactionCountProjection fetchReactionCount(Long diaryId) {
-    return diaryReactionRepository.countEachByDiaryId(diaryId).get();
+    return diaryReactionRepository.countEachByDiaryId(diaryId);
   }
 
   private List<DiaryReactionType> fetchMemberReactions(Long memberId, Long diaryId) {
-    return diaryReactionRepository.findReactionByMemberAndDiaryId(memberId, diaryId);
+    return diaryReactionRepository.findMemberReaction(memberId, diaryId);
   }
 
   public void write(TodakUser principal, String publicContent, Long diaryId) {
