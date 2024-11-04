@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.ai.dto;
+package com.heartsave.todaktodak_api.ai.dto.request;
 
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import lombok.Builder;
