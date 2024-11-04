@@ -1,36 +1,47 @@
 package com.heartsave.todaktodak_api.common.storage;
 
-import java.util.ArrayList;
+import com.heartsave.todaktodak_api.common.config.properties.S3Properties;
+import java.time.Duration;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.Bucket;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 @RequiredArgsConstructor
 @Service
-public class S3FileStorageService { // Todo : S3 SDK 연동 및 pre-signed url 부여 로직 작성
-  private final S3Client s3Client;
+public class S3FileStorageService {
+  private final S3Presigner s3Presigner;
+  private final S3Properties s3Properties;
 
-  private List<String> getBucketList() {
-    var response = s3Client.listBuckets();
-    return response.buckets().stream().map(Bucket::name).collect(Collectors.toList());
-  }
-
+  // TODO: 존재하지 않는 이미지 key에 대한 예외 처리 필요
   public List<String> preSignedWebtoonUrlFrom(List<String> s3FolderUrl) {
-    return new ArrayList<>();
+    return s3FolderUrl.stream().map(this::preSign).toList();
   }
 
-  public String preSignedFirstWebtoonUrlFrom(String s3FileUrl) {
-    return "";
+  public String preSignedFirstWebtoonUrlFrom(String key) {
+    return key == null ? preSign(s3Properties.defaultKey().webtoon()) : preSign(key);
   }
 
-  public String preSignedCharacterImageUrlFrom(String s3FileUrl) {
-    return "";
+  public String preSignedCharacterImageUrlFrom(String key) {
+    return key == null ? preSign(s3Properties.defaultKey().character()) : preSign(key);
   }
 
-  public String preSignedBgmUrlFrom(String s3FileUrl) {
-    return "";
+  public String preSignedBgmUrlFrom(String key) {
+    return key == null ? preSign(s3Properties.defaultKey().bgm()) : preSign(key);
+  }
+
+  // TODO: presigned url 캐싱 관리
+  private String preSign(String key) throws NoSuchKeyException {
+    var preSignRequest =
+        GetObjectPresignRequest.builder()
+            .signatureDuration(Duration.ofSeconds(s3Properties.presignDuration()))
+            .getObjectRequest(
+                GetObjectRequest.builder().bucket(s3Properties.bucketName()).key(key).build())
+            .build();
+
+    return s3Presigner.presignGetObject(preSignRequest).url().toString();
   }
 }

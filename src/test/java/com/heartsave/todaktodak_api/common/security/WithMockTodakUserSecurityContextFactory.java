@@ -1,6 +1,5 @@
 package com.heartsave.todaktodak_api.common.security;
 
-import com.heartsave.todaktodak_api.common.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import java.util.List;
 import java.util.Map;

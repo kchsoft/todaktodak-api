@@ -13,9 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.stereotype.Component;
 
-@Component
 @RequiredArgsConstructor
 public class Oauth2FailureHandler implements AuthenticationFailureHandler {
   private final ObjectMapper objectMapper;

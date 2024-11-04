@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.member.entity;
 
-import static com.heartsave.todaktodak_api.common.security.constant.ConstraintConstant.Member.*;
+import static com.heartsave.todaktodak_api.common.constant.ConstraintConstant.Member.*;
 
 import com.heartsave.todaktodak_api.common.entity.BaseEntity;
 import com.heartsave.todaktodak_api.common.security.domain.AuthType;

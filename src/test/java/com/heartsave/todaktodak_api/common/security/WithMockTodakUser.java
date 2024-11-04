@@ -1,6 +1,5 @@
-package com.heartsave.todaktodak_api.common;
+package com.heartsave.todaktodak_api.common.security;
 
-import com.heartsave.todaktodak_api.common.security.WithMockTodakUserSecurityContextFactory;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import org.springframework.security.test.context.support.WithSecurityContext;
