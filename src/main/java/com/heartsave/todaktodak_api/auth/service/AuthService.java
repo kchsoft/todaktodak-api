@@ -1,9 +1,6 @@
 package com.heartsave.todaktodak_api.auth.service;
 
 import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.*;
-import static jakarta.servlet.http.HttpServletResponse.SC_OK;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.heartsave.todaktodak_api.auth.dto.request.SignUpRequest;
 import com.heartsave.todaktodak_api.auth.dto.response.TokenReissueResponse;
@@ -109,10 +106,7 @@ public class AuthService {
 
   private void updateRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
     var refreshCookie = CookieUtils.createValidCookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken);
-    response.setContentType(APPLICATION_JSON_VALUE);
-    response.setCharacterEncoding(UTF_8.name());
-    response.addCookie(refreshCookie);
-    response.setStatus(SC_OK);
+    CookieUtils.updateCookie(response, refreshCookie);
   }
 
   private boolean isRefreshTokenType(String token) {
