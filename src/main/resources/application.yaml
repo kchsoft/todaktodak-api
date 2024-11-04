@@ -30,7 +30,11 @@ aws:
   secret-key: ${AWS_SECRET_KEY:secret}
   s3:
     bucket-name: ${AWS_S3_BUCKET_NAME:bucket}
-    presign-duration: ${AWS_S3_PRESIGN_DURATION}
+    presign-duration: ${AWS_S3_PRESIGN_DURATION:1}
+    default-key:
+      character: ${AWS_S3_DEFAULT_CHARACTER_IMAGE_KEY:default-character}
+      webtoon: ${AWS_S3_DEFAULT_WEBTOON_IMAGE_KEY:default-webtoon}
+      bgm: ${AWS_S3_DEFAULT_BGM_IMAGE_KEY:default-bgm}
 base:
   url: ${BASE_URL:http://localhost}
   port: ${BASE_PORT:3000}

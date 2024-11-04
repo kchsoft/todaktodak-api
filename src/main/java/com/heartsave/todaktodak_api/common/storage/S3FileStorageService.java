@@ -20,7 +20,14 @@ public class S3FileStorageService {
   @Value("${aws.s3.presign-duration}")
   private Long PRE_SIGN_DURATION;
 
-  private static final String DEFAULT_CHARACTER_IMAGE_KEY = "spring-test/default-todak";
+  @Value("${aws.s3.default-key.character}")
+  private String DEFAULT_CHARACTER_IMAGE_KEY;
+
+  @Value("${aws.s3.default-key.webtoon}")
+  private String DEFAULT_WEBTOON_IMAGE_KEY;
+
+  @Value("${aws.s3.default-key.bgm}")
+  private String DEFAULT_BGM_IMAGE_KEY;
 
   public List<String> preSignedWebtoonUrlFrom(List<String> s3FolderUrl) {
     return s3FolderUrl.stream().map(this::preSign).toList();
