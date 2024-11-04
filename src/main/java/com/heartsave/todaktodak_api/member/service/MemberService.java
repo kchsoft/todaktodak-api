@@ -32,7 +32,7 @@ public class MemberService {
     MemberProfileProjection memberProfile = getMemberProfileById(principal.getId());
 
     String characterPreSignedUrl =
-        createCharacterPreSignedUrl(memberProfile.getCharacterImageUrl());
+        s3Service.preSignedCharacterImageUrlFrom(memberProfile.getCharacterImageUrl());
 
     return MemberProfileResponse.builder()
         .nickname(memberProfile.getNickname())
@@ -51,11 +51,5 @@ public class MemberService {
     return memberRepository
         .findProjectedById(id)
         .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, id));
-  }
-
-  private String createCharacterPreSignedUrl(String originUrl) {
-    return originUrl == null
-        ? s3Service.preSignedCharacterImageUrlFrom("spring-test/default-todak")
-        : s3Service.preSignedCharacterImageUrlFrom(originUrl);
   }
 }
