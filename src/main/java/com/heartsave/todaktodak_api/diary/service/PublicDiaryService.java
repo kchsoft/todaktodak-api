@@ -89,7 +89,7 @@ public class PublicDiaryService {
   }
 
   private DiaryReactionCountProjection fetchReactionCount(Long diaryId) {
-    return diaryReactionRepository.countEachByDiaryId(diaryId).get();
+    return diaryReactionRepository.countEachByDiaryId(diaryId);
   }
 
   private List<DiaryReactionType> fetchMemberReactions(Long memberId, Long diaryId) {

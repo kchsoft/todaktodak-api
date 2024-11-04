@@ -214,8 +214,7 @@ class PublicDiaryServiceTest {
 
     // 반응 정보 mock
     DiaryReactionCountProjection reactionCount = mock(DiaryReactionCountProjection.class);
-    when(mockDiaryReactionRepository.countEachByDiaryId(diary.getId()))
-        .thenReturn(Optional.of(reactionCount));
+    when(mockDiaryReactionRepository.countEachByDiaryId(diary.getId())).thenReturn(reactionCount);
     when(mockDiaryReactionRepository.findReactionByMemberAndDiaryId(memberId, diary.getId()))
         .thenReturn(List.of(DiaryReactionType.LIKE));
 
