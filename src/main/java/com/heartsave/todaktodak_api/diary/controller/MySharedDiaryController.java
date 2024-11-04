@@ -56,10 +56,25 @@ public class MySharedDiaryController {
         .body(mySharedDiaryService.getPagination(principal, publicDiaryId));
   }
 
+  @Operation(summary = "특정 날짜의 나의 공개된 일기 상세 조회")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "공개된 일기 상세 조회 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+        @ApiResponse(responseCode = "404", description = "해당 날짜의 일기를 찾을 수 없음")
+      })
   @GetMapping("/detail")
   public ResponseEntity<MySharedDiaryResponse> getMySharedDiaryDetail(
       @AuthenticationPrincipal TodakUser principal,
-      @Valid @PastOrPresent @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam("date")
+      @Parameter(
+              name = "date",
+              description = "조회할 일기 날짜",
+              example = "2024-11-04",
+              schema = @Schema(type = "string", format = "date"))
+          @Valid
+          @PastOrPresent
+          @DateTimeFormat(pattern = "yyyy-MM-dd")
+          @RequestParam("date")
           LocalDate requestDate) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(mySharedDiaryService.getDiary(principal, requestDate));
