@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.common.security.constant;
+package com.heartsave.todaktodak_api.common.constant;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

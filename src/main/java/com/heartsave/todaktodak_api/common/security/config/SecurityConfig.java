@@ -31,12 +31,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
-  private final AuthenticationEntryPointImpl authenticationEntryPoint;
-  private final AccessDeniedHandlerImpl accessDeniedHandler;
-  private final OAuth2SuccessHandler oAuth2SuccessHandler;
-  private final Oauth2FailureHandler oauth2FailureHandler;
   private final TodakOauth2UserDetailsService oauth2UserDetailsService;
-  private final JwtLogoutFilter jwtLogoutFilter;
+  private final AuthenticationEntryPointImpl authenticationEntryPoint;
   private final ObjectMapper objectMapper;
 
   @Value("${todak.cors.allowed-origin}")
@@ -52,14 +48,14 @@ public class SecurityConfig {
         .exceptionHandling(
             (eh) ->
                 eh.authenticationEntryPoint(authenticationEntryPoint)
-                    .accessDeniedHandler(accessDeniedHandler))
+                    .accessDeniedHandler(new AccessDeniedHandlerImpl()))
         .httpBasic(AbstractHttpConfigurer::disable)
         .oauth2Login(
             (oauth2) ->
                 oauth2
                     .userInfoEndpoint((config) -> config.userService(oauth2UserDetailsService))
-                    .successHandler(oAuth2SuccessHandler)
-                    .failureHandler(oauth2FailureHandler))
+                    .successHandler(new OAuth2SuccessHandler())
+                    .failureHandler(new Oauth2FailureHandler(objectMapper)))
         .authorizeHttpRequests(
             authorize ->
                 authorize
@@ -78,7 +74,7 @@ public class SecurityConfig {
         .addFilterBefore(
             new JwtAuthFilter(authenticationManager, objectMapper),
             UsernamePasswordAuthenticationFilter.class)
-        .addFilterBefore(jwtLogoutFilter, LogoutFilter.class)
+        .addFilterBefore(new JwtLogoutFilter(), LogoutFilter.class)
         .build();
   }
 

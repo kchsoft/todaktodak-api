@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.common.security.config;
+package com.heartsave.todaktodak_api.common.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
