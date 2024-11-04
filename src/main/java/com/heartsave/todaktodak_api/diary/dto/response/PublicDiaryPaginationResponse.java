@@ -18,11 +18,12 @@ public class PublicDiaryPaginationResponse {
 
   public PublicDiaryPaginationResponse() {
     this.diaries = new ArrayList<>();
-    this.after = Long.MAX_VALUE;
+    this.after = 1L;
   }
 
   public void addPublicDiary(PublicDiary publicDiary) {
     diaries.add(publicDiary);
-    after = Math.min(publicDiary.getPublicDiaryId(), after);
+    if (after == 1L) after = publicDiary.getPublicDiaryId();
+    else after = Math.min(publicDiary.getPublicDiaryId(), after);
   }
 }
