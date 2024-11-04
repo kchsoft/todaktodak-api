@@ -40,7 +40,6 @@ public class CharacterService {
 
   public void createCharacterImage(
       TodakUser principal, MultipartFile file, AiCharacterRequest dto) {
-    findMemberByPrincipal(principal);
     aiService.callCharacter(file, dto);
   }
 
