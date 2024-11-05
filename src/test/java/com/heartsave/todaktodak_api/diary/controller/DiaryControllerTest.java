@@ -191,7 +191,7 @@ public class DiaryControllerTest {
     MockHttpServletResponse response = mvcResult.getResponse();
     response.setCharacterEncoding("utf-8");
     String contentAsString = response.getContentAsString();
-    assertThat(contentAsString).contains("테스트 일기 내용").contains("joy");
+    assertThat(contentAsString).contains("테스트 일기 내용").contains(DiaryEmotion.HAPPY.getEmotion());
   }
 
   @Test

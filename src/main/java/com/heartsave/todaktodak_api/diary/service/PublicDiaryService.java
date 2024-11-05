@@ -117,7 +117,7 @@ public class PublicDiaryService {
     Long diaryId = request.diaryId();
     DiaryReactionType reactionType = request.reactionType();
     DiaryReactionEntity reactionEntity = getDiaryReactionEntity(memberId, diaryId, reactionType);
-    if (diaryReactionRepository.hasReaction(memberId, diaryId, reactionType)) {
+    if (!diaryReactionRepository.hasReaction(memberId, diaryId, reactionType)) {
       diaryReactionRepository.save(reactionEntity); // Todo: Optimistic Lock , Pessimistic Lock 학습
     } else {
       diaryReactionRepository.deleteReaction(memberId, diaryId, reactionType);
