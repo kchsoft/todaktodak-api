@@ -26,11 +26,11 @@ public class AiService {
   private final WebClient webClient;
 
   public AiContentResponse callAiContent(DiaryEntity diary) {
-    //    AiContentRequest request = getAiContentRequest(diary);
-    //    callWebtoon(request);
-    //    callBgm(request);
-    //    String comment = callComment(request);
-    return AiContentResponse.builder().aiComment("aiComment").build();
+    AiContentRequest request = getAiContentRequest(diary);
+    callWebtoon(request);
+    callBgm(request);
+    String comment = callComment(request);
+    return AiContentResponse.builder().aiComment(comment).build();
   }
 
   private AiContentRequest getAiContentRequest(DiaryEntity diary) {
