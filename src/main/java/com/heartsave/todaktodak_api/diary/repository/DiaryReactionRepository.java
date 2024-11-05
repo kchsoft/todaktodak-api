@@ -13,6 +13,21 @@ public interface DiaryReactionRepository extends JpaRepository<DiaryReactionEnti
 
   @Query(
       """
+    SELECT CASE WHEN EXISTS (
+        SELECT 1
+        FROM DiaryReactionEntity dr
+        WHERE dr.memberEntity.id = :memberId
+        AND dr.diaryEntity.id = :diaryId
+        AND dr.reactionType = :reactionType
+    ) THEN true ELSE false END
+""")
+  boolean hasReaction(
+      @Param("memberId") Long memberId,
+      @Param("diaryId") Long diaryId,
+      @Param("reactionType") DiaryReactionType reactionType);
+
+  @Query(
+      """
         SELECT dr.reactionType
         FROM DiaryReactionEntity dr
         WHERE dr.memberEntity.id = :memberId AND dr.diaryEntity.id = :diaryId
@@ -38,7 +53,7 @@ public interface DiaryReactionRepository extends JpaRepository<DiaryReactionEnti
       """
         DELETE FROM DiaryReactionEntity  dr WHERE dr.memberEntity.id = :memberId AND dr.diaryEntity.id = :diaryId AND dr.reactionType = :reactionType
       """)
-  int deleteByMemberIdAndDiaryIdAndReactionType(
+  int deleteReaction(
       @Param("memberId") Long memberId,
       @Param("diaryId") Long diaryId,
       @Param("reactionType") DiaryReactionType reactionType);
