@@ -15,6 +15,7 @@ import com.heartsave.todaktodak_api.member.dto.response.MemberProfileResponse;
 import com.heartsave.todaktodak_api.member.dto.response.NicknameUpdateResponse;
 import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
 import com.heartsave.todaktodak_api.member.service.MemberService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,7 +55,7 @@ final class MemberControllerTest {
   @Test
   @DisplayName("닉네임 변경 요청 성공")
   @WithMockTodakUser
-  void updateNickname200Test() throws Exception {
+  void updateNickname_success_200Test() throws Exception {
     // given
     final String NEW_NICKNAME = "NEW_NICKNAME";
     NicknameUpdateRequest request = new NicknameUpdateRequest(NEW_NICKNAME);
@@ -82,7 +83,7 @@ final class MemberControllerTest {
   @ParameterizedTest
   @DisplayName("닉네임 변경 요청 실패 - 유효하지 않은 닉네임")
   @ValueSource(strings = {"", " ", INVALID_NICKNAME_OVER_LENGTH})
-  void updateNickname400Test(String invalidNickname) throws Exception {
+  void updateNickname_fail_400Test(String invalidNickname) throws Exception {
     // given
     var request = new NicknameUpdateRequest(invalidNickname);
 
@@ -90,8 +91,7 @@ final class MemberControllerTest {
     mockMvc
         .perform(patch("/api/v1/member/nickname").content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.title").value("VALIDATION_ERROR"))
-        .andDo(print());
+        .andExpect(jsonPath("$.title").value("VALIDATION_ERROR"));
 
     verify(memberService, never())
         .updateNickname(any(TodakUser.class), any(NicknameUpdateRequest.class));
@@ -100,7 +100,7 @@ final class MemberControllerTest {
   @Test
   @DisplayName("닉네임 변경 요청 실패 - 존재하지 않는 회원")
   @WithMockTodakUser
-  void updateNickname404Test() throws Exception {
+  void updateNickname_fail_404Test() throws Exception {
     // given
     final String NEW_NICKNAME = "NEW_NICKNAME";
     NicknameUpdateRequest request = new NicknameUpdateRequest(NEW_NICKNAME);
@@ -116,8 +116,7 @@ final class MemberControllerTest {
     mockMvc
         .perform(patch("/api/v1/member/nickname").content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.title").value(MemberErrorSpec.NOT_FOUND.name()))
-        .andDo(print());
+        .andExpect(jsonPath("$.title").value(MemberErrorSpec.NOT_FOUND.name()));
 
     verify(memberService, times(1))
         .updateNickname(any(TodakUser.class), any(NicknameUpdateRequest.class));
@@ -126,7 +125,7 @@ final class MemberControllerTest {
   @Test
   @DisplayName("회원 프로필 조회 성공")
   @WithMockTodakUser
-  void getMemberProfile200Test() throws Exception {
+  void getMemberProfile_success_200Test() throws Exception {
     // given
     MemberProfileResponse response =
         MemberProfileResponse.builder()
@@ -144,8 +143,7 @@ final class MemberControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.nickname").value("testUser"))
         .andExpect(jsonPath("$.email").value("test@example.com"))
-        .andExpect(jsonPath("$.characterImageUrl").value("presigned-url"))
-        .andDo(print());
+        .andExpect(jsonPath("$.characterImageUrl").value("presigned-url"));
 
     verify(memberService, times(1)).getMemberProfileById(any(TodakUser.class));
   }
@@ -153,7 +151,7 @@ final class MemberControllerTest {
   @Test
   @DisplayName("회원 프로필 조회 실패 - 존재하지 않는 회원")
   @WithMockTodakUser
-  void getMemberProfile404Test() throws Exception {
+  void getMemberProfile_fail_404Test() throws Exception {
     // given
     TodakUser mockUser =
         (TodakUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -167,9 +165,45 @@ final class MemberControllerTest {
     mockMvc
         .perform(get("/api/v1/member/profile"))
         .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.title").value(MemberErrorSpec.NOT_FOUND.name()))
-        .andDo(print());
+        .andExpect(jsonPath("$.title").value(MemberErrorSpec.NOT_FOUND.name()));
 
     verify(memberService, times(1)).getMemberProfileById(any(TodakUser.class));
+  }
+
+  @Test
+  @DisplayName("회원 탈퇴 성공")
+  @WithMockTodakUser
+  void deactivateMember_success_204Test() throws Exception {
+    // when
+    doNothing()
+        .when(memberService)
+        .deactivate(any(HttpServletResponse.class), any(TodakUser.class));
+
+    // then
+    mockMvc.perform(post("/api/v1/member/deactivate")).andExpect(status().isNoContent());
+    verify(memberService, times(1))
+        .deactivate(any(HttpServletResponse.class), any(TodakUser.class));
+  }
+
+  @Test
+  @DisplayName("회원 탈퇴 실패 - 존재하지 않는 회원")
+  @WithMockTodakUser
+  void deactivateMember_fail_404Test() throws Exception {
+    // given
+    TodakUser mockUser =
+        (TodakUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    // when
+    doThrow(new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, mockUser.getId()))
+        .when(memberService)
+        .deactivate(any(HttpServletResponse.class), any(TodakUser.class));
+
+    // then
+    mockMvc
+        .perform(post("/api/v1/member/deactivate"))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.title").value(MemberErrorSpec.NOT_FOUND.name()));
+    verify(memberService, times(1))
+        .deactivate(any(HttpServletResponse.class), any(TodakUser.class));
   }
 }
