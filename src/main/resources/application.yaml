@@ -105,6 +105,8 @@ ai:
   server:
     url:
       domain: ${AI_SERVER_URL_DOMAIN}
+    api:
+      key: ${AI_SERVER_API_KEY:randomApiKey}
 ---
 spring:
   config:
