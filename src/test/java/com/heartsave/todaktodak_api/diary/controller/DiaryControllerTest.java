@@ -57,7 +57,7 @@ public class DiaryControllerTest {
   void writeDiarySuccess() throws Exception {
     DiaryWriteRequest request =
         new DiaryWriteRequest(
-            LocalDateTime.now(), DiaryEmotion.JOY, BaseTestEntity.DUMMY_STRING_CONTENT);
+            LocalDateTime.now(), DiaryEmotion.HAPPY, BaseTestEntity.DUMMY_STRING_CONTENT);
 
     final String AI_COMMENT = "this is test ai comment";
 
@@ -172,7 +172,7 @@ public class DiaryControllerTest {
     DiaryResponse mockResponse =
         DiaryResponse.builder()
             .content("테스트 일기 내용")
-            .emotion(DiaryEmotion.JOY)
+            .emotion(DiaryEmotion.HAPPY)
             .date(validDate)
             .build();
 
@@ -191,7 +191,7 @@ public class DiaryControllerTest {
     MockHttpServletResponse response = mvcResult.getResponse();
     response.setCharacterEncoding("utf-8");
     String contentAsString = response.getContentAsString();
-    assertThat(contentAsString).contains("테스트 일기 내용").contains("joy");
+    assertThat(contentAsString).contains("테스트 일기 내용").contains(DiaryEmotion.HAPPY.getEmotion());
   }
 
   @Test

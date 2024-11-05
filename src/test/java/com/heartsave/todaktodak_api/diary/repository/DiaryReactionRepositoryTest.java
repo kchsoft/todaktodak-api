@@ -164,8 +164,7 @@ public class DiaryReactionRepositoryTest {
         diaryReactionRepository.countEachByDiaryId(diary.getId());
     assertThat(resultAfterSave.getLikes()).as("반응이 저장되지 않았습니다.").isEqualTo(1);
 
-    diaryReactionRepository.deleteByMemberIdAndDiaryIdAndReactionType(
-        member.getId(), diary.getId(), DiaryReactionType.LIKE);
+    diaryReactionRepository.deleteReaction(member.getId(), diary.getId(), DiaryReactionType.LIKE);
 
     DiaryReactionCountProjection resultAfterDelete =
         diaryReactionRepository.countEachByDiaryId(diary.getId());
