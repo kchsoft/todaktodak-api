@@ -71,7 +71,7 @@ class AiServiceTest {
     DiaryEntity diary =
         DiaryEntity.builder()
             .id(1L)
-            .emotion(DiaryEmotion.JOY)
+            .emotion(DiaryEmotion.HAPPY)
             .content("content")
             .memberEntity(member)
             .build();
