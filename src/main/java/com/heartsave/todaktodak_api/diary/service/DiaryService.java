@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.diary.service;
 
-import com.heartsave.todaktodak_api.ai.dto.response.AiContentResponse;
-import com.heartsave.todaktodak_api.ai.service.AiService;
+import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
+import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DiaryService {
 
-  private final AiService aiService;
+  private final AiClientService aiClientService;
   private final DiaryRepository diaryRepository;
   private final MemberRepository memberRepository;
   private final S3FileStorageService s3FileStorageService;
@@ -51,7 +51,7 @@ public class DiaryService {
     }
 
     log.info("AI 컨텐츠 생성 요청을 시작합니다.");
-    AiContentResponse response = aiService.callAiContent(diary);
+    AiDiaryContentResponse response = aiClientService.callAiContent(diary);
     log.info("AI 컨텐츠 생성 요청을 마쳤습니다.");
 
     log.info("DB에 일기 저장을 요청합니다.");

@@ -2,7 +2,8 @@ package com.heartsave.todaktodak_api.ai.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.heartsave.todaktodak_api.ai.dto.response.AiContentResponse;
+import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
+import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
@@ -25,7 +26,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 class AiServiceTest {
 
   private static MockWebServer mockWebServer;
-  private static AiService aiService;
+  private static AiClientService aiClientService;
   private static final String WEBTOON_URI = "/webtoon";
   private static final String BGM_URI = "/bgm";
   private static final String COMMENT_URI = "/comment";
@@ -56,7 +57,7 @@ class AiServiceTest {
             .baseUrl(baseUrl)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .build();
-    aiService = new AiService(aiWebClient);
+    aiClientService = new AiClientService(aiWebClient);
   }
 
   @AfterAll
@@ -76,7 +77,7 @@ class AiServiceTest {
             .memberEntity(member)
             .build();
 
-    AiContentResponse aiResponse = aiService.callAiContent(diary);
+    AiDiaryContentResponse aiResponse = aiClientService.callAiContent(diary);
     log.info("aiComment 결과 = {}", aiResponse.getAiComment());
     Thread.sleep(300);
     assertThat(aiResponse.getAiComment()).as("AI 코멘트 비동기 요청 응답이 올바르지 않습니다.").isEqualTo(AI_COMMENT);

@@ -3,7 +3,7 @@ package com.heartsave.todaktodak_api.diary.entity;
 import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_CONTENT_MAX_SIZE;
 import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_CONTENT_MIN_SIZE;
 
-import com.heartsave.todaktodak_api.ai.dto.response.AiContentResponse;
+import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.common.entity.BaseEntity;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
@@ -102,7 +102,7 @@ public class DiaryEntity extends BaseEntity {
     return DiaryEntity.builder().id(id).build();
   }
 
-  public void addAiContent(AiContentResponse response) {
+  public void addAiContent(AiDiaryContentResponse response) {
     this.aiComment = response.getAiComment();
   }
 

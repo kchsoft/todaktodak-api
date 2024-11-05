@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.ai.config;
+package com.heartsave.todaktodak_api.ai.client.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,8 +1,8 @@
-package com.heartsave.todaktodak_api.ai.service;
+package com.heartsave.todaktodak_api.ai.client.service;
 
-import com.heartsave.todaktodak_api.ai.dto.request.AiCharacterRequest;
-import com.heartsave.todaktodak_api.ai.dto.request.AiContentRequest;
-import com.heartsave.todaktodak_api.ai.dto.response.AiContentResponse;
+import com.heartsave.todaktodak_api.ai.client.dto.request.AiCharacterRequest;
+import com.heartsave.todaktodak_api.ai.client.dto.request.AiDiaryContentRequest;
+import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.ai.exception.AiException;
 import com.heartsave.todaktodak_api.common.exception.errorspec.AiErrorSpec;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
@@ -21,27 +21,27 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class AiService {
+public class AiClientService {
 
   private final WebClient webClient;
 
-  public AiContentResponse callAiContent(DiaryEntity diary) {
-    AiContentRequest request = getAiContentRequest(diary);
+  public AiDiaryContentResponse callAiContent(DiaryEntity diary) {
+    AiDiaryContentRequest request = getAiContentRequest(diary);
     callWebtoon(request);
     callBgm(request);
     String comment = callComment(request);
-    return AiContentResponse.builder().aiComment(comment).build();
+    return AiDiaryContentResponse.builder().aiComment(comment).build();
   }
 
-  private AiContentRequest getAiContentRequest(DiaryEntity diary) {
-    return AiContentRequest.builder()
+  private AiDiaryContentRequest getAiContentRequest(DiaryEntity diary) {
+    return AiDiaryContentRequest.builder()
         .id(diary.getMemberEntity().getId())
         .content(diary.getContent())
         .emotion(diary.getEmotion())
         .build();
   }
 
-  private void callWebtoon(AiContentRequest request) {
+  private void callWebtoon(AiDiaryContentRequest request) {
     webClient
         .post()
         .uri("/webtoon")
@@ -53,7 +53,7 @@ public class AiService {
         .subscribe();
   }
 
-  private void callBgm(AiContentRequest request) {
+  private void callBgm(AiDiaryContentRequest request) {
     webClient
         .post()
         .uri("/bgm")
@@ -65,7 +65,7 @@ public class AiService {
         .subscribe();
   }
 
-  private String callComment(AiContentRequest request) {
+  private String callComment(AiDiaryContentRequest request) {
     return webClient
         .post()
         .uri("/comment")
