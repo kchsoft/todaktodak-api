@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.ai.webhook.controller;
 
-import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
+import com.heartsave.todaktodak_api.ai.webhook.service.AiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/webhook")
-public class AiDiaryController {
+public class AiController {
 
-  private final AiDiaryService webhookService;
+  private final AiService webhookService;
 
   @PostMapping("/webtoon")
   public ResponseEntity<Void> saveWebtoon() {
