@@ -130,13 +130,12 @@ class PublicDiaryServiceTest {
 
     verify(mockDiaryReactionRepository, times(1)).save(any(DiaryReactionEntity.class));
     verify(mockDiaryReactionRepository, times(0))
-        .deleteByMemberIdAndDiaryIdAndReactionType(
-            anyLong(), anyLong(), any(DiaryReactionType.class));
+        .deleteReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
 
     // 두 번째 - 준비
     when(mockDiaryReactionRepository.save(any(DiaryReactionEntity.class)))
         .thenThrow(new DataIntegrityViolationException("Duplicate entry"));
-    when(mockDiaryReactionRepository.deleteByMemberIdAndDiaryIdAndReactionType(
+    when(mockDiaryReactionRepository.deleteReaction(
             member.getId(), diary.getId(), DiaryReactionType.LIKE))
         .thenReturn(1);
 
@@ -145,8 +144,7 @@ class PublicDiaryServiceTest {
 
     verify(mockDiaryReactionRepository, times(2)).save(any(DiaryReactionEntity.class));
     verify(mockDiaryReactionRepository, times(1))
-        .deleteByMemberIdAndDiaryIdAndReactionType(
-            member.getId(), diary.getId(), DiaryReactionType.LIKE);
+        .deleteReaction(member.getId(), diary.getId(), DiaryReactionType.LIKE);
   }
 
   @Test
@@ -180,8 +178,7 @@ class PublicDiaryServiceTest {
 
     verify(mockDiaryReactionRepository, times(2)).save(any(DiaryReactionEntity.class));
     verify(mockDiaryReactionRepository, times(0))
-        .deleteByMemberIdAndDiaryIdAndReactionType(
-            anyLong(), anyLong(), any(DiaryReactionType.class));
+        .deleteReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
   }
 
   @Test
