@@ -26,8 +26,6 @@ public class S3FileStorageService {
   }
 
   public String preSignedFirstWebtoonUrlFrom(String key) {
-    log.info("this is key = {}", key);
-    log.info("this is key = {}", s3Properties.defaultKey().webtoon());
     return key == null ? preSign(s3Properties.defaultKey().webtoon()) : preSign(key);
   }
 
