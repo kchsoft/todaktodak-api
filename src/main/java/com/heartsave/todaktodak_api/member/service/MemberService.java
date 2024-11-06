@@ -25,13 +25,13 @@ public class MemberService {
   private final MemberRepository memberRepository;
   private final S3FileStorageService s3Service;
 
-  @Transactional(readOnly = true)
   public NicknameUpdateResponse updateNickname(TodakUser principal, NicknameUpdateRequest dto) {
     MemberEntity retrievedMember = findMemberById(principal.getId());
     retrievedMember.updateNickname(dto.nickname());
     return NicknameUpdateResponse.builder().nickname(retrievedMember.getNickname()).build();
   }
 
+  @Transactional(readOnly = true)
   public MemberProfileResponse getMemberProfileById(TodakUser principal) {
     MemberProfileProjection memberProfile = getMemberProfileById(principal.getId());
 
