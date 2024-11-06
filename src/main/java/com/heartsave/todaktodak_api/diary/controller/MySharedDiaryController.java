@@ -2,6 +2,7 @@ package com.heartsave.todaktodak_api.diary.controller;
 
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryPaginationResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryResponse;
 import com.heartsave.todaktodak_api.diary.service.MySharedDiaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,8 +12,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PastOrPresent;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -50,5 +54,29 @@ public class MySharedDiaryController {
           Long publicDiaryId) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(mySharedDiaryService.getPagination(principal, publicDiaryId));
+  }
+
+  @Operation(summary = "특정 날짜의 나의 공개된 일기 상세 조회")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "공개된 일기 상세 조회 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+        @ApiResponse(responseCode = "404", description = "해당 날짜의 일기를 찾을 수 없음")
+      })
+  @GetMapping("/detail")
+  public ResponseEntity<MySharedDiaryResponse> getMySharedDiary(
+      @AuthenticationPrincipal TodakUser principal,
+      @Parameter(
+              name = "date",
+              description = "조회할 일기 날짜",
+              example = "2024-11-04",
+              schema = @Schema(type = "string", format = "date"))
+          @Valid
+          @PastOrPresent
+          @DateTimeFormat(pattern = "yyyy-MM-dd")
+          @RequestParam("date")
+          LocalDate requestDate) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(mySharedDiaryService.getDiary(principal, requestDate));
   }
 }

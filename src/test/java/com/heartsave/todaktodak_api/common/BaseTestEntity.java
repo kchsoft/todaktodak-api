@@ -53,7 +53,7 @@ public class BaseTestEntity {
   public static DiaryEntity createDiary() {
     return DiaryEntity.builder()
         .id(1L)
-        .emotion(DiaryEmotion.JOY)
+        .emotion(DiaryEmotion.HAPPY)
         .diaryCreatedTime(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS))
         .content(TEST_DIARY_CONTENT)
         .memberEntity(createMember())
@@ -66,7 +66,7 @@ public class BaseTestEntity {
   public static DiaryEntity createDiaryWithMember(MemberEntity member) {
     return DiaryEntity.builder()
         .id(1L)
-        .emotion(DiaryEmotion.JOY)
+        .emotion(DiaryEmotion.HAPPY)
         .diaryCreatedTime(LocalDateTime.now())
         .content(TEST_DIARY_CONTENT)
         .memberEntity(member)
@@ -78,8 +78,21 @@ public class BaseTestEntity {
 
   public static DiaryEntity createDiaryNoIdWithMember(MemberEntity member) {
     return DiaryEntity.builder()
-        .emotion(DiaryEmotion.JOY)
+        .emotion(DiaryEmotion.HAPPY)
         .diaryCreatedTime(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS))
+        .content(TEST_DIARY_CONTENT)
+        .memberEntity(member)
+        .webtoonImageUrl(TEST_WEBTOON_URL)
+        .bgmUrl(TEST_BGM_URL)
+        .aiComment(TEST_COMMENT_URL)
+        .build();
+  }
+
+  public static DiaryEntity createDiaryNoIdWithMemberAndCreatedDateTime(
+      MemberEntity member, LocalDateTime createdDateTime) {
+    return DiaryEntity.builder()
+        .emotion(DiaryEmotion.HAPPY)
+        .diaryCreatedTime(createdDateTime)
         .content(TEST_DIARY_CONTENT)
         .memberEntity(member)
         .webtoonImageUrl(TEST_WEBTOON_URL)

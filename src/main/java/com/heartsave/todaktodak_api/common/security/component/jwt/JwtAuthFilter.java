@@ -1,7 +1,6 @@
 package com.heartsave.todaktodak_api.common.security.component.jwt;
 
 import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.*;
-import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -62,9 +61,7 @@ public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
     var accessToken = JwtUtils.issueToken(user, ACCESS_TYPE);
     var refreshToken = JwtUtils.issueToken(user, REFRESH_TYPE);
     var refreshCookie = CookieUtils.createValidCookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken);
-    response.addCookie(refreshCookie);
-    response.setStatus(SC_OK);
-    setResponseHeader(response);
+    CookieUtils.updateCookie(response, refreshCookie);
 
     LoginResponse dto = getResponseBody(authentication, accessToken);
     response.getWriter().write(objectMapper.writeValueAsString(dto));

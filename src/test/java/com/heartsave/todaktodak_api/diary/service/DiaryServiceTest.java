@@ -12,7 +12,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.heartsave.todaktodak_api.ai.dto.AiContentResponse;
+import com.heartsave.todaktodak_api.ai.dto.response.AiContentResponse;
 import com.heartsave.todaktodak_api.ai.service.AiService;
 import com.heartsave.todaktodak_api.common.BaseTestEntity;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
@@ -77,7 +77,7 @@ public class DiaryServiceTest {
   @DisplayName("일기 작성 성공")
   void diaryWritingSuccess() {
     DiaryWriteRequest request =
-        new DiaryWriteRequest(NOW_DATE_TIME, DiaryEmotion.JOY, "test diary content");
+        new DiaryWriteRequest(NOW_DATE_TIME, DiaryEmotion.HAPPY, "test diary content");
     String AI_COMMENT = "this is test ai comment";
 
     when(mockMemberRepository.findById(anyLong())).thenReturn(Optional.of(member));
@@ -93,7 +93,7 @@ public class DiaryServiceTest {
   @DisplayName("하루 일기 작성 횟수 초과 에러 발생")
   void dailyDiaryWritingLimitException() {
     DiaryWriteRequest request =
-        new DiaryWriteRequest(NOW_DATE_TIME, DiaryEmotion.JOY, "test diary content");
+        new DiaryWriteRequest(NOW_DATE_TIME, DiaryEmotion.HAPPY, "test diary content");
     when(mockMemberRepository.findById(anyLong())).thenReturn(Optional.of(member));
     when(mockDiaryRepository.existsByDate(anyLong(), any(LocalDateTime.class))).thenReturn(true);
 

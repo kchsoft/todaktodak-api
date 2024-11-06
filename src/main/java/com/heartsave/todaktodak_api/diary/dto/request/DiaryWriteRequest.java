@@ -25,7 +25,7 @@ public class DiaryWriteRequest {
   @PastOrPresent(message = "Diary Writing Date is Future")
   private LocalDateTime date;
 
-  @Schema(description = "일기에 기록된 감정", example = "HAPPY", required = true)
+  @Schema(description = "일기에 기록된 감정", example = "happy", required = true)
   @NotNull(message = "DiaryEmotion is Null")
   private DiaryEmotion emotion;
 

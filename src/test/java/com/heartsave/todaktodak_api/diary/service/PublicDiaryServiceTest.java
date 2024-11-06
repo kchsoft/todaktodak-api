@@ -39,7 +39,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 
 @Slf4j
@@ -122,31 +121,34 @@ class PublicDiaryServiceTest {
             .reactionType(DiaryReactionType.LIKE)
             .build();
 
+    when(mockDiaryReactionRepository.hasReaction(any(), any(), any())).thenReturn(false);
     when(mockDiaryReactionRepository.save(any(DiaryReactionEntity.class)))
         .thenReturn(reactionEntity);
 
     // 첫 번째 - 반응 추가
     publicDiaryService.toggleReactionStatus(principal, request);
 
+    verify(mockDiaryReactionRepository, times(1))
+        .hasReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
     verify(mockDiaryReactionRepository, times(1)).save(any(DiaryReactionEntity.class));
     verify(mockDiaryReactionRepository, times(0))
-        .deleteByMemberIdAndDiaryIdAndReactionType(
-            anyLong(), anyLong(), any(DiaryReactionType.class));
+        .deleteReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
 
     // 두 번째 - 준비
-    when(mockDiaryReactionRepository.save(any(DiaryReactionEntity.class)))
-        .thenThrow(new DataIntegrityViolationException("Duplicate entry"));
-    when(mockDiaryReactionRepository.deleteByMemberIdAndDiaryIdAndReactionType(
+    when(mockDiaryReactionRepository.hasReaction(any(), any(), any())).thenReturn(true);
+    when(mockDiaryReactionRepository.deleteReaction(
             member.getId(), diary.getId(), DiaryReactionType.LIKE))
         .thenReturn(1);
 
     // 두 번재 - 반응 삭제
+
     publicDiaryService.toggleReactionStatus(principal, request);
 
-    verify(mockDiaryReactionRepository, times(2)).save(any(DiaryReactionEntity.class));
+    verify(mockDiaryReactionRepository, times(2))
+        .hasReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
+    verify(mockDiaryReactionRepository, times(1)).save(any(DiaryReactionEntity.class));
     verify(mockDiaryReactionRepository, times(1))
-        .deleteByMemberIdAndDiaryIdAndReactionType(
-            member.getId(), diary.getId(), DiaryReactionType.LIKE);
+        .deleteReaction(member.getId(), diary.getId(), DiaryReactionType.LIKE);
   }
 
   @Test
@@ -157,31 +159,18 @@ class PublicDiaryServiceTest {
     PublicDiaryReactionRequest cheeringRequest =
         new PublicDiaryReactionRequest(diary.getId(), DiaryReactionType.CHEERING);
 
-    DiaryReactionEntity likeReaction =
-        DiaryReactionEntity.builder()
-            .memberEntity(MemberEntity.createById(member.getId()))
-            .diaryEntity(DiaryEntity.createById(diary.getId()))
-            .reactionType(DiaryReactionType.LIKE)
-            .build();
-
-    DiaryReactionEntity cheeringReaction =
-        DiaryReactionEntity.builder()
-            .memberEntity(MemberEntity.createById(member.getId()))
-            .diaryEntity(DiaryEntity.createById(diary.getId()))
-            .reactionType(DiaryReactionType.CHEERING)
-            .build();
-
-    when(mockDiaryReactionRepository.save(any(DiaryReactionEntity.class)))
-        .thenReturn(likeReaction)
-        .thenReturn(cheeringReaction);
+    when(mockDiaryReactionRepository.hasReaction(
+            anyLong(), anyLong(), any(DiaryReactionType.class)))
+        .thenReturn(false);
 
     publicDiaryService.toggleReactionStatus(principal, likeRequest);
     publicDiaryService.toggleReactionStatus(principal, cheeringRequest);
 
+    verify(mockDiaryReactionRepository, times(2))
+        .hasReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
     verify(mockDiaryReactionRepository, times(2)).save(any(DiaryReactionEntity.class));
     verify(mockDiaryReactionRepository, times(0))
-        .deleteByMemberIdAndDiaryIdAndReactionType(
-            anyLong(), anyLong(), any(DiaryReactionType.class));
+        .deleteReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
   }
 
   @Test
@@ -214,9 +203,8 @@ class PublicDiaryServiceTest {
 
     // 반응 정보 mock
     DiaryReactionCountProjection reactionCount = mock(DiaryReactionCountProjection.class);
-    when(mockDiaryReactionRepository.countEachByDiaryId(diary.getId()))
-        .thenReturn(Optional.of(reactionCount));
-    when(mockDiaryReactionRepository.findReactionByMemberAndDiaryId(memberId, diary.getId()))
+    when(mockDiaryReactionRepository.countEachByDiaryId(diary.getId())).thenReturn(reactionCount);
+    when(mockDiaryReactionRepository.findMemberReaction(memberId, diary.getId()))
         .thenReturn(List.of(DiaryReactionType.LIKE));
 
     // when
@@ -249,7 +237,7 @@ class PublicDiaryServiceTest {
     // 메서드 호출 검증
     verify(mockPublicDiaryRepository).findNextContentOnlyById(anyLong(), any(PageRequest.class));
     verify(mockDiaryReactionRepository).countEachByDiaryId(diary.getId());
-    verify(mockDiaryReactionRepository).findReactionByMemberAndDiaryId(memberId, diary.getId());
+    verify(mockDiaryReactionRepository).findMemberReaction(memberId, diary.getId());
     verify(mocksS3FileStorageService).preSignedWebtoonUrlFrom(any());
     verify(mocksS3FileStorageService).preSignedCharacterImageUrlFrom(any());
     verify(mocksS3FileStorageService).preSignedBgmUrlFrom(any());

@@ -6,14 +6,23 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
+import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryPaginationResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryResponse;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentOnlyProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection;
 import com.heartsave.todaktodak_api.diary.exception.PublicDiaryNotFoundException;
+import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.MySharedDiaryRepository;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +43,7 @@ public class MySharedDiaryServiceTest {
   @InjectMocks private MySharedDiaryService mySharedDiaryService;
 
   @Mock private MySharedDiaryRepository mySharedDiaryRepository;
-
+  @Mock private DiaryReactionRepository reactionRepository;
   @Mock private S3FileStorageService s3FileStorageService;
 
   @Mock private TodakUser mockUser;
@@ -43,8 +52,10 @@ public class MySharedDiaryServiceTest {
 
   private final Long memberId = 1L;
   private final Long publicDiaryId = 1L;
-  private final String originalImageUrl = "original-url";
-  private final String preSignedUrl = "pre-signed-url";
+  private final String webtoonUrl = "webtoonUrl";
+  private final String preSigned_webtoonUrl = "preSigned_webtoonUrl";
+  private final String bgmUrl = "bgmUrl";
+  private final String preSigned_bgmUrl = "preSigned_bgmUrl";
 
   @BeforeEach
   void setUp() {
@@ -57,8 +68,9 @@ public class MySharedDiaryServiceTest {
     List<MySharedDiaryPreviewProjection> previews = new ArrayList<>();
     previews.add(mockProjection);
 
-    when(mockProjection.getWebtoonImageUrl()).thenReturn(originalImageUrl);
-    when(s3FileStorageService.preSignedFirstWebtoonUrlFrom(anyString())).thenReturn(preSignedUrl);
+    when(mockProjection.getWebtoonImageUrl()).thenReturn(webtoonUrl);
+    when(s3FileStorageService.preSignedFirstWebtoonUrlFrom(anyString()))
+        .thenReturn(preSigned_webtoonUrl);
     when(mySharedDiaryRepository.findNextPreviews(anyLong(), anyLong(), any(PageRequest.class)))
         .thenReturn(previews);
 
@@ -66,20 +78,20 @@ public class MySharedDiaryServiceTest {
         mySharedDiaryService.getPagination(mockUser, publicDiaryId);
 
     assertThat(response).as("페이지네이션 응답이 null이 아니어야 합니다").isNotNull();
-
     assertThat(response.sharedDiaries()).as("페이지네이션 응답의 미리보기 목록은 1개의 항목을 포함해야 합니다").hasSize(1);
+    verify(s3FileStorageService).preSignedFirstWebtoonUrlFrom(webtoonUrl);
+    verify(mockProjection).replaceWebtoonImageUrl(preSigned_webtoonUrl);
   }
 
   @Test
-  @DisplayName("publicDiaryId가 0일 때 최신 ID를 조회한다")
+  @DisplayName("페이지네이션의 publicDiaryId가 0일 때 최신 ID를 조회한다")
   void getPagination_WithZeroPublicDiaryId() {
     Long diaryId = 5L;
     when(mySharedDiaryRepository.findLatestId(memberId)).thenReturn(Optional.of(5L));
     List<MySharedDiaryPreviewProjection> previews = new ArrayList<>();
     previews.add(mockProjection);
 
-    when(mockProjection.getWebtoonImageUrl()).thenReturn(originalImageUrl);
-    when(s3FileStorageService.preSignedFirstWebtoonUrlFrom(anyString())).thenReturn(preSignedUrl);
+    when(mockProjection.getWebtoonImageUrl()).thenReturn(webtoonUrl);
     when(mySharedDiaryRepository.findNextPreviews(
             eq(memberId), eq(diaryId + 1), any(PageRequest.class)))
         .thenReturn(previews);
@@ -90,17 +102,69 @@ public class MySharedDiaryServiceTest {
     assertThat(response.sharedDiaries())
         .as("publicDiaryId가 0일 때의 미리보기 목록은 1개의 항목을 포함해야 합니다")
         .hasSize(1);
+    verify(s3FileStorageService).preSignedFirstWebtoonUrlFrom(webtoonUrl);
   }
 
   @Test
-  @DisplayName("공개된 일기가 없을 때 예외를 던진다")
+  @DisplayName("페이지네이션 요청시, 공개된 일기가 없을 때 예외를 던진다")
   void getPagination_ThrowsException_WhenNoDiaryFound() {
-    // Given
     when(mySharedDiaryRepository.findLatestId(memberId)).thenReturn(Optional.empty());
 
-    // When & Then
     assertThatThrownBy(() -> mySharedDiaryService.getPagination(mockUser, 0L))
         .as("공개된 일기가 없을 때 PublicDiaryNotFoundException이 발생해야 합니다")
+        .isInstanceOf(PublicDiaryNotFoundException.class);
+
+    verify(mockProjection, times(0)).replaceWebtoonImageUrl(preSigned_webtoonUrl);
+  }
+
+  @Test
+  @DisplayName("나의 공개 일기 상세를 성공적으로 조회한다")
+  void getDiary_Success() {
+    LocalDate requestDate = LocalDate.now();
+    MySharedDiaryContentOnlyProjection contentOnly = mock(MySharedDiaryContentOnlyProjection.class);
+    DiaryReactionCountProjection reactionCount = mock(DiaryReactionCountProjection.class);
+    List<DiaryReactionType> memberReactions =
+        List.of(DiaryReactionType.LIKE, DiaryReactionType.EMPATHIZE);
+    Long diaryId = 2L;
+
+    when(contentOnly.getDiaryId()).thenReturn(diaryId);
+    when(contentOnly.getWebtoonImageUrls()).thenReturn(List.of(webtoonUrl));
+    when(contentOnly.getBgmUrl()).thenReturn(bgmUrl);
+
+    when(mySharedDiaryRepository.findContentOnly(memberId, requestDate))
+        .thenReturn(Optional.of(contentOnly));
+    when(reactionRepository.countEachByDiaryId(diaryId)).thenReturn(reactionCount);
+    when(reactionRepository.findMemberReaction(memberId, diaryId)).thenReturn(memberReactions);
+
+    when(s3FileStorageService.preSignedWebtoonUrlFrom(any()))
+        .thenReturn(List.of(preSigned_webtoonUrl));
+    when(s3FileStorageService.preSignedBgmUrlFrom(anyString())).thenReturn(preSigned_bgmUrl);
+
+    MySharedDiaryResponse response = mySharedDiaryService.getDiary(mockUser, requestDate);
+
+    assertThat(response).as("조회된 응답이 null이 아니어야 합니다").isNotNull();
+
+    assertThat(response.getMyReaction())
+        .as("사용자의 리액션 목록이 정확히 조회되어야 합니다")
+        .containsExactly(DiaryReactionType.LIKE, DiaryReactionType.EMPATHIZE);
+
+    verify(s3FileStorageService).preSignedWebtoonUrlFrom(List.of(webtoonUrl));
+    verify(s3FileStorageService).preSignedBgmUrlFrom(bgmUrl);
+    verify(contentOnly).replaceBgmUrl(preSigned_bgmUrl);
+    verify(contentOnly).replaceWebtoonImageUrls(List.of(preSigned_webtoonUrl));
+  }
+
+  @Test
+  @DisplayName("존재하지 않는 날짜의 공유된 일기 조회시 예외를 던진다")
+  void getDiary_ThrowsException_WhenDiaryNotFound() {
+    // Given
+    LocalDate requestDate = LocalDate.now();
+    when(mySharedDiaryRepository.findContentOnly(memberId, requestDate))
+        .thenReturn(Optional.empty());
+
+    // When & Then
+    assertThatThrownBy(() -> mySharedDiaryService.getDiary(mockUser, requestDate))
+        .as("존재하지 않는 날짜의 일기 조회시 PublicDiaryNotFoundException이 발생해야 합니다")
         .isInstanceOf(PublicDiaryNotFoundException.class);
   }
 }

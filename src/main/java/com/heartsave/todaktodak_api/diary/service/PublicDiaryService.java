@@ -22,7 +22,6 @@ import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,11 +88,11 @@ public class PublicDiaryService {
   }
 
   private DiaryReactionCountProjection fetchReactionCount(Long diaryId) {
-    return diaryReactionRepository.countEachByDiaryId(diaryId).get();
+    return diaryReactionRepository.countEachByDiaryId(diaryId);
   }
 
   private List<DiaryReactionType> fetchMemberReactions(Long memberId, Long diaryId) {
-    return diaryReactionRepository.findReactionByMemberAndDiaryId(memberId, diaryId);
+    return diaryReactionRepository.findMemberReaction(memberId, diaryId);
   }
 
   public void write(TodakUser principal, String publicContent, Long diaryId) {
@@ -118,11 +117,10 @@ public class PublicDiaryService {
     Long diaryId = request.diaryId();
     DiaryReactionType reactionType = request.reactionType();
     DiaryReactionEntity reactionEntity = getDiaryReactionEntity(memberId, diaryId, reactionType);
-    try {
+    if (!diaryReactionRepository.hasReaction(memberId, diaryId, reactionType)) {
       diaryReactionRepository.save(reactionEntity); // Todo: Optimistic Lock , Pessimistic Lock 학습
-    } catch (DataIntegrityViolationException e) {
-      diaryReactionRepository.deleteByMemberIdAndDiaryIdAndReactionType(
-          memberId, diaryId, reactionType);
+    } else {
+      diaryReactionRepository.deleteReaction(memberId, diaryId, reactionType);
     }
   }
 

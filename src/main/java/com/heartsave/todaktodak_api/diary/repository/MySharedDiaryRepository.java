@@ -1,7 +1,9 @@
 package com.heartsave.todaktodak_api.diary.repository;
 
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentOnlyProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
@@ -37,4 +39,21 @@ public interface MySharedDiaryRepository extends JpaRepository<PublicDiaryEntity
       @Param("memberId") Long memberId,
       @Param("publicDiaryId") Long publicDiaryId,
       Pageable pageable);
+
+  @Query(
+      """
+            SELECT new com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentOnlyProjection(
+                pd.id,
+                d.id,
+                pd.publicContent,
+                d.webtoonImageUrl,
+                d.bgmUrl,
+                CAST(d.diaryCreatedTime as LocalDate)
+            )
+            FROM PublicDiaryEntity pd
+            JOIN pd.diaryEntity d
+            WHERE  pd.memberEntity.id = :memberId AND CAST(d.diaryCreatedTime AS LocalDate) = :publicDiaryDate
+            """)
+  Optional<MySharedDiaryContentOnlyProjection> findContentOnly(
+      @Param("memberId") Long memberId, @Param("publicDiaryDate") LocalDate publicDiaryDate);
 }
