@@ -4,6 +4,8 @@ import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiBgmRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,14 +28,21 @@ public class AiWebhookController {
 
   private final AiDiaryService aiDiaryService;
 
-  @Operation(summary = "AI 웹툰 저장")
+  @Operation(summary = "AI 웹툰 저장", description = "AI가 생성한 웹툰을 저장합니다.")
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "204", description = "AI 웹툰 저장 성공"),
         @ApiResponse(responseCode = "400", description = "잘못된 요청")
       })
   @PostMapping("/webtoon")
-  public ResponseEntity<Void> saveWebtoon(@Valid @RequestBody AiWebtoonRequest request) {
+  public ResponseEntity<Void> saveWebtoon(
+      @Parameter(
+              description = "AI 웹툰 저장 요청 정보",
+              required = true,
+              schema = @Schema(implementation = AiWebtoonRequest.class))
+          @Valid
+          @RequestBody
+          AiWebtoonRequest request) {
     log.info(
         "AI 웹툰 저장을 시작합니다. memberId={}, diaryDate={}", request.memberId(), request.createdDate());
     aiDiaryService.saveWebtoon(request);
@@ -42,8 +51,21 @@ public class AiWebhookController {
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
+  @Operation(summary = "AI BGM 저장", description = "AI가 생성한 BGM을 저장합니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "204", description = "AI BGM 저장 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청")
+      })
   @PostMapping("/bgm")
-  public ResponseEntity<Void> saveBgm(@Valid @RequestBody AiBgmRequest request) {
+  public ResponseEntity<Void> saveBgm(
+      @Parameter(
+              description = "AI BGM 저장 요청 정보",
+              required = true,
+              schema = @Schema(implementation = AiBgmRequest.class))
+          @Valid
+          @RequestBody
+          AiBgmRequest request) {
     log.info(
         "AI BGM 저장을 시작합니다. memberId={}, diaryDate={}", request.memberId(), request.createdDate());
     aiDiaryService.saveBgm(request);
