@@ -19,13 +19,14 @@ public class MySharedDiaryResponse {
 
   @Schema(
       description = "웹툰 이미지 URL 목록",
-      example = "[https://example.com/webtoon/123.jpg, https://example.com/webtoon/124.jpg]")
+      example =
+          "[\"/webtoon/1/2024/11/06/1.webp\",\"/webtoon/1/2024/11/06/2.webp\",\"/webtoon/1/2024/11/06/3.webp\",\"/webtoon/1/2024/11/06/4.webp\"]")
   private final List<String> webtoonImageUrls;
 
   @Schema(description = "공개된 일기 내용", example = "오늘은 정말 좋은 하루였다...")
   private final String publicContent;
 
-  @Schema(description = "배경음악 URL", example = "https://example.com/music/123.mp3")
+  @Schema(description = "배경음악 URL", example = "/music-ai/1/2024/11/06/1.mp3")
   private final String bgmUrl;
 
   @Schema(description = "일기에 대한 리액션 수 정보")

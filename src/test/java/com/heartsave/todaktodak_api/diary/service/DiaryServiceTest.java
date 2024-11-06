@@ -12,8 +12,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.heartsave.todaktodak_api.ai.dto.response.AiContentResponse;
-import com.heartsave.todaktodak_api.ai.service.AiService;
+import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
+import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
 import com.heartsave.todaktodak_api.common.BaseTestEntity;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
@@ -56,7 +56,7 @@ public class DiaryServiceTest {
   @Mock private MemberRepository mockMemberRepository;
   @Mock private DiaryRepository mockDiaryRepository;
   @Mock private DiaryReactionRepository mockDiaryReactionRepository;
-  @Mock private AiService mockAiService;
+  @Mock private AiClientService mockAiClientService;
   @Mock private S3FileStorageService s3FileStorageService;
   @InjectMocks private DiaryService diaryService;
   private TodakUser principal;
@@ -82,8 +82,8 @@ public class DiaryServiceTest {
 
     when(mockMemberRepository.findById(anyLong())).thenReturn(Optional.of(member));
     when(mockDiaryRepository.existsByDate(anyLong(), any(LocalDateTime.class))).thenReturn(false);
-    when(mockAiService.callAiContent(any(DiaryEntity.class)))
-        .thenReturn(AiContentResponse.builder().aiComment("this is test ai comment").build());
+    when(mockAiClientService.callAiContent(any(DiaryEntity.class)))
+        .thenReturn(AiDiaryContentResponse.builder().aiComment("this is test ai comment").build());
 
     DiaryWriteResponse write = diaryService.write(principal, request);
     assertThat(write.getAiComment()).as("AI 코멘트 결과에 문제가 발생했습니다.").isEqualTo(AI_COMMENT);

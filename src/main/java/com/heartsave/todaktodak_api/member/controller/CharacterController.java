@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.member.controller;
 
-import com.heartsave.todaktodak_api.ai.dto.request.AiCharacterRequest;
+import com.heartsave.todaktodak_api.ai.client.dto.request.AiCharacterRequest;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.member.dto.response.CharacterRegisterResponse;
 import com.heartsave.todaktodak_api.member.dto.response.CharacterTemporaryImageResponse;

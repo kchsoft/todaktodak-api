@@ -2,8 +2,8 @@ package com.heartsave.todaktodak_api.member.service;
 
 import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.REFRESH_TOKEN_COOKIE_KEY;
 
-import com.heartsave.todaktodak_api.ai.dto.request.AiCharacterRequest;
-import com.heartsave.todaktodak_api.ai.service.AiService;
+import com.heartsave.todaktodak_api.ai.client.dto.request.AiCharacterRequest;
+import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 public class CharacterService {
   private final MemberRepository memberRepository;
-  private final AiService aiService;
+  private final AiClientService aiClientService;
   private final S3FileStorageService s3Service;
 
   @Transactional(readOnly = true)
@@ -40,7 +40,7 @@ public class CharacterService {
 
   public void createCharacterImage(
       TodakUser principal, MultipartFile file, AiCharacterRequest dto) {
-    aiService.callCharacter(file, dto);
+    aiClientService.callCharacter(file, dto);
   }
 
   public CharacterRegisterResponse changeRoleAndReissueToken(

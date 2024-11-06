@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "나의 공개된 일기장", description = "나의 공개된 일기장 API")
+@Tag(name = "나의 게시물", description = "나의 게시물 API")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
