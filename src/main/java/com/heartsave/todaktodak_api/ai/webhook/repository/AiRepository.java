@@ -16,7 +16,7 @@ public interface AiRepository extends JpaRepository<DiaryEntity, Long> {
         SET d.webtoonImageUrl = :url
         WHERE d.memberEntity.id = :memberId AND  CAST(d.diaryCreatedTime AS DATE ) = :createdDate
 """)
-  void updateWebtoonUrl(
+  int updateWebtoonUrl(
       @Param("memberId") Long memberId,
       @Param("createdDate") LocalDate createdDate,
       @Param("url") String url);
