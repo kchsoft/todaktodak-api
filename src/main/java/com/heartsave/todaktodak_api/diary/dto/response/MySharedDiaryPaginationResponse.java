@@ -19,12 +19,11 @@ public record MySharedDiaryPaginationResponse(
   }
 
   public static MySharedDiaryPaginationResponse of(List<MySharedDiaryPreviewProjection> previews) {
-    Long minId;
+    Long minId = 1L;
     Boolean isEnd = false;
-    if (previews.isEmpty()) {
-      minId = 1L;
-      isEnd = true;
-    } else minId = previews.getLast().getPublicDiaryId();
+
+    if (previews.isEmpty()) isEnd = true;
+    else minId = previews.getLast().getPublicDiaryId();
 
     return new MySharedDiaryPaginationResponse(previews, minId, isEnd);
   }
