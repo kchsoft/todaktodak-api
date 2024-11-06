@@ -1,5 +1,7 @@
 package com.heartsave.todaktodak_api.diary.service;
 
+import static com.heartsave.todaktodak_api.common.constant.CoreConstant.URL.DEFAULT_URL;
+
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
@@ -120,6 +122,8 @@ public class DiaryService {
         .emotion(request.getEmotion())
         .content(request.getContent())
         .diaryCreatedTime((request.getDate()))
+        .webtoonImageUrl(DEFAULT_URL)
+        .bgmUrl(DEFAULT_URL)
         .build();
   }
 }

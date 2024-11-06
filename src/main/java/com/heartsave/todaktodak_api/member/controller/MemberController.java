@@ -8,6 +8,7 @@ import com.heartsave.todaktodak_api.member.service.MemberService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -42,5 +43,17 @@ public class MemberController {
   public ResponseEntity<MemberProfileResponse> getMemberProfile(
       @AuthenticationPrincipal TodakUser user) {
     return ResponseEntity.ok(memberService.getMemberProfileById(user));
+  }
+
+  @PostMapping("/deactivate")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "204", description = "회원 탈퇴 성공"),
+        @ApiResponse(responseCode = "404", description = "회원 조회 실패")
+      })
+  public ResponseEntity<Void> deactivate(
+      @AuthenticationPrincipal TodakUser user, HttpServletResponse response) {
+    memberService.deactivate(response, user);
+    return ResponseEntity.noContent().build();
   }
 }
