@@ -3,6 +3,7 @@ package com.heartsave.todaktodak_api.ai.webhook.repository;
 import static com.heartsave.todaktodak_api.common.BaseTestEntity.DUMMY_STRING_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
 import com.heartsave.todaktodak_api.common.BaseTestEntity;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
@@ -17,10 +18,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 
 @Slf4j
 @DataJpaTest
-class AiRepositoryTest {
+@Import(AiRepository.class)
+class AiJpaRepositoryTest {
 
   @Autowired private AiRepository aiRepository;
 
@@ -52,9 +55,10 @@ class AiRepositoryTest {
     @DisplayName("웹툰 URL을 성공적으로 업데이트")
     void updateWebtoonUrlSuccessfully() {
       String newUrl = "https://new-url/webtoon.jpg";
+      AiWebtoonRequest request =
+          new AiWebtoonRequest(member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newUrl);
 
-      aiRepository.updateWebtoonUrl(
-          member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newUrl);
+      aiRepository.updateWebtoonUrl(request);
 
       DiaryEntity updatedDiary = tem.find(DiaryEntity.class, diary.getId());
       assertThat(updatedDiary.getWebtoonImageUrl()).isEqualTo(newUrl);
@@ -65,8 +69,9 @@ class AiRepositoryTest {
     void updateWebtoonUrlWithNonExistentData() {
       String newUrl = "https://example.com/webtoon.jpg";
       LocalDate nonExistentDate = LocalDate.now().plusDays(1);
+      AiWebtoonRequest request = new AiWebtoonRequest(member.getId(), nonExistentDate, newUrl);
 
-      aiRepository.updateWebtoonUrl(member.getId(), nonExistentDate, newUrl);
+      aiRepository.updateWebtoonUrl(request);
 
       DiaryEntity unchangedDiary = tem.find(DiaryEntity.class, diary.getId());
       assertThat(unchangedDiary.getWebtoonImageUrl()).isEqualTo("");
@@ -81,9 +86,8 @@ class AiRepositoryTest {
     @DisplayName("bgmUrl과 webtoonImageUrl이 모두 빈 문자열이면 false를 반환한다")
     void returnsFalseWhenBothUrlsAreEmpty() {
       Boolean result =
-          aiRepository
-              .isContentCompleted(member.getId(), diary.getDiaryCreatedTime().toLocalDate())
-              .get();
+          aiRepository.isContentCompleted(
+              member.getId(), diary.getDiaryCreatedTime().toLocalDate());
 
       assertThat(result).isFalse();
     }
@@ -106,9 +110,8 @@ class AiRepositoryTest {
       tem.clear();
 
       Boolean result =
-          aiRepository
-              .isContentCompleted(member.getId(), diaryWithBgm.getDiaryCreatedTime().toLocalDate())
-              .get();
+          aiRepository.isContentCompleted(
+              member.getId(), diaryWithBgm.getDiaryCreatedTime().toLocalDate());
 
       assertThat(result).isFalse();
     }
@@ -131,10 +134,8 @@ class AiRepositoryTest {
       tem.clear();
 
       Boolean result =
-          aiRepository
-              .isContentCompleted(
-                  member.getId(), diaryWithWebtoon.getDiaryCreatedTime().toLocalDate())
-              .get();
+          aiRepository.isContentCompleted(
+              member.getId(), diaryWithWebtoon.getDiaryCreatedTime().toLocalDate());
 
       assertThat(result).isFalse();
     }
@@ -157,10 +158,8 @@ class AiRepositoryTest {
       tem.clear();
 
       Boolean result =
-          aiRepository
-              .isContentCompleted(
-                  member.getId(), completedDiary.getDiaryCreatedTime().toLocalDate())
-              .get();
+          aiRepository.isContentCompleted(
+              member.getId(), completedDiary.getDiaryCreatedTime().toLocalDate());
 
       assertThat(result).isTrue();
     }
@@ -170,8 +169,7 @@ class AiRepositoryTest {
     void returnsNullForNonExistentData() {
       LocalDate nonExistentDate = LocalDate.now().plusDays(1);
 
-      Boolean result =
-          aiRepository.isContentCompleted(member.getId(), nonExistentDate).orElse(false);
+      Boolean result = aiRepository.isContentCompleted(member.getId(), nonExistentDate);
 
       assertThat(result).isFalse();
     }

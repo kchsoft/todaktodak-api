@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
 import com.heartsave.todaktodak_api.ai.webhook.repository.AiRepository;
 import java.time.LocalDate;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -39,24 +38,24 @@ class AiDiaryServiceTest {
     @Test
     @DisplayName("웹툰 URL 업데이트 성공 및 AI 컨텐츠 생성이 미완료된 경우")
     void saveWebtoon_UpdateSuccessAndAiContentCompleted() {
-      when(aiRepository.updateWebtoonUrl(memberId, createdDate, webtoonUrl)).thenReturn(1);
-      when(aiRepository.isContentCompleted(memberId, createdDate)).thenReturn(Optional.of(false));
+      when(aiRepository.updateWebtoonUrl(request)).thenReturn(1);
+      when(aiRepository.isContentCompleted(memberId, createdDate)).thenReturn(false);
 
       aiDiaryService.saveWebtoon(request);
 
-      verify(aiRepository, times(1)).updateWebtoonUrl(memberId, createdDate, webtoonUrl);
+      verify(aiRepository, times(1)).updateWebtoonUrl(request);
       verify(aiRepository, times(1)).isContentCompleted(memberId, createdDate);
     }
 
     @Test
     @DisplayName("웹툰 URL 업데이트 성공 및 AI 컨텐츠 생성이 완료된 경우")
     void saveWebtoon_UpdateSuccessAndCustomBgmUrl() {
-      when(aiRepository.updateWebtoonUrl(memberId, createdDate, webtoonUrl)).thenReturn(1);
-      when(aiRepository.isContentCompleted(memberId, createdDate)).thenReturn(Optional.of(true));
+      when(aiRepository.updateWebtoonUrl(request)).thenReturn(1);
+      when(aiRepository.isContentCompleted(memberId, createdDate)).thenReturn(true);
 
       aiDiaryService.saveWebtoon(request);
 
-      verify(aiRepository, times(1)).updateWebtoonUrl(memberId, createdDate, webtoonUrl);
+      verify(aiRepository, times(1)).updateWebtoonUrl(request);
       verify(aiRepository, times(1)).isContentCompleted(memberId, createdDate);
       // Todo: SSE 알림 관련 검증 추가 필요
     }
@@ -64,11 +63,11 @@ class AiDiaryServiceTest {
     @Test
     @DisplayName("업데이트할 일기가 없는 경우")
     void saveWebtoon_NoDataToUpdate() {
-      when(aiRepository.updateWebtoonUrl(memberId, createdDate, webtoonUrl)).thenReturn(0);
+      when(aiRepository.updateWebtoonUrl(request)).thenReturn(0);
 
       aiDiaryService.saveWebtoon(request);
 
-      verify(aiRepository, times(1)).updateWebtoonUrl(memberId, createdDate, webtoonUrl);
+      verify(aiRepository, times(1)).updateWebtoonUrl(request);
       verify(aiRepository, never()).isContentCompleted(any(), any());
     }
   }
