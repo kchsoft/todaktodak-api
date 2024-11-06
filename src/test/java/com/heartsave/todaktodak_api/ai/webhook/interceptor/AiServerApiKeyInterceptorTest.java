@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.ai.webhook.interceptor;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,12 +17,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest({AiWebhookController.class})
 @AutoConfigureMockMvc
-@ActiveProfiles("test") // Interceptor Bean의 api-key와 테스트의 api-key를 동일하게 설정
 @Import(TestInterceptorSecurityConfig.class)
 class AiServerApiKeyInterceptorTest {
 
@@ -39,7 +38,8 @@ class AiServerApiKeyInterceptorTest {
   void validApiKey_Success() throws Exception {
     mockMvc
         .perform(post(AI_HOOK_WEBTOON_URL).header(X_API_KEY, correctApiKey))
-        .andExpect(status().isNoContent());
+        .andExpect(status().isNoContent())
+        .andDo(print());
   }
 
   @Test
@@ -50,7 +50,8 @@ class AiServerApiKeyInterceptorTest {
         .perform(post(AI_HOOK_WEBTOON_URL))
         .andExpect(status().isUnauthorized())
         .andExpect(jsonPath("$.title").value(AiErrorSpec.INVALID_API_KEY.name()))
-        .andExpect(jsonPath("$.message").exists());
+        .andExpect(jsonPath("$.message").exists())
+        .andDo(print());
   }
 
   @Test
@@ -60,6 +61,7 @@ class AiServerApiKeyInterceptorTest {
         .perform(post(AI_HOOK_WEBTOON_URL).header(X_API_KEY, "wrong-key"))
         .andExpect(status().isUnauthorized())
         .andExpect(jsonPath("$.title").value(AiErrorSpec.INVALID_API_KEY.name()))
-        .andExpect(jsonPath("$.message").exists());
+        .andExpect(jsonPath("$.message").exists())
+        .andDo(print());
   }
 }
