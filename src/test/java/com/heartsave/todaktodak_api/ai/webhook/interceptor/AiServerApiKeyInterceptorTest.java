@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.heartsave.todaktodak_api.ai.webhook.controller.AiWebhookController;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
+import com.heartsave.todaktodak_api.ai.webhook.test_config.TestInterceptorSecurityConfig;
 import com.heartsave.todaktodak_api.common.exception.errorspec.AiErrorSpec;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,18 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest({AiServerApiKeyInterceptor.class, AiWebhookController.class})
+@WebMvcTest({AiWebhookController.class})
 @AutoConfigureMockMvc
 @ActiveProfiles("test") // Interceptor Bean의 api-key와 테스트의 api-key를 동일하게 설정
+@Import(TestInterceptorSecurityConfig.class)
 class AiServerApiKeyInterceptorTest {
 
   @Autowired private MockMvc mockMvc;
@@ -35,26 +33,6 @@ class AiServerApiKeyInterceptorTest {
 
   private String X_API_KEY = "X-API-KEY";
   private String AI_HOOK_WEBTOON_URL = "/api/v1/webhook/ai/webtoon";
-
-  @TestConfiguration // 테스트용 내부 Security 설정
-  static class TestSecurityConfig {
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-      return (web) -> web.ignoring().requestMatchers("/api/v1/webhook/ai/**");
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-      return http.csrf(csrf -> csrf.disable())
-          .authorizeHttpRequests(
-              auth ->
-                  auth.requestMatchers("/api/v1/webhook/ai/**")
-                      .permitAll()
-                      .anyRequest()
-                      .authenticated())
-          .build();
-    }
-  }
 
   @Test
   @DisplayName("유효한 API KEY 성공")
