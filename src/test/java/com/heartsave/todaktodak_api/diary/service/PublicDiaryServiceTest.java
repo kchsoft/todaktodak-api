@@ -250,21 +250,23 @@ class PublicDiaryServiceTest {
   @Test
   @DisplayName("getPublicDiaryPaginationResponse - 최신 일기 조회 (publicDiaryId = 0)")
   void getPublicDiaryPaginationResponse_LatestDiary() {
-    // given
-    Long latestId = 100L;
-    when(mockPublicDiaryRepository.findLatestId()).thenReturn(Optional.of(latestId));
-    when(mockPublicDiaryRepository.findNextContentOnlyById(
-            eq(latestId + 1), any(PageRequest.class)))
-        .thenReturn(List.of());
+    PublicDiaryContentOnlyProjection content = mock(PublicDiaryContentOnlyProjection.class);
+    DiaryReactionCountProjection reactionCount = mock(DiaryReactionCountProjection.class);
+    List<DiaryReactionType> reactionType = mock(List.class);
+    when(mockPublicDiaryRepository.findLatestId()).thenReturn(Optional.empty());
+    when(mockPublicDiaryRepository.findNextContentOnlyById(eq(1L), any(PageRequest.class)))
+        .thenReturn(List.of(content));
+    when(mockDiaryReactionRepository.countEachByDiaryId(anyLong())).thenReturn(reactionCount);
+    when(mockDiaryReactionRepository.findMemberReaction(anyLong(), anyLong()))
+        .thenReturn(reactionType);
 
-    // when
     PublicDiaryPaginationResponse response =
         publicDiaryService.getPublicDiaryPagination(principal, 0L);
 
-    // then
+    assertThat(response.getDiaries().size()).as("조회된 일기가 1개 있어야 한다").isEqualTo(1L);
+    assertThat(response.getIsEnd()).as("다음 페이지 조회가 가능하므로 isEnd는 false여야 한다").isFalse();
     verify(mockPublicDiaryRepository).findLatestId();
-    verify(mockPublicDiaryRepository)
-        .findNextContentOnlyById(eq(latestId + 1), any(PageRequest.class));
+    verify(mockPublicDiaryRepository).findNextContentOnlyById(eq(1L), any(PageRequest.class));
   }
 
   @Test
