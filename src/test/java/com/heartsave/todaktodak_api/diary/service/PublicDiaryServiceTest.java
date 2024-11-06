@@ -10,7 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.heartsave.todaktodak_api.common.BaseTestEntity;
+import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
@@ -57,8 +57,8 @@ class PublicDiaryServiceTest {
 
   @BeforeEach
   void setup() {
-    member = BaseTestEntity.createMember();
-    diary = BaseTestEntity.createDiaryWithMember(member);
+    member = BaseTestObject.createMember();
+    diary = BaseTestObject.createDiaryWithMember(member);
 
     principal = mock(TodakUser.class);
     when(principal.getId()).thenReturn(member.getId());

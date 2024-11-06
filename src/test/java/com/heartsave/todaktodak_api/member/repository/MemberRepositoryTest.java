@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.member.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.heartsave.todaktodak_api.common.BaseTestEntity;
+import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -65,7 +65,7 @@ class MemberRepositoryTest {
   @DisplayName("중복 이메일 확인")
   void getDupliactedEmailTest() {
     // Given
-    MemberEntity member = memberRepository.save(BaseTestEntity.createMemberNoId());
+    MemberEntity member = memberRepository.save(BaseTestObject.createMemberNoId());
 
     // When
     boolean isExisted = memberRepository.existsByEmail(member.getEmail());
@@ -78,7 +78,7 @@ class MemberRepositoryTest {
   @DisplayName("회원 프로필 조회")
   void getMemberProfileProjectionTest() {
     // Given
-    MemberEntity member = memberRepository.save(BaseTestEntity.createMemberNoId());
+    MemberEntity member = memberRepository.save(BaseTestObject.createMemberNoId());
 
     // When
     var memberProfile = memberRepository.findProjectedById(member.getId()).orElse(null);

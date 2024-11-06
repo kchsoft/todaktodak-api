@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.heartsave.todaktodak_api.common.BaseTestEntity;
+import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
@@ -57,7 +57,7 @@ public class DiaryControllerTest {
   void writeDiarySuccess() throws Exception {
     DiaryWriteRequest request =
         new DiaryWriteRequest(
-            LocalDateTime.now(), DiaryEmotion.HAPPY, BaseTestEntity.DUMMY_STRING_CONTENT);
+            LocalDateTime.now(), DiaryEmotion.HAPPY, BaseTestObject.DUMMY_STRING_CONTENT);
 
     final String AI_COMMENT = "this is test ai comment";
 
