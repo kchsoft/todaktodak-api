@@ -28,14 +28,14 @@ public class AiServerApiKeyInterceptor implements HandlerInterceptor {
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
-
+    log.info("AI 서버의 요청이 들어와 API-KEY를 검증합니다.");
     String apiKey = request.getHeader(API_KEY_HEADER);
-
     if (apiKey == null || !apiKey.equals(this.apiKey)) {
       setUnauthorized(response);
       printWarnLog(request);
       return false;
     }
+    log.info("AI 서버의 API-KEY 검증을 성공적으로 완료하였습니다.");
     return true;
   }
 
