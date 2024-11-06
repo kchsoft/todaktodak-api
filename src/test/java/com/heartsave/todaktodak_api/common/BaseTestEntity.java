@@ -21,9 +21,9 @@ public class BaseTestEntity {
   private static LocalDateTime TEST_LOCAL_DATE_TIME = LocalDateTime.of(2024, 10, 22, 9, 55);
   private static String TEST_DIARY_CONTENT =
       "TEST_DIARY_CONTENT : need to fill min Len = " + DUMMY_STRING_CONTENT;
-  private static String TEST_WEBTOON_URL = "http://s3-url/test-webtoon";
-  private static String TEST_BGM_URL = "http://s3-url/test-bgm";
-  private static String TEST_COMMENT_URL = "http://s3-url/test-comment";
+  private static String TEST_DEFAULT_WEBTOON_URL = "";
+  private static String TEST_DEFAULT_BGM_URL = "";
+  private static String TEST_COMMENT = "test-ai-comment";
 
   public static MemberEntity createMember() {
     return MemberEntity.builder()
@@ -57,9 +57,9 @@ public class BaseTestEntity {
         .diaryCreatedTime(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS))
         .content(TEST_DIARY_CONTENT)
         .memberEntity(createMember())
-        .webtoonImageUrl(TEST_WEBTOON_URL)
-        .bgmUrl(TEST_BGM_URL)
-        .aiComment(TEST_COMMENT_URL)
+        .webtoonImageUrl(TEST_DEFAULT_WEBTOON_URL)
+        .bgmUrl(TEST_DEFAULT_BGM_URL)
+        .aiComment(TEST_COMMENT)
         .build();
   }
 
@@ -70,9 +70,9 @@ public class BaseTestEntity {
         .diaryCreatedTime(LocalDateTime.now())
         .content(TEST_DIARY_CONTENT)
         .memberEntity(member)
-        .webtoonImageUrl(TEST_WEBTOON_URL)
-        .bgmUrl(TEST_BGM_URL)
-        .aiComment(TEST_COMMENT_URL)
+        .webtoonImageUrl(TEST_DEFAULT_WEBTOON_URL)
+        .bgmUrl(TEST_DEFAULT_BGM_URL)
+        .aiComment(TEST_COMMENT)
         .build();
   }
 
@@ -82,9 +82,9 @@ public class BaseTestEntity {
         .diaryCreatedTime(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS))
         .content(TEST_DIARY_CONTENT)
         .memberEntity(member)
-        .webtoonImageUrl(TEST_WEBTOON_URL)
-        .bgmUrl(TEST_BGM_URL)
-        .aiComment(TEST_COMMENT_URL)
+        .webtoonImageUrl(TEST_DEFAULT_WEBTOON_URL)
+        .bgmUrl(TEST_DEFAULT_BGM_URL)
+        .aiComment(TEST_COMMENT)
         .build();
   }
 
@@ -95,9 +95,9 @@ public class BaseTestEntity {
         .diaryCreatedTime(createdDateTime)
         .content(TEST_DIARY_CONTENT)
         .memberEntity(member)
-        .webtoonImageUrl(TEST_WEBTOON_URL)
-        .bgmUrl(TEST_BGM_URL)
-        .aiComment(TEST_COMMENT_URL)
+        .webtoonImageUrl(TEST_DEFAULT_WEBTOON_URL)
+        .bgmUrl(TEST_DEFAULT_BGM_URL)
+        .aiComment(TEST_COMMENT)
         .build();
   }
 }
