@@ -21,10 +21,13 @@ public class DiaryResponse {
   @Schema(description = "일기 내용", example = "오늘은 정말 좋은 하루였다...")
   private String content;
 
-  @Schema(description = "웹툰 이미지 URL", example = "[https://example.com/webtoon/123.jpg],[...]")
+  @Schema(
+      description = "웹툰 이미지 URL",
+      example =
+          "[\"/webtoon/1/2024/11/06/1.webp\",\"/webtoon/1/2024/11/06/2.webp\",\"/webtoon/1/2024/11/06/3.webp\",\"/webtoon/1/2024/11/06/4.webp\"]")
   private List<String> webtoonImageUrls;
 
-  @Schema(description = "배경음악 URL", example = "https://example.com/music/123.mp3")
+  @Schema(description = "배경음악 URL", example = "/music-ai/1/2024/11/06/1.mp3")
   private String bgmUrl;
 
   @Schema(description = "AI가 작성한 코멘트", example = "오늘 하루도 수고 많으셨어요!")

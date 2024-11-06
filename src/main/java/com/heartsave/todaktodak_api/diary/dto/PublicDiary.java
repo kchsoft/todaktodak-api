@@ -18,7 +18,7 @@ public class PublicDiary {
   @Schema(description = "원본 일기 ID", example = "1")
   private final Long diaryId;
 
-  @Schema(description = "작성자 캐릭터 이미지 URL", example = "character/123")
+  @Schema(description = "작성자 캐릭터 이미지 URL", example = "\"character/123\"")
   private final String characterImageUrl;
 
   @Schema(description = "작성자 닉네임", example = "Todak")
@@ -29,10 +29,11 @@ public class PublicDiary {
 
   @Schema(
       description = "일기 내용을 기반으로 생성된 웹툰 이미지 URL 목록",
-      example = "[\"https://example.com/webtoon/1.jpg\", \"https://example.com/webtoon/2.jpg\"]")
+      example =
+          "[\"/webtoon/1/2024/11/06/1.webp\",\"/webtoon/1/2024/11/06/2.webp\",\"/webtoon/1/2024/11/06/3.webp\",\"/webtoon/1/2024/11/06/4.webp\"]")
   private final List<String> webtoonUrls;
 
-  @Schema(description = "배경음악 URL", example = "https://example.com/bgm/123.mp3")
+  @Schema(description = "배경음악 URL", example = "/music-ai/1/2024/11/06/1.mp3")
   private final String bgmUrl;
 
   @Schema(description = "일기 작성 날짜", example = "2024-10-26", type = "string", format = "date")
