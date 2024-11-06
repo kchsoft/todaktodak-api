@@ -1,5 +1,8 @@
 package com.heartsave.todaktodak_api.member.service;
 
+import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.REFRESH_TOKEN_COOKIE_KEY;
+import static com.heartsave.todaktodak_api.common.security.util.CookieUtils.*;
+
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
@@ -10,24 +13,25 @@ import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.entity.projection.MemberProfileProjection;
 import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class MemberService {
   private final MemberRepository memberRepository;
   private final S3FileStorageService s3Service;
 
-  @Transactional
   public NicknameUpdateResponse updateNickname(TodakUser principal, NicknameUpdateRequest dto) {
     MemberEntity retrievedMember = findMemberById(principal.getId());
     retrievedMember.updateNickname(dto.nickname());
     return NicknameUpdateResponse.builder().nickname(retrievedMember.getNickname()).build();
   }
 
+  @Transactional(readOnly = true)
   public MemberProfileResponse getMemberProfileById(TodakUser principal) {
     MemberProfileProjection memberProfile = getMemberProfileById(principal.getId());
 
@@ -39,6 +43,12 @@ public class MemberService {
         .email(memberProfile.getEmail())
         .characterImageUrl(characterPreSignedUrl)
         .build();
+  }
+
+  public void deactivate(HttpServletResponse response, TodakUser principal) {
+    MemberEntity retrievedMember = findMemberById(principal.getId());
+    memberRepository.delete(retrievedMember);
+    updateCookie(response, createExpiredCookie(REFRESH_TOKEN_COOKIE_KEY));
   }
 
   private MemberEntity findMemberById(Long id) {
