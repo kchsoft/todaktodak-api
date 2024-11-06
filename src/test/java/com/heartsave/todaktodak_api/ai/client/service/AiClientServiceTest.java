@@ -1,9 +1,8 @@
-package com.heartsave.todaktodak_api.ai.service;
+package com.heartsave.todaktodak_api.ai.client.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
-import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
@@ -23,7 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
-class AiServiceTest {
+class AiClientServiceTest {
 
   private static MockWebServer mockWebServer;
   private static AiClientService aiClientService;
