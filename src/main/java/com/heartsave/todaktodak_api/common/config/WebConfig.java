@@ -14,6 +14,6 @@ public class WebConfig implements WebMvcConfigurer {
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(aiServerApiKeyInterceptor).addPathPatterns("/api/v1/ai/webhook/**");
+    registry.addInterceptor(aiServerApiKeyInterceptor).addPathPatterns("/api/v1/webhook/ai/**");
   }
 }

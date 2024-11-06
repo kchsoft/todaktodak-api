@@ -4,8 +4,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.heartsave.todaktodak_api.ai.webhook.controller.AiController;
-import com.heartsave.todaktodak_api.ai.webhook.service.AiService;
+import com.heartsave.todaktodak_api.ai.webhook.controller.AiWebhookController;
+import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
+import com.heartsave.todaktodak_api.common.exception.errorspec.AiErrorSpec;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,25 +21,25 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest({AiServerApiKeyInterceptor.class, AiController.class})
+@WebMvcTest({AiServerApiKeyInterceptor.class, AiWebhookController.class})
 @AutoConfigureMockMvc
 @ActiveProfiles("test") // Interceptor Bean의 api-key와 테스트의 api-key를 동일하게 설정
 class AiServerApiKeyInterceptorTest {
 
   @Autowired private MockMvc mockMvc;
-  @MockBean AiService aiService; // Controller Load 위해 필요
+  @MockBean AiDiaryService aiService; // Controller Load 위해 필요
 
   @Value("${ai.server.api.key}")
   private String correctApiKey;
 
   private String X_API_KEY = "X-API-KEY";
-  private String AI_HOOK_WEBTOON_URL = "/api/v1/ai/webhook/webtoon";
+  private String AI_HOOK_WEBTOON_URL = "/api/v1/webhook/ai/webtoon";
 
   @TestConfiguration // 테스트용 내부 Security 설정
   static class TestSecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-      return (web) -> web.ignoring().requestMatchers("/api/v1/ai/webhook/**");
+      return (web) -> web.ignoring().requestMatchers("/api/v1/webhook/ai/**");
     }
 
     @Bean
@@ -46,7 +47,7 @@ class AiServerApiKeyInterceptorTest {
       return http.csrf(csrf -> csrf.disable())
           .authorizeHttpRequests(
               auth ->
-                  auth.requestMatchers("/api/v1/ai/webhook/**")
+                  auth.requestMatchers("/api/v1/webhook/ai/**")
                       .permitAll()
                       .anyRequest()
                       .authenticated())
@@ -67,7 +68,7 @@ class AiServerApiKeyInterceptorTest {
     mockMvc
         .perform(post(AI_HOOK_WEBTOON_URL))
         .andExpect(status().isUnauthorized())
-        .andExpect(jsonPath("$.title").value("INVALID_API_KEY"))
+        .andExpect(jsonPath("$.title").value(AiErrorSpec.INVALID_API_KEY.name()))
         .andExpect(jsonPath("$.message").exists());
   }
 
@@ -77,7 +78,7 @@ class AiServerApiKeyInterceptorTest {
     mockMvc
         .perform(post(AI_HOOK_WEBTOON_URL).header(X_API_KEY, "wrong-key"))
         .andExpect(status().isUnauthorized())
-        .andExpect(jsonPath("$.title").value("INVALID_API_KEY"))
+        .andExpect(jsonPath("$.title").value(AiErrorSpec.INVALID_API_KEY.name()))
         .andExpect(jsonPath("$.message").exists());
   }
 }
