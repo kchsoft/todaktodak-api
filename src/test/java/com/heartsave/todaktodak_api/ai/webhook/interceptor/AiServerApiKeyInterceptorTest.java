@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.heartsave.todaktodak_api.ai.webhook.controller.AiWebhookController;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
 import com.heartsave.todaktodak_api.common.exception.errorspec.AiErrorSpec;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,6 +57,7 @@ class AiServerApiKeyInterceptorTest {
   }
 
   @Test
+  @DisplayName("유효한 API KEY 성공")
   void validApiKey_Success() throws Exception {
     mockMvc
         .perform(post(AI_HOOK_WEBTOON_URL).header(X_API_KEY, correctApiKey))
@@ -63,6 +65,7 @@ class AiServerApiKeyInterceptorTest {
   }
 
   @Test
+  @DisplayName("API KEY 없으면 실패")
   void noApiKey_Fail() throws Exception {
     // when & then
     mockMvc
@@ -73,8 +76,8 @@ class AiServerApiKeyInterceptorTest {
   }
 
   @Test
+  @DisplayName("유효하지 않은 API KEY 실패")
   void invalidApiKey_Fail() throws Exception {
-    // when & then
     mockMvc
         .perform(post(AI_HOOK_WEBTOON_URL).header(X_API_KEY, "wrong-key"))
         .andExpect(status().isUnauthorized())
