@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -63,7 +64,8 @@ public class SecurityConfig {
                         "/api/v1/auth/**",
                         "/swagger-ui/**",
                         "/swagger-resources/**",
-                        "/v3/api-docs/**")
+                        "/v3/api-docs/**",
+                        "/api/v1/webhook/ai/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
@@ -92,5 +94,10 @@ public class SecurityConfig {
     configuration.setAllowedOrigins(ALLOWED_ORIGINS);
     configuration.addAllowedHeader("*");
     return configuration;
+  }
+
+  @Bean
+  public WebSecurityCustomizer webSecurityCustomizer() {
+    return (web) -> web.ignoring().requestMatchers("/api/v1/ai/webhook/**");
   }
 }
