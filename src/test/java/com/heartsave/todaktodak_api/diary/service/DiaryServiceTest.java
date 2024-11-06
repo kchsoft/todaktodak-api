@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
-import com.heartsave.todaktodak_api.common.BaseTestEntity;
+import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
@@ -66,8 +66,8 @@ public class DiaryServiceTest {
 
   @BeforeEach
   void allSetup() {
-    member = BaseTestEntity.createMember();
-    diary = BaseTestEntity.createDiaryWithMember(member);
+    member = BaseTestObject.createMember();
+    diary = BaseTestObject.createDiaryWithMember(member);
 
     principal = mock(TodakUser.class);
     when(principal.getId()).thenReturn(member.getId());

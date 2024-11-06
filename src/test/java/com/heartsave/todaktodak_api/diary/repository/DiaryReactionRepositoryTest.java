@@ -3,7 +3,7 @@ package com.heartsave.todaktodak_api.diary.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.heartsave.todaktodak_api.common.BaseTestEntity;
+import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.DiaryReactionEntity;
@@ -34,8 +34,8 @@ public class DiaryReactionRepositoryTest {
 
   @BeforeEach
   void setupAll() {
-    member = BaseTestEntity.createMemberNoId();
-    diary = BaseTestEntity.createDiaryNoIdWithMember(member);
+    member = BaseTestObject.createMemberNoId();
+    diary = BaseTestObject.createDiaryNoIdWithMember(member);
     memberRepository.save(member);
     diaryRepository.save(diary);
   }
@@ -47,7 +47,7 @@ public class DiaryReactionRepositoryTest {
     Long expectedSurprised = 3L;
     Long expectedEmpathize = 14L;
     Long expectedCheering = 100L;
-    MemberEntity testMember = BaseTestEntity.createMemberNoId();
+    MemberEntity testMember = BaseTestObject.createMemberNoId();
     memberRepository.save(testMember);
     // LIKE 1개 생성
     diaryReactionRepository.save(
@@ -59,7 +59,7 @@ public class DiaryReactionRepositoryTest {
 
     // SURPRISED 3개 생성
     for (int i = 0; i < expectedSurprised; i++) {
-      testMember = BaseTestEntity.createMemberNoId();
+      testMember = BaseTestObject.createMemberNoId();
       memberRepository.save(testMember);
       diaryReactionRepository.save(
           DiaryReactionEntity.builder()
@@ -71,7 +71,7 @@ public class DiaryReactionRepositoryTest {
 
     // EMPATHIZE 14개 생성
     for (int i = 0; i < expectedEmpathize; i++) {
-      testMember = BaseTestEntity.createMemberNoId();
+      testMember = BaseTestObject.createMemberNoId();
       memberRepository.save(testMember);
       diaryReactionRepository.save(
           DiaryReactionEntity.builder()
@@ -83,7 +83,7 @@ public class DiaryReactionRepositoryTest {
 
     // CHEERING 100개 생성
     for (int i = 0; i < expectedCheering; i++) {
-      testMember = BaseTestEntity.createMemberNoId();
+      testMember = BaseTestObject.createMemberNoId();
       memberRepository.save(testMember);
       diaryReactionRepository.save(
           DiaryReactionEntity.builder()
@@ -199,7 +199,7 @@ public class DiaryReactionRepositoryTest {
   @Test
   @DisplayName("toggleReactionStatus - 다른 멤버가 같은 일기에 같은 타입의 반응을 하면 모두 저장됨")
   void toggleSameReactionTypeDifferentMemberTest() {
-    MemberEntity anotherMember = BaseTestEntity.createMemberNoId();
+    MemberEntity anotherMember = BaseTestObject.createMemberNoId();
     memberRepository.save(anotherMember);
 
     DiaryReactionEntity reaction1 =

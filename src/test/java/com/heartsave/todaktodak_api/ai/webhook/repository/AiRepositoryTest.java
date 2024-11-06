@@ -1,10 +1,13 @@
 package com.heartsave.todaktodak_api.ai.webhook.repository;
 
-import static com.heartsave.todaktodak_api.common.BaseTestEntity.DUMMY_STRING_CONTENT;
+import static com.heartsave.todaktodak_api.common.BaseTestObject.DUMMY_STRING_CONTENT;
+import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_BGM_URL;
+import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_WEBTOON_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiBgmRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
-import com.heartsave.todaktodak_api.common.BaseTestEntity;
+import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
@@ -23,7 +26,7 @@ import org.springframework.context.annotation.Import;
 @Slf4j
 @DataJpaTest
 @Import(AiRepository.class)
-class AiJpaRepositoryTest {
+class AiRepositoryTest {
 
   @Autowired private AiRepository aiRepository;
 
@@ -31,16 +34,14 @@ class AiJpaRepositoryTest {
 
   private MemberEntity member;
   private DiaryEntity diary;
-  private String TEST_BGM_URL = "test-bgm-url";
-  private String TEST_WEBTOON_URL = "test-webtoon-url";
   private LocalDateTime nowDateTime = LocalDateTime.now();
 
   @BeforeEach
   void setUp() {
-    member = BaseTestEntity.createMemberNoId();
+    member = BaseTestObject.createMemberNoId();
     tem.persist(member);
 
-    diary = BaseTestEntity.createDiaryNoIdWithMember(member);
+    diary = BaseTestObject.createDiaryNoIdWithMember(member);
     tem.persist(diary);
 
     tem.flush();
@@ -75,6 +76,70 @@ class AiJpaRepositoryTest {
 
       DiaryEntity unchangedDiary = tem.find(DiaryEntity.class, diary.getId());
       assertThat(unchangedDiary.getWebtoonImageUrl()).isEqualTo("");
+    }
+  }
+
+  @Nested
+  @DisplayName("updateBgmUrl 메소드는")
+  class UpdateBgmUrl {
+
+    @Test
+    @DisplayName("BGM URL을 성공적으로 업데이트")
+    void updateBgmUrlSuccessfully() {
+      String newBgmUrl = "/music-ai/1/2024/11/06/bgm.mp3";
+      AiBgmRequest request =
+          new AiBgmRequest(member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newBgmUrl);
+
+      aiRepository.updateBgmUrl(request);
+
+      DiaryEntity updatedDiary = tem.find(DiaryEntity.class, diary.getId());
+      assertThat(updatedDiary.getBgmUrl()).isEqualTo(newBgmUrl);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 데이터에 대해 업데이트를 시도해도 예외가 발생하지 않음")
+    void updateBgmUrlWithNonExistentData() {
+      // given
+      String newBgmUrl = "https://example.com/bgm.mp3";
+      LocalDate nonExistentDate = LocalDate.now().plusDays(1);
+      AiBgmRequest request = new AiBgmRequest(member.getId(), nonExistentDate, newBgmUrl);
+
+      aiRepository.updateBgmUrl(request);
+
+      DiaryEntity unchangedDiary = tem.find(DiaryEntity.class, diary.getId());
+      assertThat(unchangedDiary.getBgmUrl()).isEqualTo("");
+    }
+
+    @Test
+    @DisplayName("같은 날짜에 여러 일기가 있을 경우 memberId와 날짜로 정확히 찾아서 업데이트")
+    void updateBgmUrlWithMultipleDiariesOnSameDate() {
+      MemberEntity member2 = BaseTestObject.createMemberNoId();
+      tem.persist(member2);
+
+      DiaryEntity diary2 =
+          DiaryEntity.builder()
+              .memberEntity(member2)
+              .content(DUMMY_STRING_CONTENT)
+              .bgmUrl("")
+              .webtoonImageUrl("")
+              .diaryCreatedTime(diary.getDiaryCreatedTime())
+              .emotion(DiaryEmotion.HAPPY)
+              .build();
+      tem.persist(diary2);
+      tem.flush();
+      tem.clear();
+
+      String newBgmUrl = "https://new-url/target-member-bgm.mp3";
+      AiBgmRequest request =
+          new AiBgmRequest(member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newBgmUrl);
+
+      aiRepository.updateBgmUrl(request);
+
+      DiaryEntity targetDiary = tem.find(DiaryEntity.class, diary.getId());
+      DiaryEntity otherDiary = tem.find(DiaryEntity.class, diary2.getId());
+
+      assertThat(targetDiary.getBgmUrl()).isEqualTo(newBgmUrl);
+      assertThat(otherDiary.getBgmUrl()).isEqualTo("");
     }
   }
 

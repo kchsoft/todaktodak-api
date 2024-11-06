@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-import com.heartsave.todaktodak_api.common.BaseTestEntity;
+import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
 import com.heartsave.todaktodak_api.member.dto.request.NicknameUpdateRequest;
@@ -37,7 +37,7 @@ final class MemberServiceTest {
 
   @BeforeEach
   void setup() {
-    member = BaseTestEntity.createMember();
+    member = BaseTestObject.createMember();
     memberProfileProjection =
         new MemberProfileProjection() {
           @Override

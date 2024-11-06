@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.diary.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.heartsave.todaktodak_api.common.BaseTestEntity;
+import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentOnlyProjection;
@@ -35,7 +35,7 @@ class MySharedDiaryRepositoryTest {
 
   @BeforeEach
   void setUp() {
-    member = BaseTestEntity.createMemberNoId();
+    member = BaseTestObject.createMemberNoId();
     tem.persist(member);
 
     publicDiaries = createTestPublicDiaries();
@@ -47,7 +47,7 @@ class MySharedDiaryRepositoryTest {
     List<PublicDiaryEntity> publicDiaries = new ArrayList<>();
     for (int i = 0; i < TEST_PUBLIC_DIARY_SIZE; i++) {
       DiaryEntity diary =
-          BaseTestEntity.createDiaryNoIdWithMemberAndCreatedDateTime(
+          BaseTestObject.createDiaryNoIdWithMemberAndCreatedDateTime(
               member, LocalDateTime.now().minusDays(TEST_PUBLIC_DIARY_SIZE - (i + 1)));
       PublicDiaryEntity publicDiary =
           PublicDiaryEntity.builder()
@@ -76,7 +76,7 @@ class MySharedDiaryRepositoryTest {
   @Test
   @DisplayName("공개 일기가 없는 경우 빈 Optional을 반환한다")
   void shouldReturnEmptyOptionalWhenNoPublicDiaries() {
-    MemberEntity newMember = BaseTestEntity.createMemberNoId();
+    MemberEntity newMember = BaseTestObject.createMemberNoId();
     tem.persist(newMember);
     tem.flush();
     tem.clear();
