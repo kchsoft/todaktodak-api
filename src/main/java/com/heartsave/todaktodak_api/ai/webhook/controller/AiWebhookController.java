@@ -44,7 +44,11 @@ public class AiWebhookController {
 
   @PostMapping("/bgm")
   public ResponseEntity<Void> saveBgm(@Valid @RequestBody AiBgmRequest request) {
+    log.info(
+        "AI BGM 저장을 시작합니다. memberId={}, diaryDate={}", request.memberId(), request.createdDate());
     aiDiaryService.saveBgm(request);
+    log.info(
+        "AI BGM 저장을 마칩니다. memberId={}, diaryDate={}", request.memberId(), request.createdDate());
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }
