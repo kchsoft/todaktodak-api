@@ -79,6 +79,7 @@ public class MySharedDiaryServiceTest {
 
     assertThat(response).as("페이지네이션 응답이 null이 아니어야 합니다").isNotNull();
     assertThat(response.sharedDiaries()).as("페이지네이션 응답의 미리보기 목록은 1개의 항목을 포함해야 합니다").hasSize(1);
+    assertThat(response.isEnd()).as("페이지네이션 정보가 있으면 isEnd 조건은 false 이어야 합니다.").isFalse();
     verify(s3FileStorageService).preSignedFirstWebtoonUrlFrom(webtoonUrl);
     verify(mockProjection).replaceWebtoonImageUrl(preSigned_webtoonUrl);
   }
@@ -106,13 +107,16 @@ public class MySharedDiaryServiceTest {
   }
 
   @Test
-  @DisplayName("페이지네이션 요청시, 공개된 일기가 없을 때 예외를 던진다")
+  @DisplayName("페이지네이션 요청시 더 이상 공개된 일기가 없을 때 빈 객체 반환")
   void getPagination_ThrowsException_WhenNoDiaryFound() {
     when(mySharedDiaryRepository.findLatestId(memberId)).thenReturn(Optional.empty());
+    MySharedDiaryPaginationResponse response = mySharedDiaryService.getPagination(mockUser, 0L);
+    assertThat(response.sharedDiaries().size()).as("공개된 일기가 없을 때 빈 객체가 반환 되어야 합니다.").isEqualTo(0);
+    assertThat(response.isEnd()).as("공개된 일기가 없을 때 isEnd 조건이 true이어야합니다.").isTrue();
 
-    assertThatThrownBy(() -> mySharedDiaryService.getPagination(mockUser, 0L))
-        .as("공개된 일기가 없을 때 PublicDiaryNotFoundException이 발생해야 합니다")
-        .isInstanceOf(PublicDiaryNotFoundException.class);
+    response = mySharedDiaryService.getPagination(mockUser, 999999L);
+    assertThat(response.sharedDiaries().size()).as("공개된 일기가 없을 때 빈 객체가 반환 되어야 합니다.").isEqualTo(0);
+    assertThat(response.isEnd()).as("공개된 일기가 없을 때 isEnd 조건이 true이어야합니다.").isTrue();
 
     verify(mockProjection, times(0)).replaceWebtoonImageUrl(preSigned_webtoonUrl);
   }

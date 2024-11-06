@@ -213,6 +213,7 @@ class PublicDiaryServiceTest {
 
     // then
     assertThat(response).as("응답이 null이 아니어야 합니다").isNotNull();
+    assertThat(response.getIsEnd()).as("응답 데이터가 있기 때문에 isEnd 조건은 false 이어야 합니다.").isFalse();
 
     List<PublicDiary> publicDairies = response.getDiaries();
     assertThat(publicDairies).as("조회된 일기 목록이 비어있지 않아야 합니다").isNotNull();
@@ -277,5 +278,6 @@ class PublicDiaryServiceTest {
         publicDiaryService.getPublicDiaryPagination(principal, publicDiaryId);
 
     assertThat(response.getDiaries().size()).as("조회 결과가 없는 경우 빈 목록이 반환되어야 합니다").isEqualTo(0);
+    assertThat(response.getIsEnd()).as("조회 결과가 없는 경우 isEnd 조건이 True가 돼야 합니다.").isTrue();
   }
 }
