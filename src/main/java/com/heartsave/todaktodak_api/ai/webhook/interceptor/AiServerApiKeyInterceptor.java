@@ -23,8 +23,7 @@ public class AiServerApiKeyInterceptor implements HandlerInterceptor {
   private String apiKey;
 
   private final ObjectMapper objectMapper;
-
-  private static final String API_KEY_HEADER = "X-API-KEY";
+  private final String API_KEY_HEADER = "X-API-KEY";
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
