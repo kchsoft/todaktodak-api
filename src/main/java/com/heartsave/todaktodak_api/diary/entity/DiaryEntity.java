@@ -67,10 +67,10 @@ public class DiaryEntity extends BaseEntity {
   @Column(name = "ai_comment", nullable = true, columnDefinition = "text")
   private String aiComment;
 
-  @Column(name = "webtoon_image_url", nullable = true, length = 255)
+  @Column(name = "webtoon_image_url", nullable = false, length = 255)
   private String webtoonImageUrl;
 
-  @Column(name = "bgm_url", nullable = true, length = 255)
+  @Column(name = "bgm_url", nullable = false, length = 255)
   private String bgmUrl;
 
   @Column(

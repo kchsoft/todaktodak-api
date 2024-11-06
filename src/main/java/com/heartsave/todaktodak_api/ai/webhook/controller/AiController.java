@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.ai.webhook.controller;
 
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,8 +17,8 @@ public class AiController {
   private final AiService webhookService;
 
   @PostMapping("/webtoon")
-  public ResponseEntity<Void> saveWebtoon() {
-    webhookService.saveWebtoon();
+  public ResponseEntity<Void> saveWebtoon(AiWebtoonRequest request) {
+    webhookService.saveWebtoon(request);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }
