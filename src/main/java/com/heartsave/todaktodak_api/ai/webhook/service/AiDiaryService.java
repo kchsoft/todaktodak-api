@@ -22,7 +22,9 @@ public class AiDiaryService {
       log.warn("Webtoon Url을 업데이트 할 일기가 없습니다. memberId={}, diaryDate={}", memberId, createdDate);
       return;
     }
-    if (!aiRepository.isDefaultBgmUrl(memberId, createdDate)) { // Todo : Lock 설정을 통한 동시성 통제
+    if (aiRepository
+        .isContentCompleted(memberId, createdDate)
+        .orElse(false)) { // Todo : Lock 설정을 통한 동시성 통제
       // Todo : SSE 알림 구현
     }
   }

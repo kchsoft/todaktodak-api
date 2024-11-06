@@ -1,12 +1,12 @@
 package com.heartsave.todaktodak_api.ai.webhook.service;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
 import com.heartsave.todaktodak_api.ai.webhook.repository.AiRepository;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,27 +37,27 @@ class AiDiaryServiceTest {
   class SaveWebtoonTest {
 
     @Test
-    @DisplayName("웹툰 URL 업데이트 성공 및 기본 BGM URL인 경우")
-    void saveWebtoon_UpdateSuccessAndDefaultBgmUrl() {
+    @DisplayName("웹툰 URL 업데이트 성공 및 AI 컨텐츠 생성이 미완료된 경우")
+    void saveWebtoon_UpdateSuccessAndAiContentCompleted() {
       when(aiRepository.updateWebtoonUrl(memberId, createdDate, webtoonUrl)).thenReturn(1);
-      when(aiRepository.isDefaultBgmUrl(memberId, createdDate)).thenReturn(true);
+      when(aiRepository.isContentCompleted(memberId, createdDate)).thenReturn(Optional.of(false));
 
       aiDiaryService.saveWebtoon(request);
 
       verify(aiRepository, times(1)).updateWebtoonUrl(memberId, createdDate, webtoonUrl);
-      verify(aiRepository, times(1)).isDefaultBgmUrl(memberId, createdDate);
+      verify(aiRepository, times(1)).isContentCompleted(memberId, createdDate);
     }
 
     @Test
-    @DisplayName("웹툰 URL 업데이트 성공 및 커스텀 BGM URL인 경우")
+    @DisplayName("웹툰 URL 업데이트 성공 및 AI 컨텐츠 생성이 완료된 경우")
     void saveWebtoon_UpdateSuccessAndCustomBgmUrl() {
       when(aiRepository.updateWebtoonUrl(memberId, createdDate, webtoonUrl)).thenReturn(1);
-      when(aiRepository.isDefaultBgmUrl(memberId, createdDate)).thenReturn(false);
+      when(aiRepository.isContentCompleted(memberId, createdDate)).thenReturn(Optional.of(true));
 
       aiDiaryService.saveWebtoon(request);
 
       verify(aiRepository, times(1)).updateWebtoonUrl(memberId, createdDate, webtoonUrl);
-      verify(aiRepository, times(1)).isDefaultBgmUrl(memberId, createdDate);
+      verify(aiRepository, times(1)).isContentCompleted(memberId, createdDate);
       // Todo: SSE 알림 관련 검증 추가 필요
     }
 
@@ -69,7 +69,7 @@ class AiDiaryServiceTest {
       aiDiaryService.saveWebtoon(request);
 
       verify(aiRepository, times(1)).updateWebtoonUrl(memberId, createdDate, webtoonUrl);
-      verify(aiRepository, never()).isDefaultBgmUrl(any(), any());
+      verify(aiRepository, never()).isContentCompleted(any(), any());
     }
   }
 }

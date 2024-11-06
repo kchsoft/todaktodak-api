@@ -2,6 +2,7 @@ package com.heartsave.todaktodak_api.ai.webhook.repository;
 
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -25,11 +26,11 @@ public interface AiRepository extends JpaRepository<DiaryEntity, Long> {
       value =
           """
         SELECT
-        CASE WHEN d.bgmUrl = "" THEN TRUE
+        CASE WHEN d.bgmUrl != "" AND d.webtoonImageUrl != "" THEN TRUE
         ELSE FALSE END
         FROM DiaryEntity d
         WHERE d.memberEntity.id = :memberId AND CAST(d.diaryCreatedTime AS DATE) = :createdDate
 """)
-  Boolean isDefaultBgmUrl(
+  Optional<Boolean> isContentCompleted(
       @Param("memberId") Long memberId, @Param("createdDate") LocalDate createdDate);
 }
