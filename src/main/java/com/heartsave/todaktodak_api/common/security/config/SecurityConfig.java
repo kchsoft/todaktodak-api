@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -48,7 +49,7 @@ public class SecurityConfig {
         .exceptionHandling(
             (eh) ->
                 eh.authenticationEntryPoint(authenticationEntryPoint)
-                    .accessDeniedHandler(new AccessDeniedHandlerImpl()))
+                    .accessDeniedHandler(new AccessDeniedHandlerImpl(objectMapper)))
         .httpBasic(AbstractHttpConfigurer::disable)
         .oauth2Login(
             (oauth2) ->
@@ -65,6 +66,8 @@ public class SecurityConfig {
                         "/swagger-resources/**",
                         "/v3/api-docs/**")
                     .permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/v1/diary/my")
+                    .hasAnyRole("USER", "ADMIN")
                     .anyRequest()
                     .authenticated())
         .sessionManagement(
