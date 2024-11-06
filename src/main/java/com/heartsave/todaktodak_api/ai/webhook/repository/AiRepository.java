@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.ai.webhook.repository;
 
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiBgmRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,10 @@ public class AiRepository {
   public int updateWebtoonUrl(AiWebtoonRequest request) {
     return jpaRepository.updateWebtoonUrl(
         request.memberId(), request.createdDate(), request.webtoonFolderUrl());
+  }
+
+  public int updateBgmUrl(AiBgmRequest request) {
+    return jpaRepository.updateBgmUrl(request.memberId(), request.createdDate(), request.bgmUrl());
   }
 
   public Boolean isContentCompleted(Long memberId, LocalDate createdDate) {

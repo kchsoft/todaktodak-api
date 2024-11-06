@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.ai.webhook.controller;
 
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiBgmRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +39,12 @@ public class AiWebhookController {
     aiDiaryService.saveWebtoon(request);
     log.info(
         "AI 웹툰 저장을 마침니다. memberId={}, diaryDate={}", request.memberId(), request.createdDate());
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
+
+  @PostMapping("/bgm")
+  public ResponseEntity<Void> saveBgm(@Valid @RequestBody AiBgmRequest request) {
+    aiDiaryService.saveBgm(request);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }

@@ -22,6 +22,19 @@ public interface AiJpaRepository extends JpaRepository<DiaryEntity, Long> {
       @Param("createdDate") LocalDate createdDate,
       @Param("url") String url);
 
+  @Modifying
+  @Query(
+      value =
+          """
+                UPDATE DiaryEntity d
+                SET d.bgmUrl = :url
+                WHERE d.memberEntity.id = :memberId AND  CAST(d.diaryCreatedTime AS DATE ) = :createdDate
+        """)
+  int updateBgmUrl(
+      @Param("memberId") Long memberId,
+      @Param("createdDate") LocalDate createdDate,
+      @Param("url") String url);
+
   @Query(
       value =
           """
