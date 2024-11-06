@@ -125,3 +125,5 @@ ai:
   server:
     url:
       domain: "test-ai-server-url-domain"
+    api:
+      key: "test-api-key"
