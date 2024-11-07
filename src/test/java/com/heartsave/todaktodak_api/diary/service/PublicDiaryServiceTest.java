@@ -10,7 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.heartsave.todaktodak_api.common.BaseTestEntity;
+import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
@@ -57,8 +57,8 @@ class PublicDiaryServiceTest {
 
   @BeforeEach
   void setup() {
-    member = BaseTestEntity.createMember();
-    diary = BaseTestEntity.createDiaryWithMember(member);
+    member = BaseTestObject.createMember();
+    diary = BaseTestObject.createDiaryWithMember(member);
 
     principal = mock(TodakUser.class);
     when(principal.getId()).thenReturn(member.getId());
@@ -213,6 +213,7 @@ class PublicDiaryServiceTest {
 
     // then
     assertThat(response).as("응답이 null이 아니어야 합니다").isNotNull();
+    assertThat(response.getIsEnd()).as("응답 데이터가 있기 때문에 isEnd 조건은 false 이어야 합니다.").isFalse();
 
     List<PublicDiary> publicDairies = response.getDiaries();
     assertThat(publicDairies).as("조회된 일기 목록이 비어있지 않아야 합니다").isNotNull();
@@ -249,21 +250,23 @@ class PublicDiaryServiceTest {
   @Test
   @DisplayName("getPublicDiaryPaginationResponse - 최신 일기 조회 (publicDiaryId = 0)")
   void getPublicDiaryPaginationResponse_LatestDiary() {
-    // given
-    Long latestId = 100L;
-    when(mockPublicDiaryRepository.findLatestId()).thenReturn(Optional.of(latestId));
-    when(mockPublicDiaryRepository.findNextContentOnlyById(
-            eq(latestId + 1), any(PageRequest.class)))
-        .thenReturn(List.of());
+    PublicDiaryContentOnlyProjection content = mock(PublicDiaryContentOnlyProjection.class);
+    DiaryReactionCountProjection reactionCount = mock(DiaryReactionCountProjection.class);
+    List<DiaryReactionType> reactionType = mock(List.class);
+    when(mockPublicDiaryRepository.findLatestId()).thenReturn(Optional.empty());
+    when(mockPublicDiaryRepository.findNextContentOnlyById(eq(1L), any(PageRequest.class)))
+        .thenReturn(List.of(content));
+    when(mockDiaryReactionRepository.countEachByDiaryId(anyLong())).thenReturn(reactionCount);
+    when(mockDiaryReactionRepository.findMemberReaction(anyLong(), anyLong()))
+        .thenReturn(reactionType);
 
-    // when
     PublicDiaryPaginationResponse response =
         publicDiaryService.getPublicDiaryPagination(principal, 0L);
 
-    // then
+    assertThat(response.getDiaries().size()).as("조회된 일기가 1개 있어야 한다").isEqualTo(1L);
+    assertThat(response.getIsEnd()).as("다음 페이지 조회가 가능하므로 isEnd는 false여야 한다").isFalse();
     verify(mockPublicDiaryRepository).findLatestId();
-    verify(mockPublicDiaryRepository)
-        .findNextContentOnlyById(eq(latestId + 1), any(PageRequest.class));
+    verify(mockPublicDiaryRepository).findNextContentOnlyById(eq(1L), any(PageRequest.class));
   }
 
   @Test
@@ -277,5 +280,6 @@ class PublicDiaryServiceTest {
         publicDiaryService.getPublicDiaryPagination(principal, publicDiaryId);
 
     assertThat(response.getDiaries().size()).as("조회 결과가 없는 경우 빈 목록이 반환되어야 합니다").isEqualTo(0);
+    assertThat(response.getIsEnd()).as("조회 결과가 없는 경우 isEnd 조건이 True가 돼야 합니다.").isTrue();
   }
 }

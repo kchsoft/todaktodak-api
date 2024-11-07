@@ -37,7 +37,7 @@ public class PublicDiary {
   private final String bgmUrl;
 
   @Schema(description = "일기 작성 날짜", example = "2024-10-26", type = "string", format = "date")
-  private final LocalDate date;
+  private final LocalDate createdDate;
 
   @Schema(description = "일기에 대한 반응 수 정보")
   private final DiaryReactionCountProjection reactionCount;
@@ -63,7 +63,7 @@ public class PublicDiary {
     this.publicContent = content.getPublicContent();
     this.webtoonUrls = content.getWebtoonImageUrls();
     this.bgmUrl = content.getBgmUrl();
-    this.date = content.getDate();
+    this.createdDate = content.getDate();
     this.reactionCount = reactionCount;
     this.myReaction = memberReaction;
   }

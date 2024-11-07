@@ -1,12 +1,14 @@
 package com.heartsave.todaktodak_api.ai.webhook.service;
 
+import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_BGM_URL;
+import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_WEBTOON_URL;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiBgmRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
 import com.heartsave.todaktodak_api.ai.webhook.repository.AiRepository;
 import java.time.LocalDate;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,14 +24,15 @@ class AiDiaryServiceTest {
   @Mock private AiRepository aiRepository;
   @InjectMocks private AiDiaryService aiDiaryService;
 
-  private AiWebtoonRequest request;
+  private AiWebtoonRequest webtoonRequest;
+  private AiBgmRequest bgmRequest;
   private final Long memberId = 1L;
   private final LocalDate createdDate = LocalDate.now();
-  private final String webtoonUrl = "http://example.com/webtoon/folder";
 
   @BeforeEach
   void setUp() {
-    request = new AiWebtoonRequest(memberId, createdDate, webtoonUrl);
+    webtoonRequest = new AiWebtoonRequest(memberId, createdDate, TEST_WEBTOON_URL);
+    bgmRequest = new AiBgmRequest(memberId, createdDate, TEST_BGM_URL);
   }
 
   @Nested
@@ -39,24 +42,24 @@ class AiDiaryServiceTest {
     @Test
     @DisplayName("웹툰 URL 업데이트 성공 및 AI 컨텐츠 생성이 미완료된 경우")
     void saveWebtoon_UpdateSuccessAndAiContentCompleted() {
-      when(aiRepository.updateWebtoonUrl(memberId, createdDate, webtoonUrl)).thenReturn(1);
-      when(aiRepository.isContentCompleted(memberId, createdDate)).thenReturn(Optional.of(false));
+      when(aiRepository.updateWebtoonUrl(webtoonRequest)).thenReturn(1);
+      when(aiRepository.isContentCompleted(memberId, createdDate)).thenReturn(false);
 
-      aiDiaryService.saveWebtoon(request);
+      aiDiaryService.saveWebtoon(webtoonRequest);
 
-      verify(aiRepository, times(1)).updateWebtoonUrl(memberId, createdDate, webtoonUrl);
+      verify(aiRepository, times(1)).updateWebtoonUrl(webtoonRequest);
       verify(aiRepository, times(1)).isContentCompleted(memberId, createdDate);
     }
 
     @Test
     @DisplayName("웹툰 URL 업데이트 성공 및 AI 컨텐츠 생성이 완료된 경우")
     void saveWebtoon_UpdateSuccessAndCustomBgmUrl() {
-      when(aiRepository.updateWebtoonUrl(memberId, createdDate, webtoonUrl)).thenReturn(1);
-      when(aiRepository.isContentCompleted(memberId, createdDate)).thenReturn(Optional.of(true));
+      when(aiRepository.updateWebtoonUrl(webtoonRequest)).thenReturn(1);
+      when(aiRepository.isContentCompleted(memberId, createdDate)).thenReturn(true);
 
-      aiDiaryService.saveWebtoon(request);
+      aiDiaryService.saveWebtoon(webtoonRequest);
 
-      verify(aiRepository, times(1)).updateWebtoonUrl(memberId, createdDate, webtoonUrl);
+      verify(aiRepository, times(1)).updateWebtoonUrl(webtoonRequest);
       verify(aiRepository, times(1)).isContentCompleted(memberId, createdDate);
       // Todo: SSE 알림 관련 검증 추가 필요
     }
@@ -64,11 +67,52 @@ class AiDiaryServiceTest {
     @Test
     @DisplayName("업데이트할 일기가 없는 경우")
     void saveWebtoon_NoDataToUpdate() {
-      when(aiRepository.updateWebtoonUrl(memberId, createdDate, webtoonUrl)).thenReturn(0);
+      when(aiRepository.updateWebtoonUrl(webtoonRequest)).thenReturn(0);
 
-      aiDiaryService.saveWebtoon(request);
+      aiDiaryService.saveWebtoon(webtoonRequest);
 
-      verify(aiRepository, times(1)).updateWebtoonUrl(memberId, createdDate, webtoonUrl);
+      verify(aiRepository, times(1)).updateWebtoonUrl(webtoonRequest);
+      verify(aiRepository, never()).isContentCompleted(any(), any());
+    }
+  }
+
+  @Nested
+  @DisplayName("BGM URL 저장 테스트")
+  class SaveBgmTest {
+
+    @Test
+    @DisplayName("BGM URL 업데이트 성공 및 AI 컨텐츠 생성이 미완료된 경우")
+    void saveBgm_UpdateSuccessAndAiContentNotCompleted() {
+      when(aiRepository.updateBgmUrl(bgmRequest)).thenReturn(1);
+      when(aiRepository.isContentCompleted(memberId, createdDate)).thenReturn(false);
+
+      aiDiaryService.saveBgm(bgmRequest);
+
+      verify(aiRepository, times(1)).updateBgmUrl(bgmRequest);
+      verify(aiRepository, times(1)).isContentCompleted(memberId, createdDate);
+    }
+
+    @Test
+    @DisplayName("BGM URL 업데이트 성공 및 AI 컨텐츠 생성이 완료된 경우")
+    void saveBgm_UpdateSuccessAndAiContentCompleted() {
+      when(aiRepository.updateBgmUrl(bgmRequest)).thenReturn(1);
+      when(aiRepository.isContentCompleted(memberId, createdDate)).thenReturn(true);
+
+      aiDiaryService.saveBgm(bgmRequest);
+
+      verify(aiRepository, times(1)).updateBgmUrl(bgmRequest);
+      verify(aiRepository, times(1)).isContentCompleted(memberId, createdDate);
+      // Todo: SSE 알림 관련 검증 추가 필요
+    }
+
+    @Test
+    @DisplayName("업데이트할 일기가 없는 경우")
+    void saveBgm_NoDataToUpdate() {
+      when(aiRepository.updateBgmUrl(bgmRequest)).thenReturn(0);
+
+      aiDiaryService.saveBgm(bgmRequest);
+
+      verify(aiRepository, times(1)).updateBgmUrl(bgmRequest);
       verify(aiRepository, never()).isContentCompleted(any(), any());
     }
   }

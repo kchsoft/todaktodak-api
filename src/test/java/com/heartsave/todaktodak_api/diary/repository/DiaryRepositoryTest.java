@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.diary.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.heartsave.todaktodak_api.common.BaseTestEntity;
+import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
@@ -36,8 +36,8 @@ public class DiaryRepositoryTest {
 
   @BeforeEach
   void setup() {
-    member = BaseTestEntity.createMemberNoId();
-    diary = BaseTestEntity.createDiaryNoIdWithMember(member);
+    member = BaseTestObject.createMemberNoId();
+    diary = BaseTestObject.createDiaryNoIdWithMember(member);
     memberRepository.save(member);
     diaryRepository.save(diary);
   }
@@ -81,8 +81,8 @@ public class DiaryRepositoryTest {
   @DisplayName("멤버 ID 및 시작/끝 날짜에 해당하는 데이터 가져오기")
   void findDiaryByMemberIdAndDates() {
     diaryRepository.delete(diary);
-    DiaryEntity diary1 = BaseTestEntity.createDiaryNoIdWithMember(member);
-    DiaryEntity diary2 = BaseTestEntity.createDiaryNoIdWithMember(member);
+    DiaryEntity diary1 = BaseTestObject.createDiaryNoIdWithMember(member);
+    DiaryEntity diary2 = BaseTestObject.createDiaryNoIdWithMember(member);
     diaryRepository.save(diary1);
     diaryRepository.save(diary2);
     int testYear = diary1.getDiaryCreatedTime().getYear();
