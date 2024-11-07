@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.notification.entity;
+package com.heartsave.todaktodak_api.event.entity;
 
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import jakarta.persistence.*;
