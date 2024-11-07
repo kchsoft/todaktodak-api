@@ -8,18 +8,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiBgmRequest;
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebhookCharacterRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiWebhookCharacterService;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.config.WebConfig;
+import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -171,6 +178,114 @@ class AiWebhookControllerTest {
           .andExpect(status().isBadRequest());
 
       verify(aiDiaryService, never()).saveBgm(any(AiBgmRequest.class));
+    }
+  }
+
+  @Nested
+  @DisplayName("AI 캐릭터 생성 완료시 저장 API 테스트")
+  class SaveCharacterTest {
+    @Test
+    @DisplayName("캐릭터 저장 성공")
+    void saveCharacter_success_204Test() throws Exception {
+      // given
+      AiWebhookCharacterRequest request =
+          AiWebhookCharacterRequest.builder()
+              .memberId(member.getId())
+              .characterInfo(member.getCharacterInfo())
+              .characterStyle(member.getCharacterStyle())
+              .characterUrl(member.getCharacterImageUrl())
+              .seedNum(member.getCharacterSeed())
+              .build();
+
+      // when + then
+      mockMvc
+          .perform(
+              post("/api/v1/webhook/ai/character")
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(objectMapper.writeValueAsString(request))
+                  .characterEncoding(StandardCharsets.UTF_8))
+          .andExpect(status().isNoContent());
+      verify(aiWebhookCharacterService, times(1)).saveCharacterAndNotify(request);
+    }
+
+    @ParameterizedTest
+    @DisplayName("캐릭터 저장 실패 - 유효하지 않은 요청 정보")
+    @MethodSource("getCharacterInvalidArguments")
+    void saveCharacter_fail_400Test(
+        Long memberId,
+        String characterInfo,
+        String characterStyle,
+        Integer seedNum,
+        String characterUrl)
+        throws Exception {
+
+      // given
+      AiWebhookCharacterRequest request =
+          AiWebhookCharacterRequest.builder()
+              .memberId(memberId)
+              .characterInfo(characterInfo)
+              .characterStyle(characterStyle)
+              .characterUrl(characterUrl)
+              .seedNum(seedNum)
+              .build();
+
+      // when
+      doNothing()
+          .when(aiWebhookCharacterService)
+          .saveCharacterAndNotify(any(AiWebhookCharacterRequest.class));
+
+      // then
+      mockMvc
+          .perform(
+              post("/api/v1/webhook/ai/character")
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(new ObjectMapper().writeValueAsString(request)))
+          .andExpect(status().isBadRequest());
+    }
+
+    private static Stream<Arguments> getCharacterInvalidArguments() {
+      return Stream.of(
+          // null
+          Arguments.of(null, "{ \"hair\": \"long\" }", "romance", 123, "folder/image"),
+
+          // blank
+          Arguments.of(1L, "", "romance", 123, "folder/image", "characterInfo must not be blank"),
+
+          // 음수 시드값
+          Arguments.of(1L, "{ \"hair\": \"long\" }", "romance", -1, "folder/image"),
+
+          // 유효하지 않은 character url
+          Arguments.of(1L, "{ \"hair\": \"long\" }", "romance", 123, "/"),
+          Arguments.of(1L, "{ \"hair\": \"long\" }", "romance", 123, "invalid"));
+    }
+
+    @Test
+    @DisplayName("캐릭터 저장 실패 - 존재하지 않는 회원")
+    void saveCharacter_fail_404Test() throws Exception {
+      // given
+      AiWebhookCharacterRequest request =
+          AiWebhookCharacterRequest.builder()
+              .memberId(member.getId())
+              .characterInfo(member.getCharacterInfo())
+              .characterStyle(member.getCharacterStyle())
+              .characterUrl(member.getCharacterImageUrl())
+              .seedNum(member.getCharacterSeed())
+              .build();
+
+      // when
+      doThrow(new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, member.getId()))
+          .when(aiWebhookCharacterService)
+          .saveCharacterAndNotify(any(AiWebhookCharacterRequest.class));
+
+      // then
+      mockMvc
+          .perform(
+              post("/api/v1/webhook/ai/character")
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(objectMapper.writeValueAsString(request))
+                  .characterEncoding(StandardCharsets.UTF_8))
+          .andExpect(status().isNotFound());
+      verify(aiWebhookCharacterService, times(1)).saveCharacterAndNotify(request);
     }
   }
 }
