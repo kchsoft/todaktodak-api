@@ -18,7 +18,9 @@ public enum AuthErrorSpec implements ErrorSpec {
   ABNORMAL_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH-008", "로그인이 필요합니다.", "비정상 접근 시도"),
   AUTH_FAIL(HttpStatus.UNAUTHORIZED, "AUTH-009", "인증이 실패했습니다", "비정상 인증 에러"),
   RE_LOGIN_REQUIRED(
-      HttpStatus.UNAUTHORIZED, "AUTH-010", "다시 로그인을 해야합니다.", "리프레시 토큰 유효성 검사가 실패됐습니다.");
+      HttpStatus.UNAUTHORIZED, "AUTH-010", "다시 로그인을 해야합니다.", "리프레시 토큰 유효성 검사가 실패됐습니다."),
+  TEMP_USER_DIARY_CREATE_FAIL(
+      HttpStatus.FORBIDDEN, "AUTH-011", "캐릭터를 먼저 등록해야 합니다.", "TEMP USER 일기 작성 시도");
 
   private final HttpStatus status;
   private final String code;
