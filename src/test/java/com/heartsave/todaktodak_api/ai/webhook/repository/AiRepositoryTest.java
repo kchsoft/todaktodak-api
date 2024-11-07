@@ -5,8 +5,8 @@ import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_BGM_URL;
 import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_WEBTOON_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiBgmRequest;
-import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionRequest;
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
@@ -56,8 +56,9 @@ class AiRepositoryTest {
     @DisplayName("웹툰 URL을 성공적으로 업데이트")
     void updateWebtoonUrlSuccessfully() {
       String newUrl = "https://new-url/webtoon.jpg";
-      AiWebtoonRequest request =
-          new AiWebtoonRequest(member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newUrl);
+      WebhookWebtoonCompletionRequest request =
+          new WebhookWebtoonCompletionRequest(
+              member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newUrl);
 
       aiRepository.updateWebtoonUrl(request);
 
@@ -70,7 +71,8 @@ class AiRepositoryTest {
     void updateWebtoonUrlWithNonExistentData() {
       String newUrl = "https://example.com/webtoon.jpg";
       LocalDate nonExistentDate = LocalDate.now().plusDays(1);
-      AiWebtoonRequest request = new AiWebtoonRequest(member.getId(), nonExistentDate, newUrl);
+      WebhookWebtoonCompletionRequest request =
+          new WebhookWebtoonCompletionRequest(member.getId(), nonExistentDate, newUrl);
 
       aiRepository.updateWebtoonUrl(request);
 
@@ -87,8 +89,9 @@ class AiRepositoryTest {
     @DisplayName("BGM URL을 성공적으로 업데이트")
     void updateBgmUrlSuccessfully() {
       String newBgmUrl = "/music-ai/1/2024/11/06/bgm.mp3";
-      AiBgmRequest request =
-          new AiBgmRequest(member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newBgmUrl);
+      WebhookBgmCompletionRequest request =
+          new WebhookBgmCompletionRequest(
+              member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newBgmUrl);
 
       aiRepository.updateBgmUrl(request);
 
@@ -102,7 +105,8 @@ class AiRepositoryTest {
       // given
       String newBgmUrl = "https://example.com/bgm.mp3";
       LocalDate nonExistentDate = LocalDate.now().plusDays(1);
-      AiBgmRequest request = new AiBgmRequest(member.getId(), nonExistentDate, newBgmUrl);
+      WebhookBgmCompletionRequest request =
+          new WebhookBgmCompletionRequest(member.getId(), nonExistentDate, newBgmUrl);
 
       aiRepository.updateBgmUrl(request);
 
@@ -130,8 +134,9 @@ class AiRepositoryTest {
       tem.clear();
 
       String newBgmUrl = "https://new-url/target-member-bgm.mp3";
-      AiBgmRequest request =
-          new AiBgmRequest(member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newBgmUrl);
+      WebhookBgmCompletionRequest request =
+          new WebhookBgmCompletionRequest(
+              member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newBgmUrl);
 
       aiRepository.updateBgmUrl(request);
 

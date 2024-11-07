@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.member.service;
 
 import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.REFRESH_TOKEN_COOKIE_KEY;
 
-import com.heartsave.todaktodak_api.ai.client.dto.request.AiCharacterRequest;
+import com.heartsave.todaktodak_api.ai.client.dto.request.ClientCharacterRequest;
 import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
@@ -39,7 +39,7 @@ public class CharacterService {
   }
 
   public void createCharacterImage(
-      TodakUser principal, MultipartFile file, AiCharacterRequest dto) {
+      TodakUser principal, MultipartFile file, ClientCharacterRequest dto) {
     aiClientService.callCharacter(file, dto);
   }
 
