@@ -13,7 +13,7 @@ public class SseEmitterRepository {
   // key: 회원 ID
   private final ConcurrentHashMap<Long, SseEmitter> emitterRepository = new ConcurrentHashMap<>();
 
-  public SseEmitter save(Long memberId, SseEmitter emitter) {
+  public SseEmitter save(SseEmitter emitter, Long memberId) {
     emitterRepository.put(memberId, emitter);
     logger.info("회원 {}의 Emitter 추가", memberId);
     return emitter;
