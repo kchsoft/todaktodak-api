@@ -3,10 +3,11 @@ package com.heartsave.todaktodak_api.ai.client.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
-import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
+import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.mockwebserver.Dispatcher;
@@ -67,18 +68,26 @@ class AiClientServiceTest {
   @Test
   @DisplayName("AI 컨텐츠 요청 결과 확인")
   void aiContentRequestTest() throws InterruptedException {
-    MemberEntity member = MemberEntity.builder().id(2L).build();
-    DiaryEntity diary =
-        DiaryEntity.builder()
-            .id(1L)
-            .emotion(DiaryEmotion.HAPPY)
-            .content("content")
-            .memberEntity(member)
-            .build();
+    MemberEntity member = BaseTestObject.createMember();
+    DiaryEntity diary = BaseTestObject.createDiaryWithMember(member);
 
-    AiDiaryContentResponse aiResponse = aiClientService.callAiContent(diary);
+    AiDiaryContentResponse aiResponse = aiClientService.callDiaryContent(diary);
     log.info("aiComment 결과 = {}", aiResponse.getAiComment());
     Thread.sleep(300);
     assertThat(aiResponse.getAiComment()).as("AI 코멘트 비동기 요청 응답이 올바르지 않습니다.").isEqualTo(AI_COMMENT);
+
+    for (int i = 0; i < mockWebServer.getRequestCount(); i++) {
+      RecordedRequest request = mockWebServer.takeRequest();
+      String body = request.getBody().readUtf8();
+      String path = request.getPath();
+      log.info("{} = {}", path, body);
+
+      // /bgm 또는 /webtoon 요청일 경우에만 날짜 형식 검사
+      if (path.equals(BGM_URI) || path.equals(WEBTOON_URI)) {
+        assertThat(body.contains(LocalDate.now().toString()))
+            .as("요청하는 LocalDate 형식이 yyyy-MM-dd 가 아닙니다. Path: " + path)
+            .isTrue();
+      }
+    }
   }
 }
