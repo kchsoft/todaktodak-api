@@ -1,8 +1,10 @@
 package com.heartsave.todaktodak_api.ai.webhook.controller;
 
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookCharacterCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
+import com.heartsave.todaktodak_api.ai.webhook.service.AiWebhookCharacterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AiWebhookController {
 
   private final AiDiaryService aiDiaryService;
+  private final AiWebhookCharacterService aiWebhookCharacterService;
 
   @Operation(summary = "AI 웹툰 저장", description = "AI가 생성한 웹툰을 저장합니다.")
   @ApiResponses(
@@ -71,6 +74,22 @@ public class AiWebhookController {
     aiDiaryService.saveBgm(request);
     log.info(
         "AI BGM 저장을 마칩니다. memberId={}, diaryDate={}", request.memberId(), request.createdDate());
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
+
+  @Operation(summary = "AI 캐릭터 저장")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "204", description = "AI 캐릭터 저장 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+        @ApiResponse(responseCode = "404", description = "회원 조회 실패")
+      })
+  @PostMapping("/character")
+  public ResponseEntity<Void> saveCharacter(
+      @Valid @RequestBody WebhookCharacterCompletionRequest request) {
+    log.info("AI 캐릭터 저장을 시작합니다. memberId={}", request.memberId());
+    aiWebhookCharacterService.saveCharacterAndNotify(request);
+    log.info("AI 캐릭터 저장을 마칩니다. memberId={}", request.memberId());
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }

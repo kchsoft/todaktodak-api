@@ -7,8 +7,6 @@ import com.heartsave.todaktodak_api.common.security.domain.AuthType;
 import com.heartsave.todaktodak_api.member.domain.TodakRole;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 @Entity
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,9 +35,7 @@ public class MemberEntity extends BaseEntity {
   private String characterImageUrl;
 
   // AI 컨텐츠 사전 정보
-  @JdbcTypeCode(SqlTypes.JSON)
-  @Column(columnDefinition = "json")
-  private Object characterInfo;
+  private String characterInfo;
 
   @Enumerated(EnumType.STRING)
   private AuthType authType;
@@ -48,6 +44,8 @@ public class MemberEntity extends BaseEntity {
   private TodakRole role;
 
   private Integer characterSeed;
+
+  private String characterStyle;
 
   public static MemberEntity createById(Long id) {
     return MemberEntity.builder().id(id).build();
@@ -59,5 +57,12 @@ public class MemberEntity extends BaseEntity {
 
   public void updateRole(String role) {
     this.role = TodakRole.valueOf(role);
+  }
+
+  public void updateCharacterInfo(
+      String characterInfo, String characterStyle, Integer characterSeed) {
+    this.characterInfo = characterInfo;
+    this.characterStyle = characterStyle;
+    this.characterSeed = characterSeed;
   }
 }
