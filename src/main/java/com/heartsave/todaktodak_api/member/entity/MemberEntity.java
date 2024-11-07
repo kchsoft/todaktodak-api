@@ -60,9 +60,10 @@ public class MemberEntity extends BaseEntity {
   }
 
   public void updateCharacterInfo(
-      String characterInfo, String characterStyle, Integer characterSeed) {
+      String characterInfo, String characterStyle, Integer characterSeed, String characterUrl) {
     this.characterInfo = characterInfo;
     this.characterStyle = characterStyle;
     this.characterSeed = characterSeed;
+    this.characterImageUrl = characterUrl;
   }
 }

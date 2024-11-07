@@ -5,7 +5,7 @@ import static com.heartsave.todaktodak_api.common.security.util.CookieUtils.*;
 
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
-import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
 import com.heartsave.todaktodak_api.member.dto.request.NicknameUpdateRequest;
 import com.heartsave.todaktodak_api.member.dto.response.MemberProfileResponse;
 import com.heartsave.todaktodak_api.member.dto.response.NicknameUpdateResponse;

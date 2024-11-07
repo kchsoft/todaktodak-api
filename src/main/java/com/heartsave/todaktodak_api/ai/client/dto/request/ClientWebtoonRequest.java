@@ -16,15 +16,15 @@ public class ClientWebtoonRequest {
   private final String content;
   private final String characterInfo;
   private final Integer seedNum;
-
-  // Todo : characterStyle enum 추가
+  private final String characterStyle;
 
   private ClientWebtoonRequest(DiaryEntity diary, MemberEntity member) {
     this.memberId = member.getId();
     this.date = diary.getDiaryCreatedTime().toLocalDate();
     this.content = diary.getContent();
-    this.characterInfo = (String) member.getCharacterInfo();
+    this.characterInfo = member.getCharacterInfo();
     this.seedNum = member.getCharacterSeed();
+    this.characterStyle = member.getCharacterStyle();
   }
 
   public static ClientWebtoonRequest of(DiaryEntity diary, MemberEntity member) {

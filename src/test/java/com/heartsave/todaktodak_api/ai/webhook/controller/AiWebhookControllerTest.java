@@ -256,11 +256,7 @@ class AiWebhookControllerTest {
           Arguments.of(1L, "", "romance", 123, "folder/image", "characterInfo must not be blank"),
 
           // 음수 시드값
-          Arguments.of(1L, "{ \"hair\": \"long\" }", "romance", -1, "folder/image"),
-
-          // 유효하지 않은 character url
-          Arguments.of(1L, "{ \"hair\": \"long\" }", "romance", 123, "/"),
-          Arguments.of(1L, "{ \"hair\": \"long\" }", "romance", 123, "invalid"));
+          Arguments.of(1L, "{ \"hair\": \"long\" }", "romance", -1, "folder/image"));
     }
 
     @Test

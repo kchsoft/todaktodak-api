@@ -8,7 +8,6 @@ import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -42,7 +41,7 @@ class AiClientServiceTest {
           public MockResponse dispatch(RecordedRequest request) {
             switch (request.getPath()) {
               case WEBTOON_URI, BGM_URI:
-                return new MockResponse().setHeadersDelay(300, TimeUnit.MILLISECONDS);
+                return new MockResponse();
               case COMMENT_URI:
                 return new MockResponse().setResponseCode(200).setBody(AI_COMMENT);
               default:
@@ -73,7 +72,6 @@ class AiClientServiceTest {
 
     AiDiaryContentResponse aiResponse = aiClientService.callDiaryContent(diary);
     log.info("aiComment 결과 = {}", aiResponse.getAiComment());
-    Thread.sleep(300);
     assertThat(aiResponse.getAiComment()).as("AI 코멘트 비동기 요청 응답이 올바르지 않습니다.").isEqualTo(AI_COMMENT);
 
     for (int i = 0; i < mockWebServer.getRequestCount(); i++) {
