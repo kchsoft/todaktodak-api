@@ -5,8 +5,8 @@ import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_WEBTOON_UR
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiBgmRequest;
-import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionRequest;
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.repository.AiRepository;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,15 +24,15 @@ class AiDiaryServiceTest {
   @Mock private AiRepository aiRepository;
   @InjectMocks private AiDiaryService aiDiaryService;
 
-  private AiWebtoonRequest webtoonRequest;
-  private AiBgmRequest bgmRequest;
+  private WebhookWebtoonCompletionRequest webtoonRequest;
+  private WebhookBgmCompletionRequest bgmRequest;
   private final Long memberId = 1L;
   private final LocalDate createdDate = LocalDate.now();
 
   @BeforeEach
   void setUp() {
-    webtoonRequest = new AiWebtoonRequest(memberId, createdDate, TEST_WEBTOON_URL);
-    bgmRequest = new AiBgmRequest(memberId, createdDate, TEST_BGM_URL);
+    webtoonRequest = new WebhookWebtoonCompletionRequest(memberId, createdDate, TEST_WEBTOON_URL);
+    bgmRequest = new WebhookBgmCompletionRequest(memberId, createdDate, TEST_BGM_URL);
   }
 
   @Nested

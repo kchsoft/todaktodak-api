@@ -1,11 +1,14 @@
 package com.heartsave.todaktodak_api.ai.client.service;
 
-import com.heartsave.todaktodak_api.ai.client.dto.request.AiCharacterRequest;
-import com.heartsave.todaktodak_api.ai.client.dto.request.AiDiaryContentRequest;
+import com.heartsave.todaktodak_api.ai.client.dto.request.ClientAiCommentRequest;
+import com.heartsave.todaktodak_api.ai.client.dto.request.ClientBgmRequest;
+import com.heartsave.todaktodak_api.ai.client.dto.request.ClientCharacterRequest;
+import com.heartsave.todaktodak_api.ai.client.dto.request.ClientWebtoonRequest;
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.ai.exception.AiException;
 import com.heartsave.todaktodak_api.common.exception.errorspec.AiErrorSpec;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -25,23 +28,15 @@ public class AiClientService {
 
   private final WebClient webClient;
 
-  public AiDiaryContentResponse callAiContent(DiaryEntity diary) {
-    AiDiaryContentRequest request = getAiContentRequest(diary);
-    callWebtoon(request);
-    callBgm(request);
-    String comment = callComment(request);
+  public AiDiaryContentResponse callDiaryContent(DiaryEntity diary) {
+    MemberEntity member = diary.getMemberEntity();
+    callWebtoon(ClientWebtoonRequest.of(diary, member));
+    callBgm(ClientBgmRequest.of(diary, member));
+    String comment = callComment(ClientAiCommentRequest.of((diary)));
     return AiDiaryContentResponse.builder().aiComment(comment).build();
   }
 
-  private AiDiaryContentRequest getAiContentRequest(DiaryEntity diary) {
-    return AiDiaryContentRequest.builder()
-        .id(diary.getMemberEntity().getId())
-        .content(diary.getContent())
-        .emotion(diary.getEmotion())
-        .build();
-  }
-
-  private void callWebtoon(AiDiaryContentRequest request) {
+  private void callWebtoon(ClientWebtoonRequest request) {
     webClient
         .post()
         .uri("/webtoon")
@@ -53,7 +48,7 @@ public class AiClientService {
         .subscribe();
   }
 
-  private void callBgm(AiDiaryContentRequest request) {
+  private void callBgm(ClientBgmRequest request) {
     webClient
         .post()
         .uri("/bgm")
@@ -65,7 +60,7 @@ public class AiClientService {
         .subscribe();
   }
 
-  private String callComment(AiDiaryContentRequest request) {
+  private String callComment(ClientAiCommentRequest request) {
     return webClient
         .post()
         .uri("/comment")
@@ -77,7 +72,7 @@ public class AiClientService {
         .block();
   }
 
-  public void callCharacter(MultipartFile image, AiCharacterRequest request) {
+  public void callCharacter(MultipartFile image, ClientCharacterRequest request) {
     webClient
         .post()
         .uri("/character")
@@ -91,7 +86,7 @@ public class AiClientService {
   }
 
   private MultiValueMap<String, HttpEntity<?>> createMultipartBody(
-      MultipartFile image, AiCharacterRequest request) {
+      MultipartFile image, ClientCharacterRequest request) {
     MultiValueMap<String, HttpEntity<?>> multipartBody = new LinkedMultiValueMap<>();
 
     // 요청 json

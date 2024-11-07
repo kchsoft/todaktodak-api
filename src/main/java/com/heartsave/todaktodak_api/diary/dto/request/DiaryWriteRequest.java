@@ -3,6 +3,7 @@ package com.heartsave.todaktodak_api.diary.dto.request;
 import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_CONTENT_MAX_SIZE;
 import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_CONTENT_MIN_SIZE;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -23,7 +24,8 @@ public class DiaryWriteRequest {
       format = "date-time",
       example = "2024-10-26T15:30:00")
   @PastOrPresent(message = "Diary Writing Date is Future")
-  private LocalDateTime date;
+  @JsonProperty("date")
+  private LocalDateTime dateTime;
 
   @Schema(description = "일기에 기록된 감정", example = "happy", required = true)
   @NotNull(message = "DiaryEmotion is Null")

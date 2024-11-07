@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.ai.webhook.service;
 
-import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiBgmRequest;
-import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionRequest;
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.repository.AiRepository;
 import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ public class AiDiaryService {
 
   AiRepository aiRepository;
 
-  public void saveWebtoon(AiWebtoonRequest request) {
+  public void saveWebtoon(WebhookWebtoonCompletionRequest request) {
     Long memberId = request.memberId();
     LocalDate createdDate = request.createdDate();
     log.info("webtoon url 업데이트를 시작합니다.");
@@ -30,7 +30,7 @@ public class AiDiaryService {
     }
   }
 
-  public void saveBgm(AiBgmRequest request) {
+  public void saveBgm(WebhookBgmCompletionRequest request) {
     Long memberId = request.memberId();
     LocalDate createdDate = request.createdDate();
 
