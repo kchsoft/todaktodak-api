@@ -60,7 +60,7 @@ class AiRepositoryTest {
           new WebhookWebtoonCompletionRequest(
               member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newUrl);
 
-      aiRepository.updateWebtoonUrl(request);
+      aiRepository.updateWebtoonUrl(request, request.webtoonFolderUrl());
 
       DiaryEntity updatedDiary = tem.find(DiaryEntity.class, diary.getId());
       assertThat(updatedDiary.getWebtoonImageUrl()).isEqualTo(newUrl);
@@ -74,7 +74,7 @@ class AiRepositoryTest {
       WebhookWebtoonCompletionRequest request =
           new WebhookWebtoonCompletionRequest(member.getId(), nonExistentDate, newUrl);
 
-      aiRepository.updateWebtoonUrl(request);
+      aiRepository.updateWebtoonUrl(request, request.webtoonFolderUrl());
 
       DiaryEntity unchangedDiary = tem.find(DiaryEntity.class, diary.getId());
       assertThat(unchangedDiary.getWebtoonImageUrl()).isEqualTo("");
@@ -93,7 +93,7 @@ class AiRepositoryTest {
           new WebhookBgmCompletionRequest(
               member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newBgmUrl);
 
-      aiRepository.updateBgmUrl(request);
+      aiRepository.updateBgmUrl(request, request.bgmUrl());
 
       DiaryEntity updatedDiary = tem.find(DiaryEntity.class, diary.getId());
       assertThat(updatedDiary.getBgmUrl()).isEqualTo(newBgmUrl);
@@ -108,7 +108,7 @@ class AiRepositoryTest {
       WebhookBgmCompletionRequest request =
           new WebhookBgmCompletionRequest(member.getId(), nonExistentDate, newBgmUrl);
 
-      aiRepository.updateBgmUrl(request);
+      aiRepository.updateBgmUrl(request, request.bgmUrl());
 
       DiaryEntity unchangedDiary = tem.find(DiaryEntity.class, diary.getId());
       assertThat(unchangedDiary.getBgmUrl()).isEqualTo("");
@@ -138,7 +138,7 @@ class AiRepositoryTest {
           new WebhookBgmCompletionRequest(
               member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newBgmUrl);
 
-      aiRepository.updateBgmUrl(request);
+      aiRepository.updateBgmUrl(request, request.bgmUrl());
 
       DiaryEntity targetDiary = tem.find(DiaryEntity.class, diary.getId());
       DiaryEntity otherDiary = tem.find(DiaryEntity.class, diary2.getId());

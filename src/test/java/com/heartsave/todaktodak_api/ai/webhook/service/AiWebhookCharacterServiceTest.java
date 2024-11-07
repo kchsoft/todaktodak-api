@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookCharacterCompletionRequest;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
@@ -19,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 final class AiWebhookCharacterServiceTest {
   @Mock private MemberRepository memberRepository;
+  @Mock private S3FileStorageService s3FileStorageService;
   @InjectMocks private AiWebhookCharacterService characterService;
 
   private MemberEntity member;
@@ -41,6 +43,7 @@ final class AiWebhookCharacterServiceTest {
   void saveCharacterAndNotify() {
     // given
     when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
+    when(s3FileStorageService.parseKeyFrom(anyString())).thenReturn("s3-bucket-key");
 
     // when
     characterService.saveCharacterAndNotify(request);
