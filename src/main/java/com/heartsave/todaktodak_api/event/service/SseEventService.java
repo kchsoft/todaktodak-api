@@ -1,9 +1,12 @@
 package com.heartsave.todaktodak_api.event.service;
 
+import com.heartsave.todaktodak_api.common.exception.errorspec.EventErrorSpec;
 import com.heartsave.todaktodak_api.event.entity.EventEntity;
+import com.heartsave.todaktodak_api.event.exception.EventException;
 import com.heartsave.todaktodak_api.event.repository.EventRepository;
 import com.heartsave.todaktodak_api.event.repository.SseEmitterRepository;
 import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +37,10 @@ public class SseEventService implements EventService {
         .get(event.getMemberEntity().getId())
         .ifPresentOrElse(
             emitter -> sendEvent(emitter, event),
-            () -> logEmitterNotFound(event.getMemberEntity().getId()));
+            () -> {
+              save(event);
+              logEmitterNotFound(event.getMemberEntity().getId());
+            });
   }
 
   private void sendEvent(SseEmitter emitter, EventEntity event) {
@@ -42,6 +48,7 @@ public class SseEventService implements EventService {
       emitter.send(createEvent(event));
       logEventSuccess(event);
     } catch (IOException e) {
+      save(event);
       handleEmitterError(event.getMemberEntity().getId(), e);
     }
   }
@@ -54,15 +61,21 @@ public class SseEventService implements EventService {
   }
 
   public SseEmitter connect(Long memberId, Long timeout) {
+    // 기존 연결 존재시 제거
     disconnectExistingEmitter(memberId);
+
+    // 연결 관리 및 콜백 활성화
     SseEmitter emitter = createEmitter(timeout);
     setEmitterCallbacks(emitter, memberId);
+    emitterRepository.save(emitter, memberId);
 
-    if (!sendInitialEvent(emitter)) {
-      return null;
-    }
+    // 연결 성공 이벤트 전송
+    sendConnectEvent(emitter, memberId);
 
-    return emitterRepository.save(memberId, emitter);
+    // 미수신 이벤트 전송
+    sendPastEvent(emitter, memberId);
+
+    return emitter;
   }
 
   private void disconnectExistingEmitter(Long memberId) {
@@ -85,37 +98,45 @@ public class SseEventService implements EventService {
     emitter.onError(e -> handleEmitterError(memberId, (Exception) e));
   }
 
-  private boolean sendInitialEvent(SseEmitter emitter) {
+  private void sendConnectEvent(SseEmitter emitter, Long memberId) {
     try {
       emitter.send(SseEmitter.event().name(CONNECT_EVENT_NAME).data(CONNECT_MESSAGE));
-      return true;
     } catch (IOException e) {
-      handleEmitterError(null, e);
-      return false;
+      throw new EventException(EventErrorSpec.EVENT_CONNECT_FAIL, memberId);
     }
+  }
+
+  private void sendPastEvent(SseEmitter emitter, Long memberId) {
+    // 수신 후 이벤트 제거
+    List<EventEntity> pastEvents = eventRepository.findAllEventsByMemberId(memberId);
+    pastEvents.forEach(
+        event -> {
+          sendEvent(emitter, event);
+          eventRepository.delete(event);
+        });
   }
 
   private void handleEmitterComplete(SseEmitter emitter, Long memberId, String reason) {
     emitter.complete();
     emitterRepository.delete(memberId);
-    logger.info("{}로 인한 SSE 연결. memberId = {}", reason, memberId);
+    logger.info("SSE 연결 종료. memberId={} reason={}", memberId, reason);
   }
 
   private void handleEmitterError(Long memberId, Exception e) {
     if (memberId != null) {
       emitterRepository.delete(memberId);
     }
-    logger.error("SSE 에러 발생. memberId = {}, error = {}", memberId, e.getMessage());
+    logger.error("SSE 에러 발생. memberId={}, error={}", memberId, e.getMessage());
   }
 
   private void logEventSuccess(EventEntity event) {
     logger.info(
-        "이벤트 전송 완료. memberId = {}, eventName = {}",
+        "이벤트 전송 완료. memberId={}, eventName={}",
         event.getMemberEntity().getId(),
         event.getEventName());
   }
 
   private void logEmitterNotFound(Long memberId) {
-    logger.warn("연결된 Emitter 없음. memberId = {}", memberId);
+    logger.warn("연결된 Emitter 없음. memberId={}", memberId);
   }
 }
