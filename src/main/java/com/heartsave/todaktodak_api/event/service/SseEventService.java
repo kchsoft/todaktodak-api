@@ -31,6 +31,8 @@ public class SseEventService implements EventService {
     eventRepository.save(event);
   }
 
+  // 연결되어 있으면 이벤트를 전송하고,
+  // 그렇지 않으면 이벤트를 저장한다.
   @Override
   public void send(EventEntity event) {
     emitterRepository
@@ -120,6 +122,9 @@ public class SseEventService implements EventService {
     emitter.complete();
     emitterRepository.delete(memberId);
     logger.info("SSE 연결 종료. memberId={} reason={}", memberId, reason);
+
+    if (TIMEOUT_MESSAGE.equals(reason))
+      throw new EventException(EventErrorSpec.CONNECTION_TIMEOUT, memberId);
   }
 
   private void handleEmitterError(Long memberId, Exception e) {
