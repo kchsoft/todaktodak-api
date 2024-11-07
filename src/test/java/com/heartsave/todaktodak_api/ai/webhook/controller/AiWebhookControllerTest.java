@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionRequest;
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookCharacterCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiWebhookCharacterService;
@@ -191,8 +192,8 @@ class AiWebhookControllerTest {
     @DisplayName("캐릭터 저장 성공")
     void saveCharacter_success_204Test() throws Exception {
       // given
-      AiWebhookCharacterRequest request =
-          AiWebhookCharacterRequest.builder()
+      WebhookCharacterCompletionRequest request =
+          WebhookCharacterCompletionRequest.builder()
               .memberId(member.getId())
               .characterInfo(member.getCharacterInfo())
               .characterStyle(member.getCharacterStyle())
@@ -223,8 +224,8 @@ class AiWebhookControllerTest {
         throws Exception {
 
       // given
-      AiWebhookCharacterRequest request =
-          AiWebhookCharacterRequest.builder()
+      WebhookCharacterCompletionRequest request =
+          WebhookCharacterCompletionRequest.builder()
               .memberId(memberId)
               .characterInfo(characterInfo)
               .characterStyle(characterStyle)
@@ -235,7 +236,7 @@ class AiWebhookControllerTest {
       // when
       doNothing()
           .when(aiWebhookCharacterService)
-          .saveCharacterAndNotify(any(AiWebhookCharacterRequest.class));
+          .saveCharacterAndNotify(any(WebhookCharacterCompletionRequest.class));
 
       // then
       mockMvc
@@ -266,8 +267,8 @@ class AiWebhookControllerTest {
     @DisplayName("캐릭터 저장 실패 - 존재하지 않는 회원")
     void saveCharacter_fail_404Test() throws Exception {
       // given
-      AiWebhookCharacterRequest request =
-          AiWebhookCharacterRequest.builder()
+      WebhookCharacterCompletionRequest request =
+          WebhookCharacterCompletionRequest.builder()
               .memberId(member.getId())
               .characterInfo(member.getCharacterInfo())
               .characterStyle(member.getCharacterStyle())
@@ -278,7 +279,7 @@ class AiWebhookControllerTest {
       // when
       doThrow(new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, member.getId()))
           .when(aiWebhookCharacterService)
-          .saveCharacterAndNotify(any(AiWebhookCharacterRequest.class));
+          .saveCharacterAndNotify(any(WebhookCharacterCompletionRequest.class));
 
       // then
       mockMvc

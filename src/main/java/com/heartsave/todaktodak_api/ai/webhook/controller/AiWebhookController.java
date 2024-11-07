@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.ai.webhook.controller;
 
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookCharacterCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
@@ -84,7 +85,8 @@ public class AiWebhookController {
         @ApiResponse(responseCode = "404", description = "회원 조회 실패")
       })
   @PostMapping("/character")
-  public ResponseEntity<Void> saveCharacter(@Valid @RequestBody AiWebhookCharacterRequest request) {
+  public ResponseEntity<Void> saveCharacter(
+      @Valid @RequestBody WebhookCharacterCompletionRequest request) {
     log.info("AI 캐릭터 저장을 시작합니다. memberId={}", request.memberId());
     aiWebhookCharacterService.saveCharacterAndNotify(request);
     log.info("AI 캐릭터 저장을 마칩니다. memberId={}", request.memberId());

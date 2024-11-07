@@ -9,7 +9,7 @@ import lombok.Builder;
 
 @Builder
 @Schema(description = "AI 서버의 캐릭터 생성 완료 알림 요청 객체")
-public record AiWebhookCharacterRequest(
+public record WebhookCharacterCompletionRequest(
     @NotNull @Schema(example = "1", description = "회원 아이디") Long memberId,
     @NotBlank @Schema(example = "{ \"hairs\" : \"long,black\" }", description = "캐릭터 특징")
         String characterInfo,
