@@ -1,7 +1,6 @@
 package com.heartsave.todaktodak_api.diary.service;
 
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
-import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
@@ -14,7 +13,6 @@ import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
-import com.heartsave.todaktodak_api.diary.exception.PublicDiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
@@ -46,18 +44,13 @@ public class PublicDiaryService {
 
   private List<PublicDiaryContentOnlyProjection> fetchDiaryContents(Long publicDiaryId) {
     log.info("공개 일기 content 정보를 조회합니다.");
-    if (publicDiaryId == 0) publicDiaryId = getMaxId(); // 공개 일기 조회 API 첫 호출
+    if (publicDiaryId == 0) publicDiaryId = getFirstPaginationId(); // 공개 일기 조회 API 첫 호출
     return publicDiaryRepository.findNextContentOnlyById(
         publicDiaryId, PageRequest.of(0, 5)); // 현재 ID 제외, 다음 ID 포함 5개 조회
   }
 
-  private Long getMaxId() {
-    return publicDiaryRepository
-        .findLatestId()
-        .map(id -> id + 1)
-        .orElseThrow(
-            () ->
-                new PublicDiaryNotFoundException(PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, 0L));
+  private Long getFirstPaginationId() {
+    return publicDiaryRepository.findLatestId().map(id -> id + 1).orElse(1L);
   }
 
   private void replaceWithPreSignedUrls(List<PublicDiaryContentOnlyProjection> diaryContents) {

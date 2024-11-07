@@ -46,12 +46,7 @@ public class MySharedDiaryService {
   }
 
   private Long getFirstPreviewId(Long memberId) {
-    return mySharedDiaryRepository
-        .findLatestId(memberId)
-        .map(id -> id + 1L)
-        .orElseThrow(
-            () ->
-                new PublicDiaryNotFoundException(PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, 0L));
+    return mySharedDiaryRepository.findLatestId(memberId).map(id -> id + 1L).orElse(1L);
   }
 
   private void replaceWithPreSignedUrls(List<MySharedDiaryPreviewProjection> previews) {
