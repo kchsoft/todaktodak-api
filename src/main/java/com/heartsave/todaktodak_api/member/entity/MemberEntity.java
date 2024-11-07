@@ -49,6 +49,8 @@ public class MemberEntity extends BaseEntity {
 
   private Integer characterSeed;
 
+  private String characterStyle;
+
   public static MemberEntity createById(Long id) {
     return MemberEntity.builder().id(id).build();
   }
@@ -59,5 +61,12 @@ public class MemberEntity extends BaseEntity {
 
   public void updateRole(String role) {
     this.role = TodakRole.valueOf(role);
+  }
+
+  public void updateCharacterInfo(
+      String characterInfo, String characterStyle, Integer characterSeed) {
+    this.characterInfo = characterInfo;
+    this.characterStyle = characterStyle;
+    this.characterSeed = characterSeed;
   }
 }
