@@ -22,7 +22,7 @@ public class AiWebhookCharacterService {
   public void saveCharacterAndNotify(WebhookCharacterCompletionRequest dto) {
     MemberEntity member = saveCharacter(dto);
 
-    eventService.saveAndSend(
+    eventService.send(
         EventEntity.builder()
             .memberEntity(member)
             .eventName(EventType.CHARACTER.getType())
