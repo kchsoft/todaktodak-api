@@ -53,7 +53,7 @@ public class DiaryService {
     }
 
     log.info("AI 컨텐츠 생성 요청을 시작합니다.");
-    AiDiaryContentResponse response = aiClientService.callAiContent(diary);
+    AiDiaryContentResponse response = aiClientService.callDiaryContent(diary);
     log.info("AI 컨텐츠 생성 요청을 마쳤습니다.");
 
     log.info("DB에 일기 저장을 요청합니다.");
@@ -121,7 +121,7 @@ public class DiaryService {
         .memberEntity(member)
         .emotion(request.getEmotion())
         .content(request.getContent())
-        .diaryCreatedTime((request.getDate()))
+        .diaryCreatedTime((request.getDateTime()))
         .webtoonImageUrl(DEFAULT_URL)
         .bgmUrl(DEFAULT_URL)
         .build();

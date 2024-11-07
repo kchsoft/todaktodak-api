@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.ai.webhook.controller;
 
-import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiBgmRequest;
-import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionRequest;
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,10 +39,10 @@ public class AiWebhookController {
       @Parameter(
               description = "AI 웹툰 저장 요청 정보",
               required = true,
-              schema = @Schema(implementation = AiWebtoonRequest.class))
+              schema = @Schema(implementation = WebhookWebtoonCompletionRequest.class))
           @Valid
           @RequestBody
-          AiWebtoonRequest request) {
+          WebhookWebtoonCompletionRequest request) {
     log.info(
         "AI 웹툰 저장을 시작합니다. memberId={}, diaryDate={}", request.memberId(), request.createdDate());
     aiDiaryService.saveWebtoon(request);
@@ -62,10 +62,10 @@ public class AiWebhookController {
       @Parameter(
               description = "AI BGM 저장 요청 정보",
               required = true,
-              schema = @Schema(implementation = AiBgmRequest.class))
+              schema = @Schema(implementation = WebhookBgmCompletionRequest.class))
           @Valid
           @RequestBody
-          AiBgmRequest request) {
+          WebhookBgmCompletionRequest request) {
     log.info(
         "AI BGM 저장을 시작합니다. memberId={}, diaryDate={}", request.memberId(), request.createdDate());
     aiDiaryService.saveBgm(request);

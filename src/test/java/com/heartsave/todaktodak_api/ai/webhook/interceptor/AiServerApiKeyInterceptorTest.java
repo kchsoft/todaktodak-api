@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.ai.webhook.controller.AiWebhookController;
-import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
 import com.heartsave.todaktodak_api.ai.webhook.test_config.TestInterceptorSecurityConfig;
 import com.heartsave.todaktodak_api.common.exception.errorspec.AiErrorSpec;
@@ -41,7 +41,8 @@ class AiServerApiKeyInterceptorTest {
   @Test
   @DisplayName("유효한 API KEY 성공")
   void validApiKey_Success() throws Exception {
-    AiWebtoonRequest request = new AiWebtoonRequest(1L, LocalDate.now(), "test-url");
+    WebhookWebtoonCompletionRequest request =
+        new WebhookWebtoonCompletionRequest(1L, LocalDate.now(), "test-url");
     mockMvc
         .perform(
             post(AI_HOOK_WEBTOON_URL)

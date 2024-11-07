@@ -7,8 +7,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiBgmRequest;
-import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionRequest;
+import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.config.WebConfig;
@@ -58,11 +58,11 @@ class AiWebhookControllerTest {
     @Test
     @DisplayName("정상적인 요청의 경우 204 상태코드 반환")
     void saveWebtoon_ValidRequest_Returns204() throws Exception {
-      AiWebtoonRequest request =
-          new AiWebtoonRequest(
+      WebhookWebtoonCompletionRequest request =
+          new WebhookWebtoonCompletionRequest(
               member.getId(), diary.getDiaryCreatedTime().toLocalDate(), TEST_WEBTOON_URL);
 
-      doNothing().when(aiDiaryService).saveWebtoon(any(AiWebtoonRequest.class));
+      doNothing().when(aiDiaryService).saveWebtoon(any(WebhookWebtoonCompletionRequest.class));
 
       mockMvc
           .perform(
@@ -71,14 +71,15 @@ class AiWebhookControllerTest {
                   .content(objectMapper.writeValueAsString(request)))
           .andExpect(status().isNoContent());
 
-      verify(aiDiaryService, times(1)).saveWebtoon(any(AiWebtoonRequest.class));
+      verify(aiDiaryService, times(1)).saveWebtoon(any(WebhookWebtoonCompletionRequest.class));
     }
 
     @Test
     @DisplayName("필수 파라미터가 누락된 경우 400 상태코드 반환")
     void saveWebtoon_InvalidRequest_Returns400() throws Exception {
-      AiWebtoonRequest request =
-          new AiWebtoonRequest(null, diary.getDiaryCreatedTime().toLocalDate(), TEST_WEBTOON_URL);
+      WebhookWebtoonCompletionRequest request =
+          new WebhookWebtoonCompletionRequest(
+              null, diary.getDiaryCreatedTime().toLocalDate(), TEST_WEBTOON_URL);
 
       mockMvc
           .perform(
@@ -88,7 +89,7 @@ class AiWebhookControllerTest {
                   .characterEncoding(StandardCharsets.UTF_8))
           .andExpect(status().isBadRequest());
 
-      verify(aiDiaryService, never()).saveWebtoon(any(AiWebtoonRequest.class));
+      verify(aiDiaryService, never()).saveWebtoon(any(WebhookWebtoonCompletionRequest.class));
     }
   }
 
@@ -99,10 +100,11 @@ class AiWebhookControllerTest {
     @Test
     @DisplayName("정상적인 요청의 경우 204 상태코드 반환")
     void saveBgm_ValidRequest_Returns204() throws Exception {
-      AiBgmRequest request =
-          new AiBgmRequest(member.getId(), diary.getDiaryCreatedTime().toLocalDate(), TEST_BGM_URL);
+      WebhookBgmCompletionRequest request =
+          new WebhookBgmCompletionRequest(
+              member.getId(), diary.getDiaryCreatedTime().toLocalDate(), TEST_BGM_URL);
 
-      doNothing().when(aiDiaryService).saveBgm(any(AiBgmRequest.class));
+      doNothing().when(aiDiaryService).saveBgm(any(WebhookBgmCompletionRequest.class));
 
       mockMvc
           .perform(
@@ -111,14 +113,15 @@ class AiWebhookControllerTest {
                   .content(objectMapper.writeValueAsString(request)))
           .andExpect(status().isNoContent());
 
-      verify(aiDiaryService, times(1)).saveBgm(any(AiBgmRequest.class));
+      verify(aiDiaryService, times(1)).saveBgm(any(WebhookBgmCompletionRequest.class));
     }
 
     @Test
     @DisplayName("필수 파라미터가 누락된 경우 400 상태코드 반환")
     void saveBgm_InvalidRequest_Returns400() throws Exception {
-      AiBgmRequest request =
-          new AiBgmRequest(null, diary.getDiaryCreatedTime().toLocalDate(), TEST_BGM_URL);
+      WebhookBgmCompletionRequest request =
+          new WebhookBgmCompletionRequest(
+              null, diary.getDiaryCreatedTime().toLocalDate(), TEST_BGM_URL);
 
       mockMvc
           .perform(
@@ -128,14 +131,15 @@ class AiWebhookControllerTest {
                   .characterEncoding(StandardCharsets.UTF_8))
           .andExpect(status().isBadRequest());
 
-      verify(aiDiaryService, never()).saveBgm(any(AiBgmRequest.class));
+      verify(aiDiaryService, never()).saveBgm(any(WebhookBgmCompletionRequest.class));
     }
 
     @Test
     @DisplayName("BGM URL이 비어있는 경우 400 상태코드 반환")
     void saveBgm_EmptyBgmUrl_Returns400() throws Exception {
-      AiBgmRequest request =
-          new AiBgmRequest(member.getId(), diary.getDiaryCreatedTime().toLocalDate(), "");
+      WebhookBgmCompletionRequest request =
+          new WebhookBgmCompletionRequest(
+              member.getId(), diary.getDiaryCreatedTime().toLocalDate(), "");
 
       mockMvc
           .perform(
@@ -145,7 +149,7 @@ class AiWebhookControllerTest {
                   .characterEncoding(StandardCharsets.UTF_8))
           .andExpect(status().isBadRequest());
 
-      verify(aiDiaryService, never()).saveBgm(any(AiBgmRequest.class));
+      verify(aiDiaryService, never()).saveBgm(any(WebhookBgmCompletionRequest.class));
     }
 
     @Test
@@ -168,7 +172,7 @@ class AiWebhookControllerTest {
                   .characterEncoding(StandardCharsets.UTF_8))
           .andExpect(status().isBadRequest());
 
-      verify(aiDiaryService, never()).saveBgm(any(AiBgmRequest.class));
+      verify(aiDiaryService, never()).saveBgm(any(WebhookBgmCompletionRequest.class));
     }
   }
 }

@@ -82,7 +82,7 @@ public class DiaryServiceTest {
 
     when(mockMemberRepository.findById(anyLong())).thenReturn(Optional.of(member));
     when(mockDiaryRepository.existsByDate(anyLong(), any(LocalDateTime.class))).thenReturn(false);
-    when(mockAiClientService.callAiContent(any(DiaryEntity.class)))
+    when(mockAiClientService.callDiaryContent(any(DiaryEntity.class)))
         .thenReturn(AiDiaryContentResponse.builder().aiComment("this is test ai comment").build());
 
     DiaryWriteResponse write = diaryService.write(principal, request);
