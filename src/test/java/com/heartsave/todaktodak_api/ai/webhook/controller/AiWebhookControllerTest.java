@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiBgmRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
+import com.heartsave.todaktodak_api.ai.webhook.service.AiWebhookCharacterService;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.config.WebConfig;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
@@ -41,6 +42,7 @@ class AiWebhookControllerTest {
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
   @MockBean private AiDiaryService aiDiaryService;
+  @MockBean private AiWebhookCharacterService aiWebhookCharacterService;
 
   MemberEntity member;
   DiaryEntity diary;

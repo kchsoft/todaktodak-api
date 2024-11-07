@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.ai.webhook.controller.AiWebhookController;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.AiWebtoonRequest;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
+import com.heartsave.todaktodak_api.ai.webhook.service.AiWebhookCharacterService;
 import com.heartsave.todaktodak_api.ai.webhook.test_config.TestInterceptorSecurityConfig;
 import com.heartsave.todaktodak_api.common.exception.errorspec.AiErrorSpec;
 import java.time.LocalDate;
@@ -31,6 +32,7 @@ class AiServerApiKeyInterceptorTest {
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
   @MockBean AiDiaryService aiService; // Controller Load 위해 필요
+  @MockBean private AiWebhookCharacterService aiWebhookCharacterService;
 
   @Value("${ai.server.api.key}")
   private String correctApiKey;
