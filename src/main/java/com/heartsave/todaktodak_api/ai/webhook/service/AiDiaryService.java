@@ -4,16 +4,21 @@ import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionR
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.repository.AiRepository;
 import java.time.LocalDate;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Transactional
+@RequiredArgsConstructor
 @Service
 public class AiDiaryService {
 
-  AiRepository aiRepository;
+  private final AiRepository aiRepository;
+
+  //  private final EventService eventService;
+  //  private final MemberRepository memberRepository;
 
   public void saveWebtoon(WebhookWebtoonCompletionRequest request) {
     Long memberId = request.memberId();
@@ -27,6 +32,7 @@ public class AiDiaryService {
     log.info("webtoon url 업데이트를 마쳤습니다.");
     if (aiRepository.isContentCompleted(memberId, createdDate)) { // Todo : Lock 설정을 통한 동시성 통제
       // Todo : SSE 알림 구현
+      //      logEventAndNotify(memberId);
     }
   }
 
@@ -43,6 +49,21 @@ public class AiDiaryService {
     log.info("Bgm url 업데이트를 마쳤습니다. memberId={}", memberId);
     if (aiRepository.isContentCompleted(memberId, createdDate)) { // Todo : Lock 설정을 통한 동시성 통제
       // Todo : SSE 알림 구현
+      //      logEventAndNotify(memberId);
     }
   }
+
+  //  private void logEventAndNotify(Long memberId) {
+  //    var member =
+  //        memberRepository
+  //            .findById(memberId)
+  //            .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND,
+  // memberId));
+  //    eventService.saveAndSend(
+  //        EventEntity.builder()
+  //            .memberEntity(member)
+  //            .eventName(EventType.DIARY.getType())
+  //            .eventData("일기가 생성됐습니다.")
+  //            .build());
+  //  }
 }
