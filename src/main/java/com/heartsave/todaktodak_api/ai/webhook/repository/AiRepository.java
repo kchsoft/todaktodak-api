@@ -12,13 +12,12 @@ public class AiRepository {
 
   private final AiJpaRepository jpaRepository;
 
-  public int updateWebtoonUrl(WebhookWebtoonCompletionRequest request) {
-    return jpaRepository.updateWebtoonUrl(
-        request.memberId(), request.createdDate(), request.webtoonFolderUrl());
+  public int updateWebtoonUrl(WebhookWebtoonCompletionRequest request, String url) {
+    return jpaRepository.updateWebtoonUrl(request.memberId(), request.createdDate(), url);
   }
 
-  public int updateBgmUrl(WebhookBgmCompletionRequest request) {
-    return jpaRepository.updateBgmUrl(request.memberId(), request.createdDate(), request.bgmUrl());
+  public int updateBgmUrl(WebhookBgmCompletionRequest request,String url) {
+    return jpaRepository.updateBgmUrl(request.memberId(), request.createdDate(), url);
   }
 
   public Boolean isContentCompleted(Long memberId, LocalDate createdDate) {

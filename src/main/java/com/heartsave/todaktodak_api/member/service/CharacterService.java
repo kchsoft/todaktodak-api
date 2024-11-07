@@ -9,7 +9,7 @@ import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.security.util.CookieUtils;
 import com.heartsave.todaktodak_api.common.security.util.JwtUtils;
-import com.heartsave.todaktodak_api.common.storage.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
 import com.heartsave.todaktodak_api.member.domain.TodakRole;
 import com.heartsave.todaktodak_api.member.dto.response.CharacterRegisterResponse;
 import com.heartsave.todaktodak_api.member.dto.response.CharacterTemporaryImageResponse;

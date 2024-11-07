@@ -1,9 +1,14 @@
-package com.heartsave.todaktodak_api.common.storage;
+package com.heartsave.todaktodak_api.common.storage.s3;
 
 import static com.heartsave.todaktodak_api.common.constant.CoreConstant.URL.DEFAULT_URL;
 
 import com.heartsave.todaktodak_api.common.config.properties.S3Properties;
+import com.heartsave.todaktodak_api.common.exception.errorspec.S3ErrorSpec;
+import com.heartsave.todaktodak_api.common.storage.s3.expcetion.InvalidS3UrlException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +27,13 @@ public class S3FileStorageService {
 
   // TODO: 존재하지 않는 이미지 key에 대한 예외 처리 필요
   public List<String> preSignedWebtoonUrlFrom(List<String> s3FolderUrl) {
-    return s3FolderUrl.stream().map(this::preSign).toList();
+    List<String> preSigendUrls = new ArrayList<>();
+    String folderUrl = s3FolderUrl.getFirst();
+
+    for (int order = 1; order <= s3FolderUrl.size(); order++) {
+      preSigendUrls.add(folderUrl + "/" + order + ".webp");
+    }
+    return preSigendUrls.stream().map(this::preSign).toList();
   }
 
   public String preSignedFirstWebtoonUrlFrom(String key) {
@@ -35,6 +46,21 @@ public class S3FileStorageService {
 
   public String preSignedBgmUrlFrom(String key) {
     return key == null ? preSign(s3Properties.defaultKey().bgm()) : preSign(key);
+  }
+
+  public String parseKeyFrom(String url) {
+    if (url == null || !url.contains(s3Properties.bucketName()))
+      throw new InvalidS3UrlException(S3ErrorSpec.INVALID_S3_URL, url);
+
+    URL s3FullUrl;
+    String path = "";
+    try {
+      s3FullUrl = new URL(url);
+      path = s3FullUrl.getPath();
+    } catch (MalformedURLException e) {
+      throw new InvalidS3UrlException(S3ErrorSpec.INVALID_S3_URL, url);
+    }
+    return path;
   }
 
   // TODO: presigned url 캐싱 관리
