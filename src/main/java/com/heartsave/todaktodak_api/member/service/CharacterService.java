@@ -38,8 +38,7 @@ public class CharacterService {
         .build();
   }
 
-  public void createCharacterImage(
-      TodakUser principal, MultipartFile file, ClientCharacterRequest dto) {
+  public void createCharacterImage(MultipartFile file, ClientCharacterRequest dto) {
     aiClientService.callCharacter(file, dto);
   }
 
