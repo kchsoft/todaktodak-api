@@ -27,17 +27,19 @@ public class S3FileStorageService {
 
   // TODO: 존재하지 않는 이미지 key에 대한 예외 처리 필요
   public List<String> preSignedWebtoonUrlFrom(List<String> s3FolderUrl) {
-    List<String> preSigendUrls = new ArrayList<>();
-    String folderUrl = s3FolderUrl.getFirst();
+    if (s3FolderUrl.isEmpty()) return List.of();
 
+    List<String> s3ImageUrls = new ArrayList<>();
+    String folderUrl = s3FolderUrl.getFirst();
     for (int order = 1; order <= s3FolderUrl.size(); order++) {
-      preSigendUrls.add(folderUrl + "/" + order + ".webp");
+      s3ImageUrls.add(folderUrl + "/" + order + ".webp");
     }
-    return preSigendUrls.stream().map(this::preSign).toList();
+
+    return s3ImageUrls.stream().map(this::preSign).toList();
   }
 
   public String preSignedFirstWebtoonUrlFrom(String key) {
-    return key == null ? preSign(s3Properties.defaultKey().webtoon()) : preSign(key);
+    return key == null ? preSign(s3Properties.defaultKey().webtoon()) : preSign(key + "/1.webp");
   }
 
   public String preSignedCharacterImageUrlFrom(String key) {
