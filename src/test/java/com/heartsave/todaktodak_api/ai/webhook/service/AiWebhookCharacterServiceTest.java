@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookCharacterCompletionRequest;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
+import com.heartsave.todaktodak_api.event.service.EventService;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
@@ -19,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 final class AiWebhookCharacterServiceTest {
   @Mock private MemberRepository memberRepository;
+  @Mock private EventService eventService;
   @InjectMocks private AiWebhookCharacterService characterService;
 
   private MemberEntity member;
