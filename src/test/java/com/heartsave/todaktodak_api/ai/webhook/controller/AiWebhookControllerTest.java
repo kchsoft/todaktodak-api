@@ -197,7 +197,7 @@ class AiWebhookControllerTest {
               .memberId(member.getId())
               .characterInfo(member.getCharacterInfo())
               .characterStyle(member.getCharacterStyle())
-              .characterUrl(member.getCharacterImageUrl())
+              .characterProfileImageUrl(member.getCharacterImageUrl())
               .seedNum(member.getCharacterSeed())
               .build();
 
@@ -229,7 +229,7 @@ class AiWebhookControllerTest {
               .memberId(memberId)
               .characterInfo(characterInfo)
               .characterStyle(characterStyle)
-              .characterUrl(characterUrl)
+              .characterProfileImageUrl(characterUrl)
               .seedNum(seedNum)
               .build();
 
@@ -268,7 +268,7 @@ class AiWebhookControllerTest {
               .memberId(member.getId())
               .characterInfo(member.getCharacterInfo())
               .characterStyle(member.getCharacterStyle())
-              .characterUrl(member.getCharacterImageUrl())
+              .characterProfileImageUrl(member.getCharacterImageUrl())
               .seedNum(member.getCharacterSeed())
               .build();
 

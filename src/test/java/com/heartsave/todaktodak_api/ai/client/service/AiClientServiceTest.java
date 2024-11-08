@@ -29,7 +29,7 @@ class AiClientServiceTest {
   private static final String WEBTOON_URI = "/webtoon";
   private static final String BGM_URI = "/bgm";
   private static final String COMMENT_URI = "/comment";
-  private static final String AI_COMMENT = "this is ai comment";
+  private static final String AI_COMMENT = "aiComment";
 
   @BeforeAll
   static void setUp() throws IOException {

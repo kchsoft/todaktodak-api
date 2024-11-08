@@ -230,7 +230,7 @@ final class S3FileStorageServiceTest {
 
     private final String VALID_S3_URL =
         "https://" + TEST_BUCKET + ".s3.amazonaws.com/path/to/file.jpg";
-    private final String EXPECTED_KEY = "/path/to/file.jpg";
+    private final String EXPECTED_KEY = "path/to/file.jpg";
 
     @Test
     @DisplayName("유효한 S3 URL에서 키 추출 성공")
