@@ -15,4 +15,4 @@ public record WebhookCharacterCompletionRequest(
     @NotBlank @Schema(example = "romance", description = "캐릭터 화풍") String characterStyle,
     @NotNull @Positive @Schema(example = "13564", description = "캐릭터 이미지 시드") Integer seedNum,
     @NotBlank @Schema(example = "character/memberId", description = "캐릭터 이미지 경로")
-        String characterUrl) {}
+        String characterProfileImageUrl) {}

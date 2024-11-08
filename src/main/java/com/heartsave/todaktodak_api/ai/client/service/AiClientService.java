@@ -31,9 +31,9 @@ public class AiClientService {
   public AiDiaryContentResponse callDiaryContent(DiaryEntity diary) {
     MemberEntity member = diary.getMemberEntity();
     callWebtoon(ClientWebtoonRequest.of(diary, member));
-    callBgm(ClientBgmRequest.of(diary, member));
-    String comment = callComment(ClientAiCommentRequest.of((diary)));
-    return AiDiaryContentResponse.builder().aiComment(comment).build();
+    //    callBgm(ClientBgmRequest.of(diary, member));
+    //    String comment = callComment(ClientAiCommentRequest.of((diary)));
+    return AiDiaryContentResponse.builder().aiComment("aiComment").build();
   }
 
   private void callWebtoon(ClientWebtoonRequest request) {

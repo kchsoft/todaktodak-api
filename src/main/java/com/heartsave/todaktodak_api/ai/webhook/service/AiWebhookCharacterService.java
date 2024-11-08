@@ -38,7 +38,7 @@ public class AiWebhookCharacterService {
         memberRepository
             .findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, memberId));
-    String url = s3Service.parseKeyFrom(dto.characterUrl());
+    String url = s3Service.parseKeyFrom(dto.characterProfileImageUrl());
     retrievedMember.updateCharacterInfo(
         dto.characterInfo(), dto.characterStyle(), dto.seedNum(), url);
     return retrievedMember;
