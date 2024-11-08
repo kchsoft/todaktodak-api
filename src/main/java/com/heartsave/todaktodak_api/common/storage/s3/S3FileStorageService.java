@@ -31,15 +31,15 @@ public class S3FileStorageService {
 
     List<String> s3ImageUrls = new ArrayList<>();
     String folderUrl = s3FolderUrl.getFirst();
-    for (int order = 1; order <= s3FolderUrl.size(); order++) {
-      s3ImageUrls.add(folderUrl + "/" + order + ".webp");
+    for (int order = 1; order <= 4; order++) {
+      s3ImageUrls.add(folderUrl + order + ".webp");
     }
 
     return s3ImageUrls.stream().map(this::preSign).toList();
   }
 
   public String preSignedFirstWebtoonUrlFrom(String key) {
-    return key == null ? preSign(s3Properties.defaultKey().webtoon()) : preSign(key + "/1.webp");
+    return key == null ? preSign(s3Properties.defaultKey().webtoon()) : preSign(key + "1.webp");
   }
 
   public String preSignedCharacterImageUrlFrom(String key) {

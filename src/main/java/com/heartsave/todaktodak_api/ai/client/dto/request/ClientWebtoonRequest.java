@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 public class ClientWebtoonRequest {
-  private final Long memberId;
+  private final String memberId;
 
   @JsonFormat(pattern = "yyyy-MM-dd")
   private final LocalDate date;
@@ -19,7 +19,7 @@ public class ClientWebtoonRequest {
   private final String characterStyle;
 
   private ClientWebtoonRequest(DiaryEntity diary, MemberEntity member) {
-    this.memberId = member.getId();
+    this.memberId = String.valueOf(member.getId());
     this.date = diary.getDiaryCreatedTime().toLocalDate();
     this.content = diary.getContent();
     this.characterInfo = member.getCharacterInfo();
