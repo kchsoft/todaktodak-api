@@ -62,7 +62,7 @@ public class S3FileStorageService {
     } catch (MalformedURLException e) {
       throw new InvalidS3UrlException(S3ErrorSpec.INVALID_S3_URL, url);
     }
-    return path;
+    return path.substring(1);
   }
 
   // TODO: presigned url 캐싱 관리
