@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AiDiaryService {
 
-  AiRepository aiRepository;
-  S3FileStorageService s3FileStorageService;
+  private final AiRepository aiRepository;
+  private final S3FileStorageService s3FileStorageService;
 
   //  private final EventService eventService;
   //  private final MemberRepository memberRepository;
@@ -25,7 +25,7 @@ public class AiDiaryService {
   public void saveWebtoon(WebhookWebtoonCompletionRequest request) {
     Long memberId = request.memberId();
     LocalDate createdDate = request.createdDate();
-    log.info("webtoon url 업데이트를 시작합니다.");
+    log.info("webtoon url 업데이트를 시작합니다. {}", request.webtoonFolderUrl());
     String keyUrl = s3FileStorageService.parseKeyFrom(request.webtoonFolderUrl());
     int result = aiRepository.updateWebtoonUrl(request, keyUrl);
     if (result == 0) {
