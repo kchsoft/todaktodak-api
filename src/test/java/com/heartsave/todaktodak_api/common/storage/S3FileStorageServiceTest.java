@@ -207,7 +207,7 @@ final class S3FileStorageServiceTest {
       List<String> presignedUrls = s3Service.preSignedWebtoonUrlFrom(folderUrls);
 
       // then
-      assertThat(presignedUrls).hasSize(1).allMatch(url -> url.equals(TEST_PRE_SIGNED_URL));
+      assertThat(presignedUrls).hasSize(4).allMatch(url -> url.equals(TEST_PRE_SIGNED_URL));
     }
   }
 
