@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.PastOrPresent;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -118,8 +118,7 @@ public class DiaryController {
           @Valid
           @PastOrPresent(message = "현재 날짜 이전의 일기만 조회가 가능합니다.")
           @RequestParam("date")
-          LocalDateTime requestDate) {
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(diaryService.getDiary(principal, requestDate.toLocalDate()));
+          LocalDate requestDate) {
+    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getDiary(principal, requestDate));
   }
 }
