@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.ai.client.service;
 
+import com.heartsave.todaktodak_api.ai.client.config.properties.AiServerProperties;
 import com.heartsave.todaktodak_api.ai.client.dto.request.ClientAiCommentRequest;
 import com.heartsave.todaktodak_api.ai.client.dto.request.ClientBgmRequest;
 import com.heartsave.todaktodak_api.ai.client.dto.request.ClientCharacterRequest;
@@ -13,7 +14,6 @@ import java.io.IOException;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
@@ -29,15 +29,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 @Service
 public class AiClientService {
-  @Value("${ai.server.url.image-domain}")
-  private String AI_SERVER_IMAGE_URL_DOMAIN;
-
-  @Value("${ai.server.url.text-domain}")
-  private String AI_SERVER_TEXT_URL_DOMAIN;
-
-  @Value("${ai.server.url.bgm-domain}")
-  private String AI_SERVER_BGM_URL_DOMAIN;
-
+  private final AiServerProperties aiServerProperties;
   private final WebClient webClient;
 
   public AiDiaryContentResponse callDiaryContent(DiaryEntity diary) {
@@ -51,7 +43,7 @@ public class AiClientService {
   private void callWebtoon(ClientWebtoonRequest request) {
     webClient
         .post()
-        .uri(AI_SERVER_IMAGE_URL_DOMAIN + "/webtoon")
+        .uri(aiServerProperties.imageDomain() + "/webtoon")
         .bodyValue(request)
         .retrieve()
         .bodyToMono(Void.class)
@@ -63,7 +55,7 @@ public class AiClientService {
   private void callBgm(ClientBgmRequest request) {
     webClient
         .post()
-        .uri(AI_SERVER_BGM_URL_DOMAIN + "/bgm")
+        .uri(aiServerProperties.bgmDomain() + "/bgm")
         .bodyValue(request)
         .retrieve()
         .bodyToMono(Void.class)
@@ -75,7 +67,7 @@ public class AiClientService {
   private String callComment(ClientAiCommentRequest request) {
     return webClient
         .post()
-        .uri(AI_SERVER_TEXT_URL_DOMAIN + "/comment")
+        .uri(aiServerProperties.textDomain() + "/comment")
         .bodyValue(request)
         .retrieve()
         .bodyToMono(String.class)
@@ -87,7 +79,7 @@ public class AiClientService {
   public void callCharacter(MultipartFile image, ClientCharacterRequest request) {
     webClient
         .post()
-        .uri(AI_SERVER_IMAGE_URL_DOMAIN + "/character")
+        .uri(aiServerProperties.imageDomain() + "/character")
         .contentType(MediaType.MULTIPART_FORM_DATA)
         .body(BodyInserters.fromMultipartData(createMultipartBody(image, request)))
         .retrieve()
