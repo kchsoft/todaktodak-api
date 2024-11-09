@@ -84,5 +84,7 @@ public class AuthController {
         @ApiResponse(responseCode = "401", description = "로그인 실패")
       })
   @PostMapping("/login")
-  public void login(@Valid @RequestBody LoginRequest request) {}
+  public void login(@Valid @RequestBody LoginRequest request) {
+    // JwtAuthFilter 참조
+  }
 }
