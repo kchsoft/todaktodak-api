@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
+@Component
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -33,6 +35,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     String refreshToken =
         JwtUtils.issueToken((TodakUser) authentication.getPrincipal(), REFRESH_TYPE);
     response.addCookie(CookieUtils.createValidCookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken));
-    response.sendRedirect(BASE_URL + ":" + BASE_PORT);
+    response.sendRedirect(BASE_URL + ":" + BASE_PORT + "/home");
   }
 }

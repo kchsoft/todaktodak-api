@@ -35,6 +35,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
   private final TodakOauth2UserDetailsService oauth2UserDetailsService;
   private final AuthenticationEntryPointImpl authenticationEntryPoint;
+  private final OAuth2SuccessHandler oAuth2SuccessHandler;
   private final ObjectMapper objectMapper;
 
   @Value("${todak.cors.allowed-origin}")
@@ -56,7 +57,7 @@ public class SecurityConfig {
             (oauth2) ->
                 oauth2
                     .userInfoEndpoint((config) -> config.userService(oauth2UserDetailsService))
-                    .successHandler(new OAuth2SuccessHandler())
+                    .successHandler(oAuth2SuccessHandler)
                     .failureHandler(new Oauth2FailureHandler(objectMapper)))
         .authorizeHttpRequests(
             authorize ->
@@ -101,6 +102,6 @@ public class SecurityConfig {
 
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
-    return (web) -> web.ignoring().requestMatchers("/api/v1/ai/webhook/**");
+    return (web) -> web.ignoring().requestMatchers("/api/v1/ai/webhook/**", "/favicon.ico");
   }
 }
