@@ -19,7 +19,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -87,30 +86,6 @@ public class AiClientService {
         .doOnSuccess(result -> log.info("캐릭터 생성 요청을 성공적으로 보냈습니다."))
         .doOnError(error -> log.error("캐릭터 생성 요청에 오류가 발생했습니다.", error))
         .subscribe();
-  }
-
-  private MultiValueMap<String, Object> createMultipartBodys(
-      MultipartFile image, ClientCharacterRequest request) {
-    MultiValueMap<String, Object> multipartBody = new LinkedMultiValueMap<>();
-
-    // 요청 json
-    multipartBody.add("memberId", new HttpEntity<>(request.memberId()));
-    multipartBody.add("characterStyle", new HttpEntity<>(request.characterStyle()));
-
-    // 이미지
-    try {
-      ByteArrayResource imageResource =
-          new ByteArrayResource(image.getBytes()) {
-            @Override
-            public String getFilename() {
-              return image.getOriginalFilename();
-            }
-          };
-      multipartBody.add("userImage", new HttpEntity<>(imageResource));
-    } catch (Exception e) {
-      throw new AiException(AiErrorSpec.IMAGE_PROCESS_FAIL, image.getOriginalFilename());
-    }
-    return multipartBody;
   }
 
   private MultiValueMap<String, HttpEntity<?>> createMultipartBody(
