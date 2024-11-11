@@ -29,7 +29,7 @@ class AiClientServiceTest {
   private static AiClientService aiClientService;
   private static AiServerProperties aiServerProperties;
   private static final String WEBTOON_URI = "/webtoon";
-  private static final String BGM_URI = "/bgm";
+  private static final String BGM_URI = "/music-ai";
   private static final String COMMENT_URI = "/comment";
   private static final String AI_COMMENT = "aiComment";
 
@@ -79,6 +79,9 @@ class AiClientServiceTest {
     AiDiaryContentResponse aiResponse = aiClientService.callDiaryContent(diary);
     log.info("aiComment 결과 = {}", aiResponse.getAiComment());
     assertThat(aiResponse.getAiComment()).as("AI 코멘트 비동기 요청 응답이 올바르지 않습니다.").isEqualTo(AI_COMMENT);
+    assertThat(aiResponse.getAiComment().startsWith("{"))
+        .as("응답 형식은 '{' (json 형식) 로 시작하면 안됩니다.")
+        .isFalse();
 
     for (int i = 0; i < mockWebServer.getRequestCount(); i++) {
       RecordedRequest request = mockWebServer.takeRequest();
