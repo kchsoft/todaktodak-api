@@ -9,7 +9,11 @@ import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionR
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.repository.AiRepository;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.event.service.EventService;
+import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +28,8 @@ class AiDiaryServiceTest {
 
   @Mock private AiRepository aiRepository;
   @Mock private S3FileStorageService s3FileStorageService;
+  @Mock private MemberRepository memberRepository;
+  @Mock private EventService eventService;
   @InjectMocks private AiDiaryService aiDiaryService;
 
   private WebhookWebtoonCompletionRequest webtoonRequest;
@@ -58,6 +64,7 @@ class AiDiaryServiceTest {
     @Test
     @DisplayName("웹툰 URL 업데이트 성공 및 AI 컨텐츠 생성이 완료된 경우")
     void saveWebtoon_UpdateSuccessAndCustomBgmUrl() {
+      when(memberRepository.findById(anyLong())).thenReturn(Optional.of(mock(MemberEntity.class)));
       when(aiRepository.updateWebtoonUrl(webtoonRequest, parseKeyUrl)).thenReturn(1);
       when(aiRepository.isContentCompleted(memberId, createdDate)).thenReturn(true);
 
@@ -99,6 +106,7 @@ class AiDiaryServiceTest {
     @Test
     @DisplayName("BGM URL 업데이트 성공 및 AI 컨텐츠 생성이 완료된 경우")
     void saveBgm_UpdateSuccessAndAiContentCompleted() {
+      when(memberRepository.findById(anyLong())).thenReturn(Optional.of(mock(MemberEntity.class)));
       when(aiRepository.updateBgmUrl(bgmRequest, parseKeyUrl)).thenReturn(1);
       when(aiRepository.isContentCompleted(memberId, createdDate)).thenReturn(true);
 

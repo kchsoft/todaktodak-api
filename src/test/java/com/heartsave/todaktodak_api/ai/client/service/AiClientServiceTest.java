@@ -45,7 +45,10 @@ class AiClientServiceTest {
               case WEBTOON_URI, BGM_URI:
                 return new MockResponse();
               case COMMENT_URI:
-                return new MockResponse().setResponseCode(200).setBody(AI_COMMENT);
+                return new MockResponse()
+                    .setResponseCode(200)
+                    .setBody("{\"comment\": \"" + AI_COMMENT + "\"}")
+                    .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
               default:
                 return new MockResponse().setResponseCode(404);
             }
