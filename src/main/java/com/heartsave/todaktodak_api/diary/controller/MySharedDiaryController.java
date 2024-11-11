@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.diary.controller;
 
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.auth.annotation.TodakUserId;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryResponse;
 import com.heartsave.todaktodak_api.diary.service.MySharedDiaryService;
@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,7 +40,7 @@ public class MySharedDiaryController {
       })
   @GetMapping
   public ResponseEntity<MySharedDiaryPaginationResponse> getMySharedDiaryPagination(
-      @AuthenticationPrincipal TodakUser principal,
+      @TodakUserId Long memberId,
       @Parameter(
               name = "after",
               description = "마지막으로 조회된 공개 일기 ID",
@@ -52,7 +51,7 @@ public class MySharedDiaryController {
           @RequestParam(name = "after", defaultValue = "0")
           Long publicDiaryId) {
     return ResponseEntity.status(HttpStatus.OK)
-        .body(mySharedDiaryService.getPagination(principal, publicDiaryId));
+        .body(mySharedDiaryService.getPagination(memberId, publicDiaryId));
   }
 
   @Operation(summary = "특정 날짜의 나의 공개된 일기 상세 조회")
@@ -64,7 +63,7 @@ public class MySharedDiaryController {
       })
   @GetMapping("/detail")
   public ResponseEntity<MySharedDiaryResponse> getMySharedDiary(
-      @AuthenticationPrincipal TodakUser principal,
+      @TodakUserId Long memberId,
       @Parameter(
               name = "date",
               description = "조회할 일기 날짜",
@@ -75,6 +74,6 @@ public class MySharedDiaryController {
           @RequestParam("date")
           LocalDateTime requestDate) {
     return ResponseEntity.status(HttpStatus.OK)
-        .body(mySharedDiaryService.getDiary(principal, requestDate.toLocalDate()));
+        .body(mySharedDiaryService.getDiary(memberId, requestDate.toLocalDate()));
   }
 }

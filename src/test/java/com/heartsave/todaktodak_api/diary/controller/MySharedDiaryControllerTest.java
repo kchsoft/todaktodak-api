@@ -71,7 +71,7 @@ public class MySharedDiaryControllerTest {
   @WithMockTodakUser
   @DisplayName("공개된 일기 목록 조회 성공")
   void getMySharedDiaryPreviews_Success() throws Exception {
-    when(mockMySharedDiaryService.getPagination(any(TodakUser.class), anyLong()))
+    when(mockMySharedDiaryService.getPagination(anyLong(), anyLong()))
         .thenReturn(paginationResponse);
     MvcResult mvcResult =
         mockMvc
@@ -83,7 +83,7 @@ public class MySharedDiaryControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.sharedDiaries").exists())
             .andReturn();
-    verify(mockMySharedDiaryService, times(1)).getPagination(any(TodakUser.class), anyLong());
+    verify(mockMySharedDiaryService, times(1)).getPagination(anyLong(), anyLong());
   }
 
   @Test
@@ -103,7 +103,7 @@ public class MySharedDiaryControllerTest {
   @WithMockTodakUser
   @DisplayName("빈 목록 조회 성공")
   void getMySharedDiaryPreviews_EmptyList_Success() throws Exception {
-    when(mockMySharedDiaryService.getPagination(any(TodakUser.class), anyLong()))
+    when(mockMySharedDiaryService.getPagination(anyLong(), anyLong()))
         .thenReturn(MySharedDiaryPaginationResponse.of(List.of()));
 
     mockMvc
@@ -122,7 +122,7 @@ public class MySharedDiaryControllerTest {
   @WithMockTodakUser
   @DisplayName("after 파라미터 없이 요청시 기본값 0으로 성공")
   void getMySharedDiaryPreviews_WithoutAfterParam_Success() throws Exception {
-    when(mockMySharedDiaryService.getPagination(any(TodakUser.class), anyLong()))
+    when(mockMySharedDiaryService.getPagination(anyLong(), anyLong()))
         .thenReturn(paginationResponse);
 
     mockMvc
@@ -173,7 +173,7 @@ public class MySharedDiaryControllerTest {
             });
     LocalDateTime now = LocalDateTime.now();
     when(diaryResponse.getDiaryCreatedDate()).thenReturn(now.toLocalDate());
-    when(mockMySharedDiaryService.getDiary(any(TodakUser.class), any(LocalDate.class)))
+    when(mockMySharedDiaryService.getDiary(anyLong(), any(LocalDate.class)))
         .thenReturn(diaryResponse);
 
     MvcResult mvcResult =
@@ -202,7 +202,7 @@ public class MySharedDiaryControllerTest {
             webtoonImageUrls.get(2),
             webtoonImageUrls.get(3));
 
-    verify(mockMySharedDiaryService, times(1)).getDiary(any(TodakUser.class), any(LocalDate.class));
+    verify(mockMySharedDiaryService, times(1)).getDiary(anyLong(), any(LocalDate.class));
   }
 
   @Test
@@ -248,7 +248,7 @@ public class MySharedDiaryControllerTest {
   @DisplayName("존재하지 않는 날짜의 일기 조회시 404 응답")
   void getMySharedDiary_WithNonExistentDate_NotFound() throws Exception {
     LocalDateTime now = LocalDateTime.now();
-    when(mockMySharedDiaryService.getDiary(any(TodakUser.class), any(LocalDate.class)))
+    when(mockMySharedDiaryService.getDiary(anyLong(), any(LocalDate.class)))
         .thenThrow(
             new PublicDiaryNotFoundException(
                 PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, now.toLocalDate()));
