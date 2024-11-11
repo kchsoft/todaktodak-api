@@ -68,7 +68,7 @@ final class MemberServiceTest {
     when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 
     // when
-    NicknameUpdateResponse response = memberService.updateNickname(principal, request);
+    NicknameUpdateResponse response = memberService.updateNickname(principal.getId(), request);
 
     // then
     assertThat(response.nickname()).isEqualTo(newNickname);
@@ -82,7 +82,7 @@ final class MemberServiceTest {
         .thenReturn(Optional.of(memberProfileProjection));
 
     // when
-    MemberProfileResponse response = memberService.getMemberProfileById(principal);
+    MemberProfileResponse response = memberService.getMemberProfile(principal.getId());
 
     // then
     assertThat(response.nickname()).isEqualTo(member.getNickname());
@@ -97,7 +97,7 @@ final class MemberServiceTest {
     when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 
     // when
-    memberService.deactivate(response, principal);
+    memberService.deactivate(response, principal.getId());
 
     // then
     verify(memberRepository).findById(principal.getId());
@@ -113,7 +113,7 @@ final class MemberServiceTest {
 
     // when
     assertThrows(
-        MemberNotFoundException.class, () -> memberService.deactivate(response, principal));
+        MemberNotFoundException.class, () -> memberService.deactivate(response, principal.getId()));
 
     // then
     verify(memberRepository).findById(principal.getId());

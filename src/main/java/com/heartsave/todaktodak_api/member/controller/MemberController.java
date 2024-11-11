@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.member.controller;
 
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.auth.annotation.TodakUserId;
 import com.heartsave.todaktodak_api.member.dto.request.NicknameUpdateRequest;
 import com.heartsave.todaktodak_api.member.dto.response.MemberProfileResponse;
 import com.heartsave.todaktodak_api.member.dto.response.NicknameUpdateResponse;
@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "회원", description = "회원 API")
@@ -30,8 +29,8 @@ public class MemberController {
         @ApiResponse(responseCode = "404", description = "회원 조회 실패")
       })
   public ResponseEntity<NicknameUpdateResponse> updateNickname(
-      @AuthenticationPrincipal TodakUser user, @Valid @RequestBody NicknameUpdateRequest dto) {
-    return ResponseEntity.ok(memberService.updateNickname(user, dto));
+      @TodakUserId Long memberId, @Valid @RequestBody NicknameUpdateRequest dto) {
+    return ResponseEntity.ok(memberService.updateNickname(memberId, dto));
   }
 
   @GetMapping("/profile")
@@ -40,9 +39,8 @@ public class MemberController {
         @ApiResponse(responseCode = "200", description = "회원 프로필 조회"),
         @ApiResponse(responseCode = "404", description = "회원 조회 실패")
       })
-  public ResponseEntity<MemberProfileResponse> getMemberProfile(
-      @AuthenticationPrincipal TodakUser user) {
-    return ResponseEntity.ok(memberService.getMemberProfileById(user));
+  public ResponseEntity<MemberProfileResponse> getMemberProfile(@TodakUserId Long memberId) {
+    return ResponseEntity.ok(memberService.getMemberProfile(memberId));
   }
 
   @PostMapping("/deactivate")
@@ -51,9 +49,8 @@ public class MemberController {
         @ApiResponse(responseCode = "204", description = "회원 탈퇴 성공"),
         @ApiResponse(responseCode = "404", description = "회원 조회 실패")
       })
-  public ResponseEntity<Void> deactivate(
-      @AuthenticationPrincipal TodakUser user, HttpServletResponse response) {
-    memberService.deactivate(response, user);
+  public ResponseEntity<Void> deactivate(@TodakUserId Long memberId, HttpServletResponse response) {
+    memberService.deactivate(response, memberId);
     return ResponseEntity.noContent().build();
   }
 }

@@ -65,7 +65,7 @@ final class MemberControllerTest {
     // when
     doReturn(response)
         .when(memberService)
-        .updateNickname(any(TodakUser.class), any(NicknameUpdateRequest.class));
+        .updateNickname(anyLong(), any(NicknameUpdateRequest.class));
 
     // then
     mockMvc
@@ -76,11 +76,11 @@ final class MemberControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.nickname").value(NEW_NICKNAME))
         .andReturn();
-    verify(memberService, times(1))
-        .updateNickname(any(TodakUser.class), any(NicknameUpdateRequest.class));
+    verify(memberService, times(1)).updateNickname(anyLong(), any(NicknameUpdateRequest.class));
   }
 
   @ParameterizedTest
+  @WithMockTodakUser
   @DisplayName("닉네임 변경 요청 실패 - 유효하지 않은 닉네임")
   @ValueSource(strings = {"", " ", INVALID_NICKNAME_OVER_LENGTH})
   void updateNickname_fail_400Test(String invalidNickname) throws Exception {
@@ -93,8 +93,7 @@ final class MemberControllerTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.title").value("VALIDATION_ERROR"));
 
-    verify(memberService, never())
-        .updateNickname(any(TodakUser.class), any(NicknameUpdateRequest.class));
+    verify(memberService, never()).updateNickname(anyLong(), any(NicknameUpdateRequest.class));
   }
 
   @Test
@@ -110,7 +109,7 @@ final class MemberControllerTest {
     // when
     doThrow(new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, NON_EXISTED_ID))
         .when(memberService)
-        .updateNickname(any(TodakUser.class), any(NicknameUpdateRequest.class));
+        .updateNickname(anyLong(), any(NicknameUpdateRequest.class));
 
     // then
     mockMvc
@@ -118,8 +117,7 @@ final class MemberControllerTest {
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.title").value(MemberErrorSpec.NOT_FOUND.name()));
 
-    verify(memberService, times(1))
-        .updateNickname(any(TodakUser.class), any(NicknameUpdateRequest.class));
+    verify(memberService, times(1)).updateNickname(anyLong(), any(NicknameUpdateRequest.class));
   }
 
   @Test
@@ -135,7 +133,7 @@ final class MemberControllerTest {
             .build();
 
     // when
-    doReturn(response).when(memberService).getMemberProfileById(any(TodakUser.class));
+    doReturn(response).when(memberService).getMemberProfile(anyLong());
 
     // then
     mockMvc
@@ -145,7 +143,7 @@ final class MemberControllerTest {
         .andExpect(jsonPath("$.email").value("test@example.com"))
         .andExpect(jsonPath("$.characterImageUrl").value("presigned-url"));
 
-    verify(memberService, times(1)).getMemberProfileById(any(TodakUser.class));
+    verify(memberService, times(1)).getMemberProfile(anyLong());
   }
 
   @Test
@@ -159,7 +157,7 @@ final class MemberControllerTest {
     // when
     doThrow(new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, mockUser.getId()))
         .when(memberService)
-        .getMemberProfileById(any(TodakUser.class));
+        .getMemberProfile(anyLong());
 
     // then
     mockMvc
@@ -167,7 +165,7 @@ final class MemberControllerTest {
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.title").value(MemberErrorSpec.NOT_FOUND.name()));
 
-    verify(memberService, times(1)).getMemberProfileById(any(TodakUser.class));
+    verify(memberService, times(1)).getMemberProfile(anyLong());
   }
 
   @Test
@@ -175,14 +173,11 @@ final class MemberControllerTest {
   @WithMockTodakUser
   void deactivateMember_success_204Test() throws Exception {
     // when
-    doNothing()
-        .when(memberService)
-        .deactivate(any(HttpServletResponse.class), any(TodakUser.class));
+    doNothing().when(memberService).deactivate(any(HttpServletResponse.class), anyLong());
 
     // then
     mockMvc.perform(post("/api/v1/member/deactivate")).andExpect(status().isNoContent());
-    verify(memberService, times(1))
-        .deactivate(any(HttpServletResponse.class), any(TodakUser.class));
+    verify(memberService, times(1)).deactivate(any(HttpServletResponse.class), anyLong());
   }
 
   @Test
@@ -196,14 +191,13 @@ final class MemberControllerTest {
     // when
     doThrow(new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, mockUser.getId()))
         .when(memberService)
-        .deactivate(any(HttpServletResponse.class), any(TodakUser.class));
+        .deactivate(any(HttpServletResponse.class), anyLong());
 
     // then
     mockMvc
         .perform(post("/api/v1/member/deactivate"))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.title").value(MemberErrorSpec.NOT_FOUND.name()));
-    verify(memberService, times(1))
-        .deactivate(any(HttpServletResponse.class), any(TodakUser.class));
+    verify(memberService, times(1)).deactivate(any(HttpServletResponse.class), anyLong());
   }
 }
