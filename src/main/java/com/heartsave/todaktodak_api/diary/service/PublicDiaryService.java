@@ -1,7 +1,6 @@
 package com.heartsave.todaktodak_api.diary.service;
 
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
@@ -34,9 +33,7 @@ public class PublicDiaryService {
   private final DiaryReactionRepository diaryReactionRepository;
   private final S3FileStorageService s3FileStorageService;
 
-  public PublicDiaryPaginationResponse getPublicDiaryPagination(
-      TodakUser principal, Long publicDiaryId) {
-    Long memberId = principal.getId();
+  public PublicDiaryPaginationResponse getPublicDiaryPagination(Long memberId, Long publicDiaryId) {
     List<PublicDiaryContentOnlyProjection> diaryContents = fetchDiaryContents(publicDiaryId);
     replaceWithPreSignedUrls(diaryContents);
     return createPaginationResponse(diaryContents, memberId);
@@ -88,8 +85,7 @@ public class PublicDiaryService {
     return diaryReactionRepository.findMemberReaction(memberId, diaryId);
   }
 
-  public void write(TodakUser principal, String publicContent, Long diaryId) {
-    Long memberId = principal.getId();
+  public void write(Long memberId, String publicContent, Long diaryId) {
     DiaryEntity diary =
         diaryRepository
             .findById(diaryId) // Todo : exist 로 최적화
@@ -105,8 +101,7 @@ public class PublicDiaryService {
     publicDiaryRepository.save(publicDiary);
   }
 
-  public void toggleReactionStatus(TodakUser principal, PublicDiaryReactionRequest request) {
-    Long memberId = principal.getId();
+  public void toggleReactionStatus(Long memberId, PublicDiaryReactionRequest request) {
     Long diaryId = request.diaryId();
     DiaryReactionType reactionType = request.reactionType();
     DiaryReactionEntity reactionEntity = getDiaryReactionEntity(memberId, diaryId, reactionType);
