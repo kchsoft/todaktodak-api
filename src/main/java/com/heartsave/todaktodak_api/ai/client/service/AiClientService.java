@@ -55,7 +55,7 @@ public class AiClientService {
   private void callBgm(ClientBgmRequest request) {
     webClient
         .post()
-        .uri(aiServerProperties.bgmDomain() + "/bgm")
+        .uri(aiServerProperties.bgmDomain() + "/music-ai")
         .bodyValue(request)
         .retrieve()
         .bodyToMono(Void.class)
