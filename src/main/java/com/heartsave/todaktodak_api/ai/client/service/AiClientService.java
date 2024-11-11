@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.ai.client.service;
 
 import com.heartsave.todaktodak_api.ai.client.config.properties.AiServerProperties;
+import com.heartsave.todaktodak_api.ai.client.domain.AiComment;
 import com.heartsave.todaktodak_api.ai.client.dto.request.ClientAiCommentRequest;
 import com.heartsave.todaktodak_api.ai.client.dto.request.ClientBgmRequest;
 import com.heartsave.todaktodak_api.ai.client.dto.request.ClientCharacterRequest;
@@ -36,8 +37,8 @@ public class AiClientService {
     MemberEntity member = diary.getMemberEntity();
     callWebtoon(ClientWebtoonRequest.of(diary, member));
     callBgm(ClientBgmRequest.of(diary, member));
-    String comment = callComment(ClientAiCommentRequest.of((diary)));
-    return AiDiaryContentResponse.builder().aiComment(comment).build();
+    AiComment aiComment = callComment(ClientAiCommentRequest.of((diary)));
+    return AiDiaryContentResponse.builder().aiComment(aiComment.comment()).build();
   }
 
   private void callWebtoon(ClientWebtoonRequest request) {
@@ -64,13 +65,13 @@ public class AiClientService {
         .subscribe();
   }
 
-  private String callComment(ClientAiCommentRequest request) {
+  private AiComment callComment(ClientAiCommentRequest request) {
     return webClient
         .post()
         .uri(aiServerProperties.textDomain() + "/comment")
         .bodyValue(request)
         .retrieve()
-        .bodyToMono(String.class)
+        .bodyToMono(AiComment.class)
         .doOnSuccess(result -> log.info("AI 코멘트 생성 요청을 성공적으로 보냈습니다."))
         .doOnError(error -> log.error("AI 코멘트 생성 요청에 오류가 발생했습니다."))
         .block();
