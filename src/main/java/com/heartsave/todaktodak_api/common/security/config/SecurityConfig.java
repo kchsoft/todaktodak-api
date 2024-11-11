@@ -67,7 +67,8 @@ public class SecurityConfig {
                         "/swagger-ui/**",
                         "/swagger-resources/**",
                         "/v3/api-docs/**",
-                        "/api/v1/webhook/ai/**")
+                        "/api/v1/webhook/ai/**",
+                        "/error")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/v1/diary/my")
                     .hasAnyRole("USER", "ADMIN")
