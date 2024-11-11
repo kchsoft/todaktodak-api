@@ -6,7 +6,6 @@ import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentRespons
 import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
@@ -42,9 +41,8 @@ public class DiaryService {
   private final MemberRepository memberRepository;
   private final S3FileStorageService s3FileStorageService;
 
-  public DiaryWriteResponse write(TodakUser principal, DiaryWriteRequest request) {
-    DiaryEntity diary = createDiaryEntity(principal, request);
-    Long memberId = diary.getMemberEntity().getId();
+  public DiaryWriteResponse write(Long memberId, DiaryWriteRequest request) {
+    DiaryEntity diary = createDiaryEntity(memberId, request);
     LocalDateTime diaryCreatedDate = diary.getDiaryCreatedTime();
 
     if (diaryRepository.existsByDate(memberId, diaryCreatedDate)) {
@@ -63,9 +61,7 @@ public class DiaryService {
     return DiaryWriteResponse.builder().aiComment(response.getAiComment()).build();
   }
 
-  public void delete(TodakUser principal, Long diaryId) {
-    Long memberId = principal.getId();
-
+  public void delete(Long memberId, Long diaryId) {
     log.info("DB에 일기를 삭제를 요청합니다.");
     if (0 == diaryRepository.deleteByIds(memberId, diaryId))
       throw new DiaryDeleteNotFoundException(DiaryErrorSpec.DELETE_NOT_FOUND, memberId, diaryId);
@@ -75,20 +71,19 @@ public class DiaryService {
     return;
   }
 
-  public DiaryIndexResponse getIndex(TodakUser principal, YearMonth yearMonth) {
+  public DiaryIndexResponse getIndex(Long memberId, YearMonth yearMonth) {
     LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
     LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(LocalTime.MAX);
     log.info("해당 연월에 작성한 일기를 정보를 요청합니다.");
     List<DiaryIndexProjection> indexes =
         diaryRepository
-            .findIndexesByMemberIdAndDateTimes(principal.getId(), startDateTime, endDateTime)
+            .findIndexesByMemberIdAndDateTimes(memberId, startDateTime, endDateTime)
             .orElseGet(List::of);
     log.info("해당 연월에 작성한 일기를 정보를 성공적으로 가져왔습니다.");
     return DiaryIndexResponse.builder().diaryIndexes(indexes).build();
   }
 
-  public DiaryResponse getDiary(TodakUser principal, LocalDate requestDate) {
-    Long memberId = principal.getId();
+  public DiaryResponse getDiary(Long memberId, LocalDate requestDate) {
     log.info("사용자의 나의 일기 정보를 요청합니다.");
     DiaryEntity diary =
         diaryRepository
@@ -111,8 +106,7 @@ public class DiaryService {
         .build();
   }
 
-  private DiaryEntity createDiaryEntity(TodakUser principal, DiaryWriteRequest request) {
-    Long memberId = principal.getId();
+  private DiaryEntity createDiaryEntity(Long memberId, DiaryWriteRequest request) {
     MemberEntity member =
         memberRepository
             .findById(memberId)

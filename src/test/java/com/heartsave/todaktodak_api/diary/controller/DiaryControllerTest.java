@@ -17,7 +17,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
@@ -61,7 +60,7 @@ public class DiaryControllerTest {
 
     final String AI_COMMENT = "this is test ai comment";
 
-    when(diaryService.write(any(TodakUser.class), any(DiaryWriteRequest.class)))
+    when(diaryService.write(anyLong(), any(DiaryWriteRequest.class)))
         .thenReturn(DiaryWriteResponse.builder().aiComment(AI_COMMENT).build());
     MvcResult mvcResult =
         mockMvc
@@ -73,7 +72,7 @@ public class DiaryControllerTest {
             .andDo(print())
             .andReturn();
 
-    verify(diaryService, times(1)).write(any(TodakUser.class), any(DiaryWriteRequest.class));
+    verify(diaryService, times(1)).write(anyLong(), any(DiaryWriteRequest.class));
     MockHttpServletResponse response = mvcResult.getResponse();
     assertThat(response.getContentAsString()).contains(AI_COMMENT);
   }
@@ -83,28 +82,29 @@ public class DiaryControllerTest {
   @WithMockTodakUser
   @ValueSource(longs = {1L, Long.MAX_VALUE, 25234L})
   void deleteDiarySuccess(Long diaryId) throws Exception {
-    doNothing().when(diaryService).delete(any(TodakUser.class), anyLong());
+    doNothing().when(diaryService).delete(anyLong(), anyLong());
     MvcResult mvcResult =
         mockMvc
             .perform(delete("/api/v1/diary/my/" + diaryId))
             .andExpect(status().isNoContent())
             .andDo(print())
             .andReturn();
-    verify(diaryService, times(1)).delete(any(TodakUser.class), anyLong());
+    verify(diaryService, times(1)).delete(anyLong(), anyLong());
   }
 
+  @WithMockTodakUser
   @ParameterizedTest
   @DisplayName("일기 삭제 요청 실패 - 매개변수 검증 실패")
   @ValueSource(longs = {0L, -1L, -123124L})
   void deleteDiaryFailByParameterValidation(Long diaryId) throws Exception {
-    doNothing().when(diaryService).delete(any(TodakUser.class), anyLong());
+    doNothing().when(diaryService).delete(anyLong(), anyLong());
     MvcResult mvcResult =
         mockMvc
             .perform(delete("/api/v1/diary/my/" + diaryId))
             .andExpect(status().isBadRequest())
             .andDo(print())
             .andReturn();
-    verify(diaryService, times(0)).delete(any(TodakUser.class), anyLong());
+    verify(diaryService, times(0)).delete(anyLong(), anyLong());
   }
 
   @DisplayName("연월 일기 작성 현황 요청 성공")
@@ -117,8 +117,7 @@ public class DiaryControllerTest {
         DiaryIndexResponse.builder().diaryIndexes(mockIndexes).build();
 
     // when
-    when(diaryService.getIndex(any(TodakUser.class), any(YearMonth.class)))
-        .thenReturn(mockResponse);
+    when(diaryService.getIndex(anyLong(), any(YearMonth.class))).thenReturn(mockResponse);
 
     // then
     MvcResult mvcResult =
@@ -148,8 +147,7 @@ public class DiaryControllerTest {
     DiaryIndexResponse mockResponse = new DiaryIndexResponse(new ArrayList<>());
 
     // when
-    when(diaryService.getIndex(any(TodakUser.class), any(YearMonth.class)))
-        .thenReturn(mockResponse);
+    when(diaryService.getIndex(anyLong(), any(YearMonth.class))).thenReturn(mockResponse);
 
     // then
     MvcResult mvcResult =
@@ -177,8 +175,7 @@ public class DiaryControllerTest {
             .build();
 
     // when
-    when(diaryService.getDiary(any(TodakUser.class), any(LocalDate.class)))
-        .thenReturn(mockResponse);
+    when(diaryService.getDiary(anyLong(), any(LocalDate.class))).thenReturn(mockResponse);
 
     // then
     MvcResult mvcResult =
@@ -206,6 +203,7 @@ public class DiaryControllerTest {
         .andDo(print());
   }
 
+  @WithMockTodakUser
   @ParameterizedTest
   @DisplayName("일기 상세 조회 실패 - 잘못된 날짜 형식")
   @ValueSource(
