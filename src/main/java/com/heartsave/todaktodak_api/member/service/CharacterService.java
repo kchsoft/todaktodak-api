@@ -38,8 +38,10 @@ public class CharacterService {
         .build();
   }
 
-  public void createCharacterImage(
-      TodakUser principal, MultipartFile file, ClientCharacterRequest dto) {
+  public void createCharacterImage(MultipartFile file, TodakUser principal) {
+    MemberEntity member = findMemberByPrincipal(principal);
+    ClientCharacterRequest dto =
+        ClientCharacterRequest.builder().characterStyle("romance").memberId(member.getId()).build();
     aiClientService.callCharacter(file, dto);
   }
 

@@ -31,7 +31,7 @@ public class PublicDiary {
       description = "일기 내용을 기반으로 생성된 웹툰 이미지 URL 목록",
       example =
           "[\"/webtoon/1/2024/11/06/1.webp\",\"/webtoon/1/2024/11/06/2.webp\",\"/webtoon/1/2024/11/06/3.webp\",\"/webtoon/1/2024/11/06/4.webp\"]")
-  private final List<String> webtoonUrls;
+  private final List<String> webtoonImageUrls;
 
   @Schema(description = "배경음악 URL", example = "/music-ai/1/2024/11/06/1.mp3")
   private final String bgmUrl;
@@ -61,7 +61,7 @@ public class PublicDiary {
     this.characterImageUrl = content.getCharacterImageUrl();
     this.nickname = content.getNickname();
     this.publicContent = content.getPublicContent();
-    this.webtoonUrls = content.getWebtoonImageUrls();
+    this.webtoonImageUrls = content.getWebtoonImageUrls();
     this.bgmUrl = content.getBgmUrl();
     this.createdDate = content.getDate();
     this.reactionCount = reactionCount;

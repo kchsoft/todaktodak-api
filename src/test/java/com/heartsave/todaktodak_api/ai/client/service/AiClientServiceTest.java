@@ -2,6 +2,7 @@ package com.heartsave.todaktodak_api.ai.client.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.heartsave.todaktodak_api.ai.client.config.properties.AiServerProperties;
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
@@ -26,10 +27,11 @@ class AiClientServiceTest {
 
   private static MockWebServer mockWebServer;
   private static AiClientService aiClientService;
+  private static AiServerProperties aiServerProperties;
   private static final String WEBTOON_URI = "/webtoon";
   private static final String BGM_URI = "/bgm";
   private static final String COMMENT_URI = "/comment";
-  private static final String AI_COMMENT = "this is ai comment";
+  private static final String AI_COMMENT = "aiComment";
 
   @BeforeAll
   static void setUp() throws IOException {
@@ -43,20 +45,24 @@ class AiClientServiceTest {
               case WEBTOON_URI, BGM_URI:
                 return new MockResponse();
               case COMMENT_URI:
-                return new MockResponse().setResponseCode(200).setBody(AI_COMMENT);
+                return new MockResponse()
+                    .setResponseCode(200)
+                    .setBody("{\"comment\": \"" + AI_COMMENT + "\"}")
+                    .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
               default:
                 return new MockResponse().setResponseCode(404);
             }
           }
         });
 
-    String baseUrl = String.format("http://localhost:%s", mockWebServer.getPort());
+    String AI_URL = String.format("http://localhost:%s", mockWebServer.getPort());
+    aiServerProperties = new AiServerProperties(AI_URL, AI_URL, AI_URL);
+
     WebClient aiWebClient =
         WebClient.builder()
-            .baseUrl(baseUrl)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .build();
-    aiClientService = new AiClientService(aiWebClient);
+    aiClientService = new AiClientService(aiServerProperties, aiWebClient);
   }
 
   @AfterAll

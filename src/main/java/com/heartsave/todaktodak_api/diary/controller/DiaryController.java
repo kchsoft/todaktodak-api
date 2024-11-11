@@ -118,7 +118,6 @@ public class DiaryController {
           @Valid
           @PastOrPresent(message = "현재 날짜 이전의 일기만 조회가 가능합니다.")
           @RequestParam("date")
-          @DateTimeFormat(pattern = "yyyy-MM-dd")
           LocalDate requestDate) {
     return ResponseEntity.status(HttpStatus.OK).body(diaryService.getDiary(principal, requestDate));
   }

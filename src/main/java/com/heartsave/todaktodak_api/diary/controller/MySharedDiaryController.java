@@ -13,10 +13,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.PastOrPresent;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -73,10 +72,9 @@ public class MySharedDiaryController {
               schema = @Schema(type = "string", format = "date"))
           @Valid
           @PastOrPresent
-          @DateTimeFormat(pattern = "yyyy-MM-dd")
           @RequestParam("date")
-          LocalDate requestDate) {
+          LocalDateTime requestDate) {
     return ResponseEntity.status(HttpStatus.OK)
-        .body(mySharedDiaryService.getDiary(principal, requestDate));
+        .body(mySharedDiaryService.getDiary(principal, requestDate.toLocalDate()));
   }
 }

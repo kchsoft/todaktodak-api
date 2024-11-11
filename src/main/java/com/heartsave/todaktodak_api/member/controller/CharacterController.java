@@ -1,6 +1,5 @@
 package com.heartsave.todaktodak_api.member.controller;
 
-import com.heartsave.todaktodak_api.ai.client.dto.request.ClientCharacterRequest;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.member.dto.response.CharacterRegisterResponse;
 import com.heartsave.todaktodak_api.member.dto.response.CharacterTemporaryImageResponse;
@@ -40,10 +39,9 @@ public class CharacterController {
       })
   @PostMapping
   public ResponseEntity<Void> createCharacterImage(
-      @AuthenticationPrincipal TodakUser principal,
       @RequestParam("uploadImage") MultipartFile file,
-      ClientCharacterRequest dto) {
-    characterService.createCharacterImage(principal, file, dto);
+      @AuthenticationPrincipal TodakUser principal) {
+    characterService.createCharacterImage(file, principal);
     return ResponseEntity.noContent().build();
   }
 
