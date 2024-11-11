@@ -69,7 +69,6 @@ public class AiClientService {
         .post()
         .uri(aiServerProperties.textDomain() + "/comment")
         .bodyValue(request)
-        .accept(MediaType.APPLICATION_JSON)
         .retrieve()
         .bodyToMono(AiComment.class)
         .doOnSuccess(result -> log.info("AI 코멘트 생성 요청을 성공적으로 보냈습니다."))
