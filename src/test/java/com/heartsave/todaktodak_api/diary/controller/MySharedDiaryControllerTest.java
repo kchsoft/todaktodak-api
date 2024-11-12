@@ -22,6 +22,7 @@ import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreview
 import com.heartsave.todaktodak_api.diary.exception.PublicDiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.service.MySharedDiaryService;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -170,8 +171,8 @@ public class MySharedDiaryControllerTest {
                 return 1L;
               }
             });
-    LocalDate now = LocalDate.now();
-    when(diaryResponse.getDiaryCreatedDate()).thenReturn(now);
+    LocalDateTime now = LocalDateTime.now();
+    when(diaryResponse.getDiaryCreatedDate()).thenReturn(now.toLocalDate());
     when(mockMySharedDiaryService.getDiary(any(TodakUser.class), any(LocalDate.class)))
         .thenReturn(diaryResponse);
 
@@ -246,10 +247,11 @@ public class MySharedDiaryControllerTest {
   @WithMockTodakUser
   @DisplayName("존재하지 않는 날짜의 일기 조회시 404 응답")
   void getMySharedDiary_WithNonExistentDate_NotFound() throws Exception {
-    LocalDate now = LocalDate.now();
+    LocalDateTime now = LocalDateTime.now();
     when(mockMySharedDiaryService.getDiary(any(TodakUser.class), any(LocalDate.class)))
         .thenThrow(
-            new PublicDiaryNotFoundException(PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, now));
+            new PublicDiaryNotFoundException(
+                PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, now.toLocalDate()));
 
     mockMvc
         .perform(

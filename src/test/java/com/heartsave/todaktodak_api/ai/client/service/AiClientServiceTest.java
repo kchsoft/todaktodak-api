@@ -2,6 +2,7 @@ package com.heartsave.todaktodak_api.ai.client.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.heartsave.todaktodak_api.ai.client.config.properties.AiServerProperties;
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
@@ -26,10 +27,11 @@ class AiClientServiceTest {
 
   private static MockWebServer mockWebServer;
   private static AiClientService aiClientService;
+  private static AiServerProperties aiServerProperties;
   private static final String WEBTOON_URI = "/webtoon";
-  private static final String BGM_URI = "/bgm";
+  private static final String BGM_URI = "/music-ai";
   private static final String COMMENT_URI = "/comment";
-  private static final String AI_COMMENT = "this is ai comment";
+  private static final String AI_COMMENT = "comment";
 
   @BeforeAll
   static void setUp() throws IOException {
@@ -43,20 +45,24 @@ class AiClientServiceTest {
               case WEBTOON_URI, BGM_URI:
                 return new MockResponse();
               case COMMENT_URI:
-                return new MockResponse().setResponseCode(200).setBody(AI_COMMENT);
+                return new MockResponse()
+                    .setResponseCode(200)
+                    .setBody("{\"content\": \"" + AI_COMMENT + "\"}")
+                    .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
               default:
                 return new MockResponse().setResponseCode(404);
             }
           }
         });
 
-    String baseUrl = String.format("http://localhost:%s", mockWebServer.getPort());
+    String AI_URL = String.format("http://localhost:%s", mockWebServer.getPort());
+    aiServerProperties = new AiServerProperties(AI_URL, AI_URL, AI_URL);
+
     WebClient aiWebClient =
         WebClient.builder()
-            .baseUrl(baseUrl)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .build();
-    aiClientService = new AiClientService(aiWebClient);
+    aiClientService = new AiClientService(aiServerProperties, aiWebClient);
   }
 
   @AfterAll
@@ -73,6 +79,9 @@ class AiClientServiceTest {
     AiDiaryContentResponse aiResponse = aiClientService.callDiaryContent(diary);
     log.info("aiComment 결과 = {}", aiResponse.getAiComment());
     assertThat(aiResponse.getAiComment()).as("AI 코멘트 비동기 요청 응답이 올바르지 않습니다.").isEqualTo(AI_COMMENT);
+    assertThat(aiResponse.getAiComment().startsWith("{"))
+        .as("응답 형식은 '{' (json 형식) 로 시작하면 안됩니다.")
+        .isFalse();
 
     for (int i = 0; i < mockWebServer.getRequestCount(); i++) {
       RecordedRequest request = mockWebServer.takeRequest();

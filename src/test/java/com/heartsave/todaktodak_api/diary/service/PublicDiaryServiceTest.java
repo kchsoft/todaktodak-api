@@ -227,8 +227,8 @@ class PublicDiaryServiceTest {
               assertThat(diary.getPublicDiaryId()).isEqualTo(publicDiaryId);
               assertThat(diary.getDiaryId()).isEqualTo(this.diary.getId());
               assertThat(diary.getCharacterImageUrl()).isEqualTo("character/image.jpg");
-              assertThat(diary.getWebtoonUrls().getFirst()).isEqualTo("webtoon/image.jpg");
-              assertThat(diary.getWebtoonUrls().size()).isEqualTo(1);
+              assertThat(diary.getWebtoonImageUrls().getFirst()).isEqualTo("webtoon/image.jpg");
+              assertThat(diary.getWebtoonImageUrls().size()).isEqualTo(1);
               assertThat(diary.getBgmUrl()).isEqualTo("bgm/music.mp3");
               assertThat(diary.getNickname()).isEqualTo("nickname");
               assertThat(diary.getPublicContent()).isEqualTo("content");

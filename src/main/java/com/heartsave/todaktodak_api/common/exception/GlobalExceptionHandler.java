@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleInvalidException(MethodArgumentNotValidException e) {
     var errors = extractValidationErrors(e);
     logger.error("유효성 검사 실패 - 무결성: {}", errors);
-    return ResponseEntity.badRequest().body(ErrorResponse.from(errors));
+    return ResponseEntity.badRequest().body(ErrorResponse.validError(errors.toString()));
   }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
       MethodArgumentTypeMismatchException e) {
     var errors = extractMisMatchErrors(e);
     logger.error("유효성 검사 실패 - 타입: {}", errors);
-    return ResponseEntity.badRequest().body(ErrorResponse.from(errors));
+    return ResponseEntity.badRequest().body(ErrorResponse.validError(errors.toString()));
   }
 
   private Map<String, String> extractMisMatchErrors(MethodArgumentTypeMismatchException e) {

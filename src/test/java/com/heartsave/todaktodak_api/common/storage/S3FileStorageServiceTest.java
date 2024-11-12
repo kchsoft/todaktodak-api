@@ -207,7 +207,7 @@ final class S3FileStorageServiceTest {
       List<String> presignedUrls = s3Service.preSignedWebtoonUrlFrom(folderUrls);
 
       // then
-      assertThat(presignedUrls).hasSize(1).allMatch(url -> url.equals(TEST_PRE_SIGNED_URL));
+      assertThat(presignedUrls).hasSize(4).allMatch(url -> url.equals(TEST_PRE_SIGNED_URL));
     }
   }
 
@@ -230,7 +230,7 @@ final class S3FileStorageServiceTest {
 
     private final String VALID_S3_URL =
         "https://" + TEST_BUCKET + ".s3.amazonaws.com/path/to/file.jpg";
-    private final String EXPECTED_KEY = "/path/to/file.jpg";
+    private final String EXPECTED_KEY = "path/to/file.jpg";
 
     @Test
     @DisplayName("유효한 S3 URL에서 키 추출 성공")

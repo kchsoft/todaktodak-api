@@ -24,4 +24,8 @@ public class ErrorResponse {
   public static ErrorResponse from(Map<String, String> jsonMessage) {
     return ErrorResponse.builder().title(VALIDATION_ERROR).message(jsonMessage).build();
   }
+
+  public static ErrorResponse validError(String message) {
+    return ErrorResponse.builder().title(VALIDATION_ERROR).message(message).build();
+  }
 }

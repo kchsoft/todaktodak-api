@@ -31,15 +31,15 @@ public class S3FileStorageService {
 
     List<String> s3ImageUrls = new ArrayList<>();
     String folderUrl = s3FolderUrl.getFirst();
-    for (int order = 1; order <= s3FolderUrl.size(); order++) {
-      s3ImageUrls.add(folderUrl + "/" + order + ".webp");
+    for (int order = 1; order <= 4; order++) {
+      s3ImageUrls.add(folderUrl + order + ".webp");
     }
 
     return s3ImageUrls.stream().map(this::preSign).toList();
   }
 
   public String preSignedFirstWebtoonUrlFrom(String key) {
-    return key == null ? preSign(s3Properties.defaultKey().webtoon()) : preSign(key + "/1.webp");
+    return key == null ? preSign(s3Properties.defaultKey().webtoon()) : preSign(key + "1.webp");
   }
 
   public String preSignedCharacterImageUrlFrom(String key) {
@@ -62,7 +62,7 @@ public class S3FileStorageService {
     } catch (MalformedURLException e) {
       throw new InvalidS3UrlException(S3ErrorSpec.INVALID_S3_URL, url);
     }
-    return path;
+    return path.substring(1);
   }
 
   // TODO: presigned url 캐싱 관리
