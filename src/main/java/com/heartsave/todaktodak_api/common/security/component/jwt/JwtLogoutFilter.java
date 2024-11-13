@@ -4,7 +4,6 @@ import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.util.CookieUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -33,9 +32,5 @@ public class JwtLogoutFilter extends OncePerRequestFilter {
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
     return !request.getServletPath().equals(LOGOUT_URL);
-  }
-
-  private Cookie extractRefreshTokenCookie(HttpServletRequest request) {
-    return CookieUtils.extractCookie(request, JwtConstant.REFRESH_TOKEN_COOKIE_KEY);
   }
 }
