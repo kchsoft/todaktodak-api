@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.diary.controller;
 
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.auth.annotation.TodakUserId;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,10 +48,9 @@ public class DiaryController {
       })
   @PostMapping
   public ResponseEntity<DiaryWriteResponse> writeDiary(
-      @AuthenticationPrincipal TodakUser principal,
-      @Valid @RequestBody DiaryWriteRequest writeRequest) {
+      @TodakUserId Long memberId, @Valid @RequestBody DiaryWriteRequest writeRequest) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(diaryService.write(principal, writeRequest));
+        .body(diaryService.write(memberId, writeRequest));
   }
 
   @Operation(summary = "일기 삭제")
@@ -63,7 +61,7 @@ public class DiaryController {
       })
   @DeleteMapping("/{diaryId}")
   public ResponseEntity<Void> deleteDiary(
-      @AuthenticationPrincipal TodakUser principal,
+      @TodakUserId Long memberId,
       @Parameter(
               name = "diaryId",
               description = "삭제할 일기 ID",
@@ -74,7 +72,7 @@ public class DiaryController {
           @PathVariable
           @Min(value = 1, message = "diaryId의 값은 최소 1 이상이어야 합니다.")
           Long diaryId) {
-    diaryService.delete(principal, diaryId);
+    diaryService.delete(memberId, diaryId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -86,7 +84,7 @@ public class DiaryController {
       })
   @GetMapping
   public ResponseEntity<DiaryIndexResponse> getDiaryIndex(
-      @AuthenticationPrincipal TodakUser principal,
+      @TodakUserId Long memberId,
       @Parameter(
               name = "yearMonth",
               description = "조회할 연월",
@@ -96,7 +94,7 @@ public class DiaryController {
           @RequestParam("yearMonth")
           @DateTimeFormat(pattern = "yyyy-MM")
           YearMonth yearMonth) {
-    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getIndex(principal, yearMonth));
+    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getIndex(memberId, yearMonth));
   }
 
   @Operation(summary = "일기 상세 조회")
@@ -108,7 +106,7 @@ public class DiaryController {
       })
   @GetMapping("/detail")
   public ResponseEntity<DiaryResponse> getDiary(
-      @AuthenticationPrincipal TodakUser principal,
+      @TodakUserId Long memberId,
       @Parameter(
               name = "date",
               description = "조회할 일기의 날짜",
@@ -119,6 +117,6 @@ public class DiaryController {
           @PastOrPresent(message = "현재 날짜 이전의 일기만 조회가 가능합니다.")
           @RequestParam("date")
           LocalDate requestDate) {
-    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getDiary(principal, requestDate));
+    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getDiary(memberId, requestDate));
   }
 }

@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.diary.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -12,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
@@ -44,7 +44,7 @@ public class PublicDiaryControllerTest {
     String content = "테스트 공개 일기 내용";
     PublicDiaryWriteRequest request = new PublicDiaryWriteRequest(diaryId, content);
 
-    doNothing().when(publicDiaryService).write(any(TodakUser.class), eq(content), eq(diaryId));
+    doNothing().when(publicDiaryService).write(anyLong(), eq(content), eq(diaryId));
 
     mockMvc
         .perform(
@@ -80,7 +80,7 @@ public class PublicDiaryControllerTest {
 
     doNothing()
         .when(publicDiaryService)
-        .toggleReactionStatus(any(TodakUser.class), any(PublicDiaryReactionRequest.class));
+        .toggleReactionStatus(anyLong(), any(PublicDiaryReactionRequest.class));
 
     mockMvc
         .perform(
@@ -147,7 +147,7 @@ public class PublicDiaryControllerTest {
     PublicDiary publicDiary2 = mock(PublicDiary.class);
     response.addPublicDiary(publicDiary1);
     response.addPublicDiary(publicDiary2);
-    when(publicDiaryService.getPublicDiaryPagination(any(TodakUser.class), eq(publicDiaryId)))
+    when(publicDiaryService.getPublicDiaryPagination(anyLong(), eq(publicDiaryId)))
         .thenReturn(response);
 
     mockMvc
@@ -165,8 +165,7 @@ public class PublicDiaryControllerTest {
   @WithMockTodakUser
   void getPublicDiaryPagination_Success_DefaultAfterParameter() throws Exception {
     PublicDiaryPaginationResponse response = new PublicDiaryPaginationResponse();
-    when(publicDiaryService.getPublicDiaryPagination(any(TodakUser.class), eq(0L)))
-        .thenReturn(response);
+    when(publicDiaryService.getPublicDiaryPagination(anyLong(), eq(0L))).thenReturn(response);
 
     mockMvc
         .perform(get("/api/v1/diary/public").contentType(MediaType.APPLICATION_JSON))

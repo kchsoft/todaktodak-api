@@ -31,23 +31,23 @@ public class CharacterService {
   private final S3FileStorageService s3Service;
 
   @Transactional(readOnly = true)
-  public CharacterTemporaryImageResponse getPastCharacterImage(TodakUser principal) {
-    MemberEntity member = findMemberByPrincipal(principal);
+  public CharacterTemporaryImageResponse getPastCharacterImage(Long memberId) {
+    MemberEntity member = findMemberById(memberId);
     return CharacterTemporaryImageResponse.builder()
         .characterImageUrl(s3Service.preSignedCharacterImageUrlFrom(member.getCharacterImageUrl()))
         .build();
   }
 
-  public void createCharacterImage(MultipartFile file, TodakUser principal) {
-    MemberEntity member = findMemberByPrincipal(principal);
+  public void createCharacterImage(MultipartFile file, Long memberId) {
+    MemberEntity member = findMemberById(memberId);
     ClientCharacterRequest dto =
         ClientCharacterRequest.builder().characterStyle("romance").memberId(member.getId()).build();
     aiClientService.callCharacter(file, dto);
   }
 
   public CharacterRegisterResponse changeRoleAndReissueToken(
-      TodakUser principal, HttpServletResponse response) {
-    MemberEntity member = findMemberByPrincipal(principal);
+      Long memberId, HttpServletResponse response) {
+    MemberEntity member = findMemberById(memberId);
     member.updateRole(TodakRole.ROLE_USER.name());
 
     var newUser = createNewTodakUser(member);
@@ -58,11 +58,10 @@ public class CharacterService {
     return CharacterRegisterResponse.builder().accessToken(accessToken).build();
   }
 
-  private MemberEntity findMemberByPrincipal(TodakUser principal) {
-    Long id = principal.getId();
+  private MemberEntity findMemberById(Long memberId) {
     return memberRepository
-        .findById(id)
-        .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, id));
+        .findById(memberId)
+        .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, memberId));
   }
 
   private TodakUser createNewTodakUser(MemberEntity member) {

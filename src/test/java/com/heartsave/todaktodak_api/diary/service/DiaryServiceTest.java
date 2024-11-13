@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,7 +15,6 @@ import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentRespons
 import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.common.TestDiaryObjectFactory;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
@@ -59,7 +57,6 @@ public class DiaryServiceTest {
   @Mock private AiClientService mockAiClientService;
   @Mock private S3FileStorageService s3FileStorageService;
   @InjectMocks private DiaryService diaryService;
-  private TodakUser principal;
   private MemberEntity member;
   private DiaryEntity diary;
   private final LocalDateTime NOW_DATE_TIME = LocalDateTime.now();
@@ -68,9 +65,6 @@ public class DiaryServiceTest {
   void allSetup() {
     member = BaseTestObject.createMember();
     diary = BaseTestObject.createDiaryWithMember(member);
-
-    principal = mock(TodakUser.class);
-    when(principal.getId()).thenReturn(member.getId());
   }
 
   @Test
@@ -85,7 +79,7 @@ public class DiaryServiceTest {
     when(mockAiClientService.callDiaryContent(any(DiaryEntity.class)))
         .thenReturn(AiDiaryContentResponse.builder().aiComment("this is test ai comment").build());
 
-    DiaryWriteResponse write = diaryService.write(principal, request);
+    DiaryWriteResponse write = diaryService.write(member.getId(), request);
     assertThat(write.getAiComment()).as("AI 코멘트 결과에 문제가 발생했습니다.").isEqualTo(AI_COMMENT);
   }
 
@@ -100,7 +94,7 @@ public class DiaryServiceTest {
     DiaryException diaryException =
         assertThrows(
             DiaryDailyWritingLimitExceedException.class,
-            () -> diaryService.write(principal, request));
+            () -> diaryService.write(member.getId(), request));
     assertThat(diaryException.getErrorSpec()).isEqualTo(DiaryErrorSpec.DAILY_WRITING_LIMIT_EXCEED);
     log.info(diaryException.getLogMessage());
   }
@@ -111,7 +105,7 @@ public class DiaryServiceTest {
     when(mockDiaryRepository.deleteByIds(anyLong(), anyLong())).thenReturn(1);
     assertDoesNotThrow(
         () -> {
-          diaryService.delete(principal, diary.getId());
+          diaryService.delete(member.getId(), diary.getId());
         },
         "예상치 못한 예외가 발생했습니다.");
     verify(mockDiaryRepository, times(1)).deleteByIds(anyLong(), anyLong());
@@ -125,7 +119,7 @@ public class DiaryServiceTest {
         assertThrows(
             DiaryDeleteNotFoundException.class,
             () -> {
-              diaryService.delete(principal, diary.getId() + 1L);
+              diaryService.delete(member.getId(), diary.getId() + 1L);
             },
             "Diary Delete Not Found 예외가 발생하지 않았습니다.");
     verify(mockDiaryRepository, times(1)).deleteByIds(anyLong(), anyLong());
@@ -142,12 +136,10 @@ public class DiaryServiceTest {
     List<DiaryIndexProjection> testProjection =
         TestDiaryObjectFactory.getTestDiaryIndexProjections_2024_03_Data_Of_2();
 
-    when(mockDiaryRepository.findIndexesByMemberIdAndDateTimes(
-            principal.getId(), testStart, testEnd))
+    when(mockDiaryRepository.findIndexesByMemberIdAndDateTimes(member.getId(), testStart, testEnd))
         .thenReturn(Optional.of(testProjection));
-
     DiaryIndexResponse indexes =
-        diaryService.getIndex(principal, YearMonth.of(testYear, testMonth));
+        diaryService.getIndex(member.getId(), YearMonth.of(testYear, testMonth));
 
     List<DiaryIndexProjection> responseIndexes = indexes.getDiaryIndexes();
     DiaryIndexProjection first = responseIndexes.get(0);
@@ -178,12 +170,11 @@ public class DiaryServiceTest {
     LocalDateTime testStart = YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay();
     LocalDateTime testEnd = YearMonth.of(testYear, testMonth).atEndOfMonth().atTime(LocalTime.MAX);
 
-    when(mockDiaryRepository.findIndexesByMemberIdAndDateTimes(
-            principal.getId(), testStart, testEnd))
+    when(mockDiaryRepository.findIndexesByMemberIdAndDateTimes(member.getId(), testStart, testEnd))
         .thenReturn(Optional.empty());
 
     DiaryIndexResponse indexes =
-        diaryService.getIndex(principal, YearMonth.of(testYear, testMonth));
+        diaryService.getIndex(member.getId(), YearMonth.of(testYear, testMonth));
 
     List<DiaryIndexProjection> responseIndexes = indexes.getDiaryIndexes();
     System.out.println("responseIndexes = " + responseIndexes);
@@ -204,7 +195,7 @@ public class DiaryServiceTest {
     when(s3FileStorageService.preSignedWebtoonUrlFrom(anyList())).thenReturn(preSignedWebtoon);
     when(s3FileStorageService.preSignedBgmUrlFrom(anyString())).thenReturn(preSignedBgm);
 
-    DiaryResponse response = diaryService.getDiary(principal, requestDate);
+    DiaryResponse response = diaryService.getDiary(member.getId(), requestDate);
 
     assertThat(response)
         .satisfies(
@@ -231,7 +222,7 @@ public class DiaryServiceTest {
 
     DiaryException diaryException =
         assertThrows(
-            DiaryNotFoundException.class, () -> diaryService.getDiary(principal, requestDate));
+            DiaryNotFoundException.class, () -> diaryService.getDiary(member.getId(), requestDate));
 
     assertThat(diaryException.getErrorSpec()).isEqualTo(DiaryErrorSpec.DIARY_NOT_FOUND);
     verify(mockDiaryRepository, times(1)).findByMemberIdAndDate(anyLong(), any(LocalDate.class));

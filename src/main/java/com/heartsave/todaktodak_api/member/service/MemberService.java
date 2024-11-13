@@ -4,7 +4,6 @@ import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.
 import static com.heartsave.todaktodak_api.common.security.util.CookieUtils.*;
 
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
 import com.heartsave.todaktodak_api.member.dto.request.NicknameUpdateRequest;
 import com.heartsave.todaktodak_api.member.dto.response.MemberProfileResponse;
@@ -25,15 +24,15 @@ public class MemberService {
   private final MemberRepository memberRepository;
   private final S3FileStorageService s3Service;
 
-  public NicknameUpdateResponse updateNickname(TodakUser principal, NicknameUpdateRequest dto) {
-    MemberEntity retrievedMember = findMemberById(principal.getId());
+  public NicknameUpdateResponse updateNickname(Long memberId, NicknameUpdateRequest dto) {
+    MemberEntity retrievedMember = findMemberById(memberId);
     retrievedMember.updateNickname(dto.nickname());
     return NicknameUpdateResponse.builder().nickname(retrievedMember.getNickname()).build();
   }
 
   @Transactional(readOnly = true)
-  public MemberProfileResponse getMemberProfileById(TodakUser principal) {
-    MemberProfileProjection memberProfile = getMemberProfileById(principal.getId());
+  public MemberProfileResponse getMemberProfile(Long memberId) {
+    MemberProfileProjection memberProfile = getMemberProfileById(memberId);
 
     String characterPreSignedUrl =
         s3Service.preSignedCharacterImageUrlFrom(memberProfile.getCharacterImageUrl());
@@ -45,8 +44,8 @@ public class MemberService {
         .build();
   }
 
-  public void deactivate(HttpServletResponse response, TodakUser principal) {
-    MemberEntity retrievedMember = findMemberById(principal.getId());
+  public void deactivate(HttpServletResponse response, Long memberId) {
+    MemberEntity retrievedMember = findMemberById(memberId);
     memberRepository.delete(retrievedMember);
     updateCookie(response, createExpiredCookie(REFRESH_TOKEN_COOKIE_KEY));
   }

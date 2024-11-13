@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.member.controller;
 
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.auth.annotation.TodakUserId;
 import com.heartsave.todaktodak_api.member.dto.response.CharacterRegisterResponse;
 import com.heartsave.todaktodak_api.member.dto.response.CharacterTemporaryImageResponse;
 import com.heartsave.todaktodak_api.member.service.CharacterService;
@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,8 +27,8 @@ public class CharacterController {
       })
   @GetMapping
   public ResponseEntity<CharacterTemporaryImageResponse> getPastCharacterImage(
-      @AuthenticationPrincipal TodakUser principal) {
-    return ResponseEntity.ok(characterService.getPastCharacterImage(principal));
+      @TodakUserId Long memberId) {
+    return ResponseEntity.ok(characterService.getPastCharacterImage(memberId));
   }
 
   @ApiResponses(
@@ -39,9 +38,8 @@ public class CharacterController {
       })
   @PostMapping
   public ResponseEntity<Void> createCharacterImage(
-      @RequestParam("uploadImage") MultipartFile file,
-      @AuthenticationPrincipal TodakUser principal) {
-    characterService.createCharacterImage(file, principal);
+      @RequestParam("uploadImage") MultipartFile file, @TodakUserId Long memberId) {
+    characterService.createCharacterImage(file, memberId);
     return ResponseEntity.noContent().build();
   }
 
@@ -52,7 +50,7 @@ public class CharacterController {
       })
   @PostMapping("/register")
   public ResponseEntity<CharacterRegisterResponse> completeCharacterRegister(
-      @AuthenticationPrincipal TodakUser principal, HttpServletResponse response) {
-    return ResponseEntity.ok(characterService.changeRoleAndReissueToken(principal, response));
+      @TodakUserId Long memberId, HttpServletResponse response) {
+    return ResponseEntity.ok(characterService.changeRoleAndReissueToken(memberId, response));
   }
 }

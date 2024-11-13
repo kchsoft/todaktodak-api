@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
@@ -50,7 +49,6 @@ class PublicDiaryServiceTest {
   @Mock private S3FileStorageService mocksS3FileStorageService;
   @InjectMocks private PublicDiaryService publicDiaryService;
 
-  private TodakUser principal;
   private MemberEntity member;
   private DiaryEntity diary;
   private final String PUBLIC_CONTENT = "테스트 공개 일기 내용";
@@ -59,9 +57,6 @@ class PublicDiaryServiceTest {
   void setup() {
     member = BaseTestObject.createMember();
     diary = BaseTestObject.createDiaryWithMember(member);
-
-    principal = mock(TodakUser.class);
-    when(principal.getId()).thenReturn(member.getId());
   }
 
   @Test
@@ -75,7 +70,7 @@ class PublicDiaryServiceTest {
             .publicContent(PUBLIC_CONTENT)
             .build();
 
-    publicDiaryService.write(principal, PUBLIC_CONTENT, diary.getId());
+    publicDiaryService.write(member.getId(), PUBLIC_CONTENT, diary.getId());
 
     verify(mockPublicDiaryRepository, times(1)).save(any(PublicDiaryEntity.class));
 
@@ -100,7 +95,7 @@ class PublicDiaryServiceTest {
     DiaryNotFoundException exception =
         assertThrows(
             DiaryNotFoundException.class,
-            () -> publicDiaryService.write(principal, PUBLIC_CONTENT, nonExistentDiaryId));
+            () -> publicDiaryService.write(member.getId(), PUBLIC_CONTENT, nonExistentDiaryId));
 
     assertThat(exception.getErrorSpec())
         .as("존재하지 않는 일기에 대한 접근 시 DIARY_NOT_FOUND 에러가 발생해야 합니다")
@@ -126,7 +121,7 @@ class PublicDiaryServiceTest {
         .thenReturn(reactionEntity);
 
     // 첫 번째 - 반응 추가
-    publicDiaryService.toggleReactionStatus(principal, request);
+    publicDiaryService.toggleReactionStatus(member.getId(), request);
 
     verify(mockDiaryReactionRepository, times(1))
         .hasReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
@@ -142,7 +137,7 @@ class PublicDiaryServiceTest {
 
     // 두 번재 - 반응 삭제
 
-    publicDiaryService.toggleReactionStatus(principal, request);
+    publicDiaryService.toggleReactionStatus(member.getId(), request);
 
     verify(mockDiaryReactionRepository, times(2))
         .hasReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
@@ -163,8 +158,8 @@ class PublicDiaryServiceTest {
             anyLong(), anyLong(), any(DiaryReactionType.class)))
         .thenReturn(false);
 
-    publicDiaryService.toggleReactionStatus(principal, likeRequest);
-    publicDiaryService.toggleReactionStatus(principal, cheeringRequest);
+    publicDiaryService.toggleReactionStatus(member.getId(), likeRequest);
+    publicDiaryService.toggleReactionStatus(member.getId(), cheeringRequest);
 
     verify(mockDiaryReactionRepository, times(2))
         .hasReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
@@ -177,7 +172,7 @@ class PublicDiaryServiceTest {
   @DisplayName("getPublicDiaryPaginationResponse - 공개 일기 조회 성공")
   void getPublicDiaryPaginationResponse_Success() {
     Long publicDiaryId = 1L;
-    Long memberId = principal.getId();
+    Long memberId = member.getId();
 
     // Projection mock 데이터 준비
     PublicDiaryContentOnlyProjection content = mock(PublicDiaryContentOnlyProjection.class);
@@ -209,7 +204,7 @@ class PublicDiaryServiceTest {
 
     // when
     PublicDiaryPaginationResponse response =
-        publicDiaryService.getPublicDiaryPagination(principal, publicDiaryId);
+        publicDiaryService.getPublicDiaryPagination(member.getId(), publicDiaryId);
 
     // then
     assertThat(response).as("응답이 null이 아니어야 합니다").isNotNull();
@@ -261,7 +256,7 @@ class PublicDiaryServiceTest {
         .thenReturn(reactionType);
 
     PublicDiaryPaginationResponse response =
-        publicDiaryService.getPublicDiaryPagination(principal, 0L);
+        publicDiaryService.getPublicDiaryPagination(member.getId(), 0L);
 
     assertThat(response.getDiaries().size()).as("조회된 일기가 1개 있어야 한다").isEqualTo(1L);
     assertThat(response.getIsEnd()).as("다음 페이지 조회가 가능하므로 isEnd는 false여야 한다").isFalse();
@@ -277,7 +272,7 @@ class PublicDiaryServiceTest {
         .thenReturn(List.of());
 
     PublicDiaryPaginationResponse response =
-        publicDiaryService.getPublicDiaryPagination(principal, publicDiaryId);
+        publicDiaryService.getPublicDiaryPagination(member.getId(), publicDiaryId);
 
     assertThat(response.getDiaries().size()).as("조회 결과가 없는 경우 빈 목록이 반환되어야 합니다").isEqualTo(0);
     assertThat(response.getIsEnd()).as("조회 결과가 없는 경우 isEnd 조건이 True가 돼야 합니다.").isTrue();

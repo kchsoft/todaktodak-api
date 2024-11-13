@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.diary.controller;
 
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.auth.annotation.TodakUserId;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPaginationResponse;
@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,12 +41,12 @@ public class PublicDiaryController {
       })
   @GetMapping
   public ResponseEntity<PublicDiaryPaginationResponse> getPublicDiaries(
-      @AuthenticationPrincipal TodakUser principal,
+      @TodakUserId Long memberId,
       @Valid @Min(0L) @RequestParam(name = "after", defaultValue = "0", required = false)
           Long publicDiaryId) {
     log.info("공개 일기를 조회를 요청합니다. after = {}", publicDiaryId);
     PublicDiaryPaginationResponse response =
-        publicDiaryService.getPublicDiaryPagination(principal, publicDiaryId);
+        publicDiaryService.getPublicDiaryPagination(memberId, publicDiaryId);
     log.info("공개 일기 조회를 성공적으로 마쳤습니다.");
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
@@ -60,11 +59,11 @@ public class PublicDiaryController {
       })
   @PostMapping
   public ResponseEntity<Void> writePublicContent(
-      @AuthenticationPrincipal TodakUser principal,
+      @TodakUserId Long memberId,
       @Parameter(description = "일기 공개 업로드 요청 데이터", required = true) @Valid @RequestBody
           PublicDiaryWriteRequest request) {
     log.info("공개 일기 업로드 시작");
-    publicDiaryService.write(principal, request.publicContent(), request.diaryId());
+    publicDiaryService.write(memberId, request.publicContent(), request.diaryId());
     log.info("공개 일기 업로드 성공");
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
@@ -79,11 +78,11 @@ public class PublicDiaryController {
       })
   @PostMapping("/reaction")
   public ResponseEntity<Void> toggleReaction(
-      @Parameter(hidden = true) @AuthenticationPrincipal TodakUser principal,
+      @Parameter(hidden = true) @TodakUserId Long memberId,
       @Parameter(description = "일기 반응 요청 데이터", required = true) @Valid @RequestBody
           PublicDiaryReactionRequest request) {
     log.info("일기장 반응 토글을 요청합니다");
-    publicDiaryService.toggleReactionStatus(principal, request);
+    publicDiaryService.toggleReactionStatus(memberId, request);
     log.info("일기장 반응 토글을 성공적으로 마쳤습니다.");
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }

@@ -1,7 +1,6 @@
 package com.heartsave.todaktodak_api.diary.service;
 
 import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryPaginationResponse;
@@ -30,9 +29,8 @@ public class MySharedDiaryService {
   private final DiaryReactionRepository reactionRepository;
   private final S3FileStorageService s3FileStorageService;
 
-  public MySharedDiaryPaginationResponse getPagination(TodakUser principal, Long publicDiaryId) {
+  public MySharedDiaryPaginationResponse getPagination(Long memberId, Long publicDiaryId) {
     log.info("나의 공개된 일기 정보를 요청합니다.");
-    Long memberId = principal.getId();
     List<MySharedDiaryPreviewProjection> previews = fetchPreviews(memberId, publicDiaryId);
     replaceWithPreSignedUrls(previews);
     log.info("나의 공개된 일기 정보 요청을 성공적으로 마쳤습니다.");
@@ -57,9 +55,8 @@ public class MySharedDiaryService {
     }
   }
 
-  public MySharedDiaryResponse getDiary(TodakUser principal, LocalDate requestDate) {
+  public MySharedDiaryResponse getDiary(Long memberId, LocalDate requestDate) {
     log.info("나의 공개된 일기 상세 정보를 요청합니다.");
-    Long memberId = principal.getId();
     MySharedDiaryContentOnlyProjection contentOnly = fetchContentOnly(requestDate, memberId);
     replaceWithPreSignedUrls(contentOnly);
 

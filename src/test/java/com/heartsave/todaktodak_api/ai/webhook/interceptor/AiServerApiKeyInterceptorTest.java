@@ -11,7 +11,6 @@ import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonComplet
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiWebhookCharacterService;
 import com.heartsave.todaktodak_api.ai.webhook.test_config.TestInterceptorSecurityConfig;
-import com.heartsave.todaktodak_api.common.config.WebConfig;
 import com.heartsave.todaktodak_api.common.exception.errorspec.AiErrorSpec;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest({AiWebhookController.class})
 @AutoConfigureMockMvc
-@Import({TestInterceptorSecurityConfig.class, WebConfig.class})
+@Import({TestInterceptorSecurityConfig.class})
 class AiServerApiKeyInterceptorTest {
 
   @Autowired private MockMvc mockMvc;
