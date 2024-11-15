@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.heartsave.todaktodak_api.common.converter.InstantConverter;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
@@ -22,7 +23,7 @@ import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreview
 import com.heartsave.todaktodak_api.diary.exception.PublicDiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.MySharedDiaryRepository;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -126,7 +127,7 @@ public class MySharedDiaryServiceTest {
   @Test
   @DisplayName("나의 공개 일기 상세를 성공적으로 조회한다")
   void getDiary_Success() {
-    LocalDate requestDate = LocalDate.now();
+    Instant requestDate = Instant.now();
     MySharedDiaryContentOnlyProjection contentOnly = mock(MySharedDiaryContentOnlyProjection.class);
     DiaryReactionCountProjection reactionCount = mock(DiaryReactionCountProjection.class);
     List<DiaryReactionType> memberReactions =
@@ -137,7 +138,8 @@ public class MySharedDiaryServiceTest {
     when(contentOnly.getWebtoonImageUrls()).thenReturn(List.of(webtoonUrl));
     when(contentOnly.getBgmUrl()).thenReturn(bgmUrl);
 
-    when(mySharedDiaryRepository.findContentOnly(memberId, requestDate))
+    when(mySharedDiaryRepository.findContentOnly(
+            memberId, InstantConverter.toLocalDate(requestDate)))
         .thenReturn(Optional.of(contentOnly));
     when(reactionRepository.countEachByDiaryId(diaryId)).thenReturn(reactionCount);
     when(reactionRepository.findMemberReaction(memberId, diaryId)).thenReturn(memberReactions);
@@ -164,8 +166,9 @@ public class MySharedDiaryServiceTest {
   @DisplayName("존재하지 않는 날짜의 공유된 일기 조회시 예외를 던진다")
   void getDiary_ThrowsException_WhenDiaryNotFound() {
     // Given
-    LocalDate requestDate = LocalDate.now();
-    when(mySharedDiaryRepository.findContentOnly(memberId, requestDate))
+    Instant requestDate = Instant.now();
+    when(mySharedDiaryRepository.findContentOnly(
+            memberId, InstantConverter.toLocalDate(requestDate)))
         .thenReturn(Optional.empty());
 
     // When & Then

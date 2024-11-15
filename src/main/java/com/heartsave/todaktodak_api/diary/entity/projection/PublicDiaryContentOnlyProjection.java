@@ -1,9 +1,11 @@
 package com.heartsave.todaktodak_api.diary.entity.projection;
 
+import com.heartsave.todaktodak_api.common.constant.CoreConstant.TIME_FORMAT;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import lombok.Getter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 @Schema(description = "공개 일기 조회 프로젝션")
@@ -33,7 +35,8 @@ public class PublicDiaryContentOnlyProjection {
   private String bgmUrl;
 
   @Schema(description = "일기 작성 날짜", example = "2024-10-26", type = "string", format = "date")
-  private final LocalDate date;
+  @DateTimeFormat(pattern = TIME_FORMAT.ISO_DATETIME_WITH_MILLISECONDS)
+  private final Instant date;
 
   public PublicDiaryContentOnlyProjection(
       Long publicDiaryId,
@@ -43,7 +46,7 @@ public class PublicDiaryContentOnlyProjection {
       String publicContent,
       String webtoonImageUrl,
       String bgmUrl,
-      LocalDate date) {
+      Instant date) {
     this.publicDiaryId = publicDiaryId;
     this.diaryId = diaryId;
     this.characterImageUrl = characterImageUrls;

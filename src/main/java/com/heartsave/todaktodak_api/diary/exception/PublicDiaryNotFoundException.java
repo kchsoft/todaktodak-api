@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.diary.exception;
 
 import com.heartsave.todaktodak_api.common.exception.ErrorFieldBuilder;
 import com.heartsave.todaktodak_api.common.exception.errorspec.ErrorSpec;
-import java.time.LocalDate;
+import java.time.Instant;
 
 public class PublicDiaryNotFoundException extends PublicDiaryException {
 
@@ -10,7 +10,7 @@ public class PublicDiaryNotFoundException extends PublicDiaryException {
     super(errorSpec, ErrorFieldBuilder.builder().add("publicDiaryId", publicDiaryId).build());
   }
 
-  public PublicDiaryNotFoundException(ErrorSpec errorSpec, LocalDate publicDiaryCreatedDate) {
+  public PublicDiaryNotFoundException(ErrorSpec errorSpec, Instant publicDiaryCreatedDate) {
     super(
         errorSpec,
         ErrorFieldBuilder.builder().add("publicDiaryCreatedDate", publicDiaryCreatedDate).build());

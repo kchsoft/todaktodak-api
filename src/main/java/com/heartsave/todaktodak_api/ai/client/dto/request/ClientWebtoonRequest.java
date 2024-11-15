@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.ai.client.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.heartsave.todaktodak_api.common.converter.InstantConverter;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.time.LocalDate;
@@ -20,7 +21,7 @@ public class ClientWebtoonRequest {
 
   private ClientWebtoonRequest(DiaryEntity diary, MemberEntity member) {
     this.memberId = String.valueOf(member.getId());
-    this.date = diary.getDiaryCreatedTime().toLocalDate();
+    this.date = InstantConverter.toLocalDate(diary.getDiaryCreatedTime());
     this.content = diary.getContent();
     this.characterInfo = member.getCharacterInfo();
     this.seedNum = member.getCharacterSeed();
