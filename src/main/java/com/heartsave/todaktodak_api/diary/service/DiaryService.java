@@ -1,6 +1,5 @@
 package com.heartsave.todaktodak_api.diary.service;
 
-import static com.heartsave.todaktodak_api.common.constant.CoreConstant.URL.DEFAULT_URL;
 
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
@@ -63,14 +62,23 @@ public class DiaryService {
 
   public void delete(Long memberId, Long diaryId) {
     log.info("DB에 일기를 삭제를 요청합니다.");
+    DiaryEntity diary =
+        diaryRepository
+            .findById(diaryId)
+            .orElseThrow(
+                () ->
+                    new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, diaryId));
     if (0 == diaryRepository.deleteByIds(memberId, diaryId))
       throw new DiaryDeleteNotFoundException(DiaryErrorSpec.DELETE_NOT_FOUND, memberId, diaryId);
     log.info("DB에서 일기를 삭제했습니다.");
+    log.info("S3에 일기 컨텐츠 삭제를 요청합니다.");
+    s3FileStorageService.deleteObjects(List.of(diary.getWebtoonImageUrl(), diary.getBgmUrl()));
+    log.info("S3에서 일기 컨텐츠를 삭제했습니다.");
 
-    // TODO :  s3에서 webtoon,bgm,comment 삭제 요청
     return;
   }
 
+  @Transactional(readOnly = true)
   public DiaryIndexResponse getIndex(Long memberId, YearMonth yearMonth) {
     LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
     LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(LocalTime.MAX);
@@ -83,6 +91,7 @@ public class DiaryService {
     return DiaryIndexResponse.builder().diaryIndexes(indexes).build();
   }
 
+  @Transactional(readOnly = true)
   public DiaryResponse getDiary(Long memberId, LocalDate requestDate) {
     log.info("사용자의 나의 일기 정보를 요청합니다.");
     DiaryEntity diary =
@@ -111,13 +120,6 @@ public class DiaryService {
         memberRepository
             .findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, memberId));
-    return DiaryEntity.builder()
-        .memberEntity(member)
-        .emotion(request.getEmotion())
-        .content(request.getContent())
-        .diaryCreatedTime((request.getDateTime()))
-        .webtoonImageUrl(DEFAULT_URL)
-        .bgmUrl(DEFAULT_URL)
-        .build();
+    return DiaryEntity.createDefault(request, member);
   }
 }

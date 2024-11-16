@@ -1,11 +1,13 @@
 package com.heartsave.todaktodak_api.diary.entity;
 
+import static com.heartsave.todaktodak_api.common.constant.CoreConstant.URL.DEFAULT_URL;
 import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_CONTENT_MAX_SIZE;
 import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_CONTENT_MIN_SIZE;
 
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.common.entity.BaseEntity;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
+import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -108,5 +110,16 @@ public class DiaryEntity extends BaseEntity {
 
   public void addReaction(DiaryReactionEntity reactionType) {
     reactions.add(reactionType);
+  }
+
+  public static DiaryEntity createDefault(DiaryWriteRequest request, MemberEntity member) {
+    return DiaryEntity.builder()
+        .memberEntity(member)
+        .emotion(request.getEmotion())
+        .content(request.getContent())
+        .diaryCreatedTime((request.getDateTime()))
+        .webtoonImageUrl(DEFAULT_URL)
+        .bgmUrl(DEFAULT_URL)
+        .build();
   }
 }

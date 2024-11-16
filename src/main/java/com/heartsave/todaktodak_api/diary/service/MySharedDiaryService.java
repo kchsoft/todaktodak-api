@@ -29,6 +29,7 @@ public class MySharedDiaryService {
   private final DiaryReactionRepository reactionRepository;
   private final S3FileStorageService s3FileStorageService;
 
+  @Transactional(readOnly = true)
   public MySharedDiaryPaginationResponse getPagination(Long memberId, Long publicDiaryId) {
     log.info("나의 공개된 일기 정보를 요청합니다.");
     List<MySharedDiaryPreviewProjection> previews = fetchPreviews(memberId, publicDiaryId);
@@ -55,6 +56,7 @@ public class MySharedDiaryService {
     }
   }
 
+  @Transactional(readOnly = true)
   public MySharedDiaryResponse getDiary(Long memberId, LocalDate requestDate) {
     log.info("나의 공개된 일기 상세 정보를 요청합니다.");
     MySharedDiaryContentOnlyProjection contentOnly = fetchContentOnly(requestDate, memberId);

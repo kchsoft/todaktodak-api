@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
@@ -23,6 +24,7 @@ final class S3FileStorageServiceTest {
 
   @Mock private static S3Presigner s3Presigner;
   @Mock private static S3Properties s3Properties;
+  @Mock private static S3Client s3Client;
 
   @InjectMocks private static S3FileStorageService s3Service;
 
@@ -39,7 +41,7 @@ final class S3FileStorageServiceTest {
 
   @BeforeEach
   void setUp() {
-    s3Service = new S3FileStorageService(s3Presigner, s3Properties);
+    s3Service = new S3FileStorageService(s3Presigner, s3Properties, s3Client);
   }
 
   private void mockBasicProperties() {

@@ -33,6 +33,7 @@ public class PublicDiaryService {
   private final DiaryReactionRepository diaryReactionRepository;
   private final S3FileStorageService s3FileStorageService;
 
+  @Transactional(readOnly = true)
   public PublicDiaryPaginationResponse getPublicDiaryPagination(Long memberId, Long publicDiaryId) {
     List<PublicDiaryContentOnlyProjection> diaryContents = fetchDiaryContents(publicDiaryId);
     replaceWithPreSignedUrls(diaryContents);

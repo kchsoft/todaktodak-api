@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,7 +26,6 @@ import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
-import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
@@ -55,7 +55,7 @@ public class DiaryServiceTest {
   @Mock private DiaryRepository mockDiaryRepository;
   @Mock private DiaryReactionRepository mockDiaryReactionRepository;
   @Mock private AiClientService mockAiClientService;
-  @Mock private S3FileStorageService s3FileStorageService;
+  @Mock private S3FileStorageService mockS3Service;
   @InjectMocks private DiaryService diaryService;
   private MemberEntity member;
   private DiaryEntity diary;
@@ -103,26 +103,47 @@ public class DiaryServiceTest {
   @DisplayName("일기 삭제 요청 성공")
   void diaryDeleteSuccess() {
     when(mockDiaryRepository.deleteByIds(anyLong(), anyLong())).thenReturn(1);
+    when(mockDiaryRepository.findById(diary.getId())).thenReturn(Optional.of(diary));
     assertDoesNotThrow(
         () -> {
           diaryService.delete(member.getId(), diary.getId());
         },
         "예상치 못한 예외가 발생했습니다.");
     verify(mockDiaryRepository, times(1)).deleteByIds(anyLong(), anyLong());
+    verify(mockDiaryRepository, times(1)).findById(anyLong());
   }
 
   @Test
-  @DisplayName("일기 삭제 요청 실패")
-  void diaryDeleteFail() {
-    when(mockDiaryRepository.deleteByIds(anyLong(), anyLong())).thenReturn(0);
+  @DisplayName("일기 삭제 요청 실패 - 일기가 없습니다.")
+  void diaryDeleteFail_NotFound() {
+    when(mockDiaryRepository.findById(diary.getId())).thenReturn(Optional.empty());
+
     DiaryException diaryException =
         assertThrows(
-            DiaryDeleteNotFoundException.class,
+            DiaryNotFoundException.class,
             () -> {
-              diaryService.delete(member.getId(), diary.getId() + 1L);
+              diaryService.delete(member.getId(), diary.getId());
             },
-            "Diary Delete Not Found 예외가 발생하지 않았습니다.");
-    verify(mockDiaryRepository, times(1)).deleteByIds(anyLong(), anyLong());
+            "Diary Not Found 예외가 발생하지 않았습니다.");
+    verify(mockDiaryRepository, times(0)).deleteByIds(anyLong(), anyLong());
+    verify(mockDiaryRepository, times(1)).findById(anyLong());
+    log.info(diaryException.getLogMessage());
+  }
+
+  @Test
+  @DisplayName("일기 삭제 요청 실패 - 찾을 수 없는 일기 입니다.")
+  void diaryDeleteFail_NotDiaryOwner() {
+    when(mockDiaryRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+    DiaryException diaryException =
+        assertThrows(
+            DiaryNotFoundException.class,
+            () -> {
+              diaryService.delete(member.getId() + 9999, diary.getId());
+            },
+            "Diary Not Found 예외가 발생하지 않았습니다.");
+    verify(mockDiaryRepository, never()).deleteByIds(anyLong(), anyLong());
+    verify(mockDiaryRepository, times(1)).findById(anyLong());
     log.info(diaryException.getLogMessage());
   }
 
@@ -192,8 +213,8 @@ public class DiaryServiceTest {
     List<String> preSignedWebtoon = List.of("pre-sigend-webtoon");
     String preSignedBgm = "pre-sigend-bgm";
 
-    when(s3FileStorageService.preSignedWebtoonUrlFrom(anyList())).thenReturn(preSignedWebtoon);
-    when(s3FileStorageService.preSignedBgmUrlFrom(anyString())).thenReturn(preSignedBgm);
+    when(mockS3Service.preSignedWebtoonUrlFrom(anyList())).thenReturn(preSignedWebtoon);
+    when(mockS3Service.preSignedBgmUrlFrom(anyString())).thenReturn(preSignedBgm);
 
     DiaryResponse response = diaryService.getDiary(member.getId(), requestDate);
 
