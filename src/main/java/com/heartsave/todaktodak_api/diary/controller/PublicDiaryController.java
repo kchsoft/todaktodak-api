@@ -1,9 +1,11 @@
 package com.heartsave.todaktodak_api.diary.controller;
 
 import com.heartsave.todaktodak_api.auth.annotation.TodakUserId;
+import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryReactionErrorSpec;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPaginationResponse;
+import com.heartsave.todaktodak_api.diary.exception.DiaryReactionExistException;
 import com.heartsave.todaktodak_api.diary.service.PublicDiaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,6 +17,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -82,7 +85,15 @@ public class PublicDiaryController {
       @Parameter(description = "일기 반응 요청 데이터", required = true) @Valid @RequestBody
           PublicDiaryReactionRequest request) {
     log.info("일기장 반응 토글을 요청합니다");
-    publicDiaryService.toggleReactionStatus(memberId, request);
+    try {
+      publicDiaryService.toggleReactionStatus(memberId, request);
+    } catch (DataIntegrityViolationException exception) {
+      throw new DiaryReactionExistException(
+          DiaryReactionErrorSpec.DIARY_REACTION_EXIST,
+          memberId,
+          request.diaryId(),
+          request.reactionType());
+    }
     log.info("일기장 반응 토글을 성공적으로 마쳤습니다.");
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
