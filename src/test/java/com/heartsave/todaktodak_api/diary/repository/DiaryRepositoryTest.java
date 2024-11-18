@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIdsProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
@@ -19,6 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
@@ -30,6 +33,7 @@ public class DiaryRepositoryTest {
 
   @Autowired private DiaryRepository diaryRepository;
   @Autowired private MemberRepository memberRepository;
+  @Autowired TestEntityManager tem;
 
   private MemberEntity member;
   private DiaryEntity diary;
@@ -189,5 +193,58 @@ public class DiaryRepositoryTest {
     AuditorAware<Long> auditorAware() {
       return () -> Optional.of(7L);
     }
+  }
+
+  @Test
+  @DisplayName("findIdsById - 일기 ID로 일기와 공개 일기 ID 조회 성공")
+  void findIdsByIdSuccess() {
+    PublicDiaryEntity publicDiary =
+        PublicDiaryEntity.builder()
+            .memberEntity(member)
+            .diaryEntity(diary)
+            .publicContent("public-content")
+            .build();
+    tem.persist(publicDiary);
+    tem.flush();
+    tem.clear();
+
+    // When
+    Optional<DiaryIdsProjection> result = diaryRepository.findIdsById(diary.getId());
+
+    // Then
+    assertThat(result).as("일기 ID %d에 대한 조회 결과가 없습니다.", diary.getId()).isPresent();
+
+    DiaryIdsProjection ids = result.get();
+    assertThat(ids.getDiaryId()).as("조회된 일기 ID가 저장된 일기의 ID와 일치하지 않습니다.").isEqualTo(diary.getId());
+
+    assertThat(ids.getPublicDiaryId())
+        .as("조회된 공개 일기 ID가 저장된 공개 일기의 ID와 일치하지 않습니다.")
+        .isEqualTo(publicDiary.getId());
+  }
+
+  @Test
+  @DisplayName("findIdsById - 존재하지 않는 일기 ID로 조회")
+  void findIdsByIdEmpty() {
+    // Given
+    Long nonExistentId = 9999L;
+
+    // When
+    Optional<DiaryIdsProjection> result = diaryRepository.findIdsById(nonExistentId);
+
+    // Then
+    assertThat(result).as("존재하지 않는 일기 ID %d에 대한 조회 결과가 있습니다.", nonExistentId).isEmpty();
+  }
+
+  @Test
+  @DisplayName("findIdsById - 공개 일기가 없는 일기 ID로 조회")
+  void findIdsByIdWithoutPublicDiary() {
+    Optional<DiaryIdsProjection> result = diaryRepository.findIdsById(diary.getId());
+    // Then
+    assertThat(result).as("일기 ID %d에 대한 조회 결과가 없습니다.", diary.getId()).isPresent();
+
+    DiaryIdsProjection ids = result.get();
+    assertThat(ids.getDiaryId()).as("조회된 일기 ID가 저장된 일기의 ID와 일치하지 않습니다.").isEqualTo(diary.getId());
+
+    assertThat(ids.getPublicDiaryId()).as("공개 일기가 없는데 publicDiaryId가 null이 아닙니다.").isNull();
   }
 }

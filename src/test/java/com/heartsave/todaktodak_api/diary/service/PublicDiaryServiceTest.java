@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
+import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
@@ -20,9 +21,11 @@ import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPaginationResp
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.DiaryReactionEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIdsProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
+import com.heartsave.todaktodak_api.diary.exception.PublicDiaryExistException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
@@ -64,35 +67,24 @@ class PublicDiaryServiceTest {
   @Test
   @DisplayName("공개 일기 작성 성공")
   void write_Success() {
-    when(mockDiaryRepository.existsById(anyLong())).thenReturn((true));
-    PublicDiaryEntity publicDiary =
-        PublicDiaryEntity.builder()
-            .memberEntity(member)
-            .diaryEntity(diary)
-            .publicContent(PUBLIC_CONTENT)
-            .build();
+    DiaryIdsProjection mockIds = mock(DiaryIdsProjection.class);
+    when(mockIds.getPublicDiaryId()).thenReturn(null);
+
+    when(mockDiaryRepository.findIdsById(diary.getId())).thenReturn(Optional.of(mockIds));
 
     publicDiaryService.write(member.getId(), diary.getId(), PUBLIC_CONTENT);
 
+    verify(mockDiaryRepository, times(1)).findIdsById(anyLong());
+    verify(mockDiaryRepository, times(1)).getReferenceById(anyLong());
+    verify(mockMemberRepository, times(1)).getReferenceById(anyLong());
     verify(mockPublicDiaryRepository, times(1)).save(any(PublicDiaryEntity.class));
-
-    assertThat(publicDiary)
-        .as("생성된 공개 일기가 올바른 정보를 포함하고 있어야 합니다")
-        .satisfies(
-            pd -> {
-              assertThat(pd.getPublicContent())
-                  .as("공개 일기 내용이 입력된 내용과 일치해야 합니다")
-                  .isEqualTo(PUBLIC_CONTENT);
-              assertThat(pd.getDiaryEntity()).as("공개 일기의 원본 일기가 올바르게 설정되어야 합니다").isEqualTo(diary);
-              assertThat(pd.getMemberEntity()).as("공개 일기의 작성자가 올바르게 설정되어야 합니다").isEqualTo(member);
-            });
   }
 
   @Test
   @DisplayName("공개 일기 작성 실패 - 일기를 찾을 수 없음")
   void write_Fail_DiaryNotFound() {
     Long nonExistentDiaryId = Long.MAX_VALUE;
-    when(mockDiaryRepository.existsById(nonExistentDiaryId)).thenReturn(false);
+    when(mockDiaryRepository.findIdsById(nonExistentDiaryId)).thenReturn(Optional.empty());
 
     DiaryNotFoundException exception =
         assertThrows(
@@ -103,7 +95,30 @@ class PublicDiaryServiceTest {
         .as("존재하지 않는 일기에 대한 접근 시 DIARY_NOT_FOUND 에러가 발생해야 합니다")
         .isEqualTo(DiaryErrorSpec.DIARY_NOT_FOUND);
 
-    verify(mockPublicDiaryRepository, times(0)).save(any());
+    verify(mockDiaryRepository, times(1)).findIdsById(anyLong());
+    verify(mockPublicDiaryRepository, times(0)).save(any(PublicDiaryEntity.class));
+  }
+
+  @Test
+  @DisplayName("공개 일기 작성 실패 - 이미 공개 일기가 있음.")
+  void write_Fail_PublicDiaryAlreadyExist() {
+    DiaryIdsProjection mockIds = mock(DiaryIdsProjection.class);
+    when(mockIds.getPublicDiaryId()).thenReturn(100L);
+    when(mockDiaryRepository.findIdsById(diary.getId())).thenReturn(Optional.of(mockIds));
+
+    PublicDiaryExistException exception =
+        assertThrows(
+            PublicDiaryExistException.class,
+            () -> publicDiaryService.write(member.getId(), diary.getId(), PUBLIC_CONTENT));
+
+    assertThat(exception.getErrorSpec())
+        .as("공개 일기가 이미 존재하고 있다는 예외가 발생해야 합니다.")
+        .isEqualTo(PublicDiaryErrorSpec.PUBLIC_DIARY_EXIST);
+
+    verify(mockDiaryRepository, times(1)).findIdsById(anyLong());
+    verify(mockDiaryRepository, times(0)).getReferenceById(anyLong());
+    verify(mockMemberRepository, times(0)).getReferenceById(anyLong());
+    verify(mockPublicDiaryRepository, times(0)).save(any(PublicDiaryEntity.class));
   }
 
   @Test

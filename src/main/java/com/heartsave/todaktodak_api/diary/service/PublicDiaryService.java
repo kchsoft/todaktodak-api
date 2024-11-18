@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.diary.service;
 
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
+import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
@@ -9,9 +10,11 @@ import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPaginationResp
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.DiaryReactionEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIdsProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
+import com.heartsave.todaktodak_api.diary.exception.PublicDiaryExistException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
@@ -89,8 +92,16 @@ public class PublicDiaryService {
   }
 
   public void write(Long memberId, Long diaryId, String publicContent) {
-    if (!diaryRepository.existsById(diaryId)) {
-      throw new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, diaryId);
+    DiaryIdsProjection ids =
+        diaryRepository
+            .findIdsById(diaryId)
+            .orElseThrow(
+                () ->
+                    new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, diaryId));
+
+    if (ids.getPublicDiaryId() != null) {
+      throw new PublicDiaryExistException(
+          PublicDiaryErrorSpec.PUBLIC_DIARY_EXIST, memberId, ids.getPublicDiaryId());
     }
 
     DiaryEntity diaryRef = diaryRepository.getReferenceById(diaryId);
