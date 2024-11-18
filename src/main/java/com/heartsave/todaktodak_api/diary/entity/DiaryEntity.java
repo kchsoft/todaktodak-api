@@ -108,14 +108,16 @@ public class DiaryEntity extends BaseEntity {
     reactions.add(reactionType);
   }
 
+  private DiaryEntity(DiaryWriteRequest request, MemberEntity member) {
+    this.memberEntity = member;
+    this.emotion = request.getEmotion();
+    this.content = request.getContent();
+    this.diaryCreatedTime = request.getDateTime();
+    this.webtoonImageUrl = DEFAULT_URL;
+    this.bgmUrl = DEFAULT_URL;
+  }
+
   public static DiaryEntity createDefault(DiaryWriteRequest request, MemberEntity member) {
-    return DiaryEntity.builder()
-        .memberEntity(member)
-        .emotion(request.getEmotion())
-        .content(request.getContent())
-        .diaryCreatedTime((request.getDateTime()))
-        .webtoonImageUrl(DEFAULT_URL)
-        .bgmUrl(DEFAULT_URL)
-        .build();
+    return new DiaryEntity(request, member);
   }
 }
