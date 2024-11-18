@@ -16,6 +16,7 @@ import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ public class PublicDiaryService {
   private final DiaryRepository diaryRepository;
   private final PublicDiaryRepository publicDiaryRepository;
   private final DiaryReactionRepository diaryReactionRepository;
+  private final MemberRepository memberRepository;
   private final S3FileStorageService s3FileStorageService;
 
   @Transactional(readOnly = true)
@@ -86,17 +88,18 @@ public class PublicDiaryService {
     return diaryReactionRepository.findMemberReaction(memberId, diaryId);
   }
 
-  public void write(Long memberId, String publicContent, Long diaryId) {
-    DiaryEntity diary =
-        diaryRepository
-            .findById(diaryId) // Todo : exist 로 최적화
-            .orElseThrow(
-                () ->
-                    new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, diaryId));
+  public void write(Long memberId, Long diaryId, String publicContent) {
+    if (!diaryRepository.existsById(diaryId)) {
+      throw new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, diaryId);
+    }
+
+    DiaryEntity diaryRef = diaryRepository.getReferenceById(diaryId);
+    MemberEntity memberRef = memberRepository.getReferenceById(memberId);
+
     PublicDiaryEntity publicDiary =
         PublicDiaryEntity.builder()
-            .diaryEntity(diary)
-            .memberEntity(diary.getMemberEntity())
+            .diaryEntity(diaryRef)
+            .memberEntity(memberRef)
             .publicContent(publicContent)
             .build();
     publicDiaryRepository.save(publicDiary);
@@ -115,10 +118,12 @@ public class PublicDiaryService {
 
   private DiaryReactionEntity getDiaryReactionEntity(
       Long memberId, Long diaryId, DiaryReactionType reactionType) {
+    MemberEntity memberRef = memberRepository.getReferenceById(memberId);
+    DiaryEntity diaryRef = diaryRepository.getReferenceById(diaryId);
     DiaryReactionEntity reactionEntity =
         DiaryReactionEntity.builder()
-            .memberEntity(MemberEntity.createById(memberId))
-            .diaryEntity(DiaryEntity.createById(diaryId))
+            .memberEntity(memberRef)
+            .diaryEntity(diaryRef)
             .reactionType(reactionType)
             .build();
     return reactionEntity;

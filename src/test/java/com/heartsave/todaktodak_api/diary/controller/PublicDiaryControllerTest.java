@@ -44,7 +44,7 @@ public class PublicDiaryControllerTest {
     String content = "테스트 공개 일기 내용";
     PublicDiaryWriteRequest request = new PublicDiaryWriteRequest(diaryId, content);
 
-    doNothing().when(publicDiaryService).write(anyLong(), eq(content), eq(diaryId));
+    doNothing().when(publicDiaryService).write(anyLong(), eq(diaryId), eq(content));
 
     mockMvc
         .perform(

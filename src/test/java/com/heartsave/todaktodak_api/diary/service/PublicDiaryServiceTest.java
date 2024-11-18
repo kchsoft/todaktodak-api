@@ -27,6 +27,7 @@ import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +48,7 @@ class PublicDiaryServiceTest {
   @Mock private PublicDiaryRepository mockPublicDiaryRepository;
   @Mock private DiaryReactionRepository mockDiaryReactionRepository;
   @Mock private S3FileStorageService mocksS3FileStorageService;
+  @Mock private MemberRepository mockMemberRepository;
   @InjectMocks private PublicDiaryService publicDiaryService;
 
   private MemberEntity member;
@@ -62,7 +64,7 @@ class PublicDiaryServiceTest {
   @Test
   @DisplayName("공개 일기 작성 성공")
   void write_Success() {
-    when(mockDiaryRepository.findById(anyLong())).thenReturn(Optional.of(diary));
+    when(mockDiaryRepository.existsById(anyLong())).thenReturn((true));
     PublicDiaryEntity publicDiary =
         PublicDiaryEntity.builder()
             .memberEntity(member)
@@ -70,7 +72,7 @@ class PublicDiaryServiceTest {
             .publicContent(PUBLIC_CONTENT)
             .build();
 
-    publicDiaryService.write(member.getId(), PUBLIC_CONTENT, diary.getId());
+    publicDiaryService.write(member.getId(), diary.getId(), PUBLIC_CONTENT);
 
     verify(mockPublicDiaryRepository, times(1)).save(any(PublicDiaryEntity.class));
 
@@ -90,12 +92,12 @@ class PublicDiaryServiceTest {
   @DisplayName("공개 일기 작성 실패 - 일기를 찾을 수 없음")
   void write_Fail_DiaryNotFound() {
     Long nonExistentDiaryId = Long.MAX_VALUE;
-    when(mockDiaryRepository.findById(nonExistentDiaryId)).thenReturn(Optional.empty());
+    when(mockDiaryRepository.existsById(nonExistentDiaryId)).thenReturn(false);
 
     DiaryNotFoundException exception =
         assertThrows(
             DiaryNotFoundException.class,
-            () -> publicDiaryService.write(member.getId(), PUBLIC_CONTENT, nonExistentDiaryId));
+            () -> publicDiaryService.write(member.getId(), nonExistentDiaryId, PUBLIC_CONTENT));
 
     assertThat(exception.getErrorSpec())
         .as("존재하지 않는 일기에 대한 접근 시 DIARY_NOT_FOUND 에러가 발생해야 합니다")
@@ -107,12 +109,15 @@ class PublicDiaryServiceTest {
   @Test
   @DisplayName("toggleReactionStatus - 반응 추가/삭제 토글 테스트")
   void toggleReactionStatus() {
+    when(mockDiaryRepository.getReferenceById(anyLong())).thenReturn(mock(DiaryEntity.class));
+    when(mockMemberRepository.getReferenceById(anyLong())).thenReturn(mock(MemberEntity.class));
+
     PublicDiaryReactionRequest request =
         new PublicDiaryReactionRequest(diary.getId(), DiaryReactionType.LIKE);
     DiaryReactionEntity reactionEntity =
         DiaryReactionEntity.builder()
-            .memberEntity(MemberEntity.createById(member.getId()))
-            .diaryEntity(DiaryEntity.createById(diary.getId()))
+            .memberEntity(mockMemberRepository.getReferenceById(member.getId()))
+            .diaryEntity(mockDiaryRepository.getReferenceById(diary.getId()))
             .reactionType(DiaryReactionType.LIKE)
             .build();
 

@@ -47,10 +47,6 @@ public class MemberEntity extends BaseEntity {
 
   private String characterStyle;
 
-  public static MemberEntity createById(Long id) {
-    return MemberEntity.builder().id(id).build();
-  }
-
   public void updateNickname(String newNickName) {
     nickname = newNickName;
   }

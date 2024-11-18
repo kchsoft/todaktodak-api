@@ -63,7 +63,7 @@ public class PublicDiaryController {
       @Parameter(description = "일기 공개 업로드 요청 데이터", required = true) @Valid @RequestBody
           PublicDiaryWriteRequest request) {
     log.info("공개 일기 업로드 시작");
-    publicDiaryService.write(memberId, request.publicContent(), request.diaryId());
+    publicDiaryService.write(memberId, request.diaryId(), request.publicContent());
     log.info("공개 일기 업로드 성공");
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }

@@ -100,10 +100,6 @@ public class DiaryEntity extends BaseEntity {
       orphanRemoval = true)
   private PublicDiaryEntity publicDiaryEntity;
 
-  public static DiaryEntity createById(Long id) {
-    return DiaryEntity.builder().id(id).build();
-  }
-
   public void addAiContent(AiDiaryContentResponse response) {
     this.aiComment = response.getAiComment();
   }
