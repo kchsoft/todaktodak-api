@@ -1,6 +1,5 @@
 package com.heartsave.todaktodak_api.diary.service;
 
-
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
@@ -71,11 +70,7 @@ public class DiaryService {
     if (0 == diaryRepository.deleteByIds(memberId, diaryId))
       throw new DiaryDeleteNotFoundException(DiaryErrorSpec.DELETE_NOT_FOUND, memberId, diaryId);
     log.info("DB에서 일기를 삭제했습니다.");
-    log.info("S3에 일기 컨텐츠 삭제를 요청합니다.");
     s3FileStorageService.deleteObjects(List.of(diary.getWebtoonImageUrl(), diary.getBgmUrl()));
-    log.info("S3에서 일기 컨텐츠를 삭제했습니다.");
-
-    return;
   }
 
   @Transactional(readOnly = true)

@@ -89,7 +89,10 @@ public class S3FileStorageService {
 
     DeleteObjectRequest request =
         DeleteObjectRequest.builder().bucket(s3Properties.bucketName()).key(key).build();
+
+    log.info("S3에 일기 컨텐츠 삭제를 요청합니다.");
     s3Client.deleteObject(request);
+    log.info("S3에서 일기 컨텐츠를 삭제했습니다.");
   }
 
   public void deleteObjects(List<String> keys) {
