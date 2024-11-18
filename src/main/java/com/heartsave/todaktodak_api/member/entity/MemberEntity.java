@@ -35,6 +35,7 @@ public class MemberEntity extends BaseEntity {
   private String characterImageUrl;
 
   // AI 컨텐츠 사전 정보
+  @Column(columnDefinition = "text")
   private String characterInfo;
 
   @Enumerated(EnumType.STRING)

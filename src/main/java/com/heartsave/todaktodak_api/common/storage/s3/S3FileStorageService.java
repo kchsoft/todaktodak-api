@@ -78,8 +78,9 @@ public class S3FileStorageService {
             .getObjectRequest(
                 GetObjectRequest.builder().bucket(s3Properties.bucketName()).key(key).build())
             .build();
-
-    return s3Presigner.presignGetObject(preSignRequest).url().toString();
+    String preSignedUrl = s3Presigner.presignGetObject(preSignRequest).url().toString();
+    log.info("pre-signed KEY={}, URL{}", key, preSignedUrl);
+    return preSignedUrl;
   }
 
   // TODO: 존재하지 않는 key에 대한 예외 처리 필요
