@@ -6,7 +6,7 @@ import static org.mockito.Mockito.*;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookCharacterCompletionRequest;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.exception.errorspec.EventErrorSpec;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.event.constant.EventType;
 import com.heartsave.todaktodak_api.event.entity.EventEntity;
 import com.heartsave.todaktodak_api.event.exception.EventException;
@@ -27,7 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 final class AiWebhookCharacterServiceTest {
   @Mock private MemberRepository memberRepository;
-  @Mock private S3FileStorageService s3FileStorageService;
+  @Mock private S3FileStorageManager s3FileStorageManager;
   @Mock private EventService eventService;
   @InjectMocks private AiWebhookCharacterService characterService;
 
@@ -53,7 +53,7 @@ final class AiWebhookCharacterServiceTest {
     // given
     when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
     ArgumentCaptor<EventEntity> eventCaptor = ArgumentCaptor.forClass(EventEntity.class);
-    when(s3FileStorageService.parseKeyFrom(anyString())).thenReturn("s3-bucket-key");
+    when(s3FileStorageManager.parseKeyFrom(anyString())).thenReturn("s3-bucket-key");
 
     // when
     characterService.saveCharacterAndNotify(request);

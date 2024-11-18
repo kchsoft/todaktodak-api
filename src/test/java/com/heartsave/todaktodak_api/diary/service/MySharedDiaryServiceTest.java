@@ -12,7 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryResponse;
@@ -44,7 +44,7 @@ public class MySharedDiaryServiceTest {
 
   @Mock private MySharedDiaryRepository mySharedDiaryRepository;
   @Mock private DiaryReactionRepository reactionRepository;
-  @Mock private S3FileStorageService s3FileStorageService;
+  @Mock private S3FileStorageManager s3FileStorageManager;
 
   @Mock private TodakUser mockUser;
 
@@ -69,7 +69,7 @@ public class MySharedDiaryServiceTest {
     previews.add(mockProjection);
 
     when(mockProjection.getWebtoonImageUrl()).thenReturn(webtoonUrl);
-    when(s3FileStorageService.preSignedFirstWebtoonUrlFrom(anyString()))
+    when(s3FileStorageManager.preSignedFirstWebtoonUrlFrom(anyString()))
         .thenReturn(preSigned_webtoonUrl);
     when(mySharedDiaryRepository.findNextPreviews(anyLong(), anyLong(), any(PageRequest.class)))
         .thenReturn(previews);
@@ -80,7 +80,7 @@ public class MySharedDiaryServiceTest {
     assertThat(response).as("페이지네이션 응답이 null이 아니어야 합니다").isNotNull();
     assertThat(response.sharedDiaries()).as("페이지네이션 응답의 미리보기 목록은 1개의 항목을 포함해야 합니다").hasSize(1);
     assertThat(response.isEnd()).as("페이지네이션 정보가 있으면 isEnd 조건은 false 이어야 합니다.").isFalse();
-    verify(s3FileStorageService).preSignedFirstWebtoonUrlFrom(webtoonUrl);
+    verify(s3FileStorageManager).preSignedFirstWebtoonUrlFrom(webtoonUrl);
     verify(mockProjection).replaceWebtoonImageUrl(preSigned_webtoonUrl);
   }
 
@@ -104,7 +104,7 @@ public class MySharedDiaryServiceTest {
     assertThat(response.sharedDiaries())
         .as("publicDiaryId가 0일 때의 미리보기 목록은 1개의 항목을 포함해야 합니다")
         .hasSize(1);
-    verify(s3FileStorageService).preSignedFirstWebtoonUrlFrom(webtoonUrl);
+    verify(s3FileStorageManager).preSignedFirstWebtoonUrlFrom(webtoonUrl);
   }
 
   @Test
@@ -142,9 +142,9 @@ public class MySharedDiaryServiceTest {
     when(reactionRepository.countEachByDiaryId(diaryId)).thenReturn(reactionCount);
     when(reactionRepository.findMemberReaction(memberId, diaryId)).thenReturn(memberReactions);
 
-    when(s3FileStorageService.preSignedWebtoonUrlFrom(any()))
+    when(s3FileStorageManager.preSignedWebtoonUrlFrom(any()))
         .thenReturn(List.of(preSigned_webtoonUrl));
-    when(s3FileStorageService.preSignedBgmUrlFrom(anyString())).thenReturn(preSigned_bgmUrl);
+    when(s3FileStorageManager.preSignedBgmUrlFrom(anyString())).thenReturn(preSigned_bgmUrl);
 
     MySharedDiaryResponse response = mySharedDiaryService.getDiary(mockUser.getId(), requestDate);
 
@@ -154,8 +154,8 @@ public class MySharedDiaryServiceTest {
         .as("사용자의 리액션 목록이 정확히 조회되어야 합니다")
         .containsExactly(DiaryReactionType.LIKE, DiaryReactionType.EMPATHIZE);
 
-    verify(s3FileStorageService).preSignedWebtoonUrlFrom(List.of(webtoonUrl));
-    verify(s3FileStorageService).preSignedBgmUrlFrom(bgmUrl);
+    verify(s3FileStorageManager).preSignedWebtoonUrlFrom(List.of(webtoonUrl));
+    verify(s3FileStorageManager).preSignedBgmUrlFrom(bgmUrl);
     verify(contentOnly).replaceBgmUrl(preSigned_bgmUrl);
     verify(contentOnly).replaceWebtoonImageUrls(List.of(preSigned_webtoonUrl));
   }

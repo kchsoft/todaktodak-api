@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import com.heartsave.todaktodak_api.common.config.properties.S3Properties;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.common.storage.s3.expcetion.InvalidS3UrlException;
 import java.net.URI;
 import java.util.List;
@@ -20,13 +20,13 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 @ExtendWith(MockitoExtension.class)
-final class S3FileStorageServiceTest {
+final class S3FileStorageManagerTest {
 
   @Mock private static S3Presigner s3Presigner;
   @Mock private static S3Properties s3Properties;
   @Mock private static S3Client s3Client;
 
-  @InjectMocks private static S3FileStorageService s3Service;
+  @InjectMocks private static S3FileStorageManager s3Manager;
 
   private static final String TEST_BUCKET = "test-bucket";
   private static final Long TEST_DURATION = 3600L;
@@ -41,7 +41,7 @@ final class S3FileStorageServiceTest {
 
   @BeforeEach
   void setUp() {
-    s3Service = new S3FileStorageService(s3Presigner, s3Properties, s3Client);
+    s3Manager = new S3FileStorageManager(s3Presigner, s3Properties, s3Client);
   }
 
   private void mockBasicProperties() {
@@ -80,7 +80,7 @@ final class S3FileStorageServiceTest {
       List<String> keys = List.of("1.webp", "2.webp", "3.webp", "4.webp");
 
       // when
-      List<String> urls = s3Service.preSignedWebtoonUrlFrom(keys);
+      List<String> urls = s3Manager.preSignedWebtoonUrlFrom(keys);
 
       // then
       assertThat(urls).hasSize(4).allMatch(url -> url.equals(TEST_PRE_SIGNED_URL));
@@ -94,7 +94,7 @@ final class S3FileStorageServiceTest {
       mockPresign();
 
       // when
-      String url = s3Service.preSignedFirstWebtoonUrlFrom(null);
+      String url = s3Manager.preSignedFirstWebtoonUrlFrom(null);
 
       // then
       assertThat(url).isEqualTo(TEST_PRE_SIGNED_URL);
@@ -118,7 +118,7 @@ final class S3FileStorageServiceTest {
       String key = "character.jpg";
 
       // when
-      String url = s3Service.preSignedCharacterImageUrlFrom(key);
+      String url = s3Manager.preSignedCharacterImageUrlFrom(key);
 
       // then
       assertThat(url).isEqualTo(TEST_PRE_SIGNED_URL);
@@ -132,7 +132,7 @@ final class S3FileStorageServiceTest {
       mockPresign();
 
       // when
-      String url = s3Service.preSignedCharacterImageUrlFrom(null);
+      String url = s3Manager.preSignedCharacterImageUrlFrom(null);
 
       // then
       assertThat(url).isEqualTo(TEST_PRE_SIGNED_URL);
@@ -156,7 +156,7 @@ final class S3FileStorageServiceTest {
       String key = "music.mp3";
 
       // when
-      String url = s3Service.preSignedBgmUrlFrom(key);
+      String url = s3Manager.preSignedBgmUrlFrom(key);
 
       // then
       assertThat(url).isEqualTo(TEST_PRE_SIGNED_URL);
@@ -170,7 +170,7 @@ final class S3FileStorageServiceTest {
       mockPresign();
 
       // when
-      String url = s3Service.preSignedBgmUrlFrom(null);
+      String url = s3Manager.preSignedBgmUrlFrom(null);
 
       // then
       assertThat(url).isEqualTo(TEST_PRE_SIGNED_URL);
@@ -185,7 +185,7 @@ final class S3FileStorageServiceTest {
         .willThrow(NoSuchKeyException.class);
 
     // when + then
-    assertThatThrownBy(() -> s3Service.preSignedBgmUrlFrom("non-existent.mp3"))
+    assertThatThrownBy(() -> s3Manager.preSignedBgmUrlFrom("non-existent.mp3"))
         .isInstanceOf(NoSuchKeyException.class);
   }
 
@@ -206,7 +206,7 @@ final class S3FileStorageServiceTest {
       List<String> folderUrls = List.of("webtoon/chapter1");
 
       // when
-      List<String> presignedUrls = s3Service.preSignedWebtoonUrlFrom(folderUrls);
+      List<String> presignedUrls = s3Manager.preSignedWebtoonUrlFrom(folderUrls);
 
       // then
       assertThat(presignedUrls).hasSize(4).allMatch(url -> url.equals(TEST_PRE_SIGNED_URL));
@@ -220,7 +220,7 @@ final class S3FileStorageServiceTest {
     List<String> emptyUrls = List.of();
 
     // when
-    List<String> presignedUrls = s3Service.preSignedWebtoonUrlFrom(emptyUrls);
+    List<String> presignedUrls = s3Manager.preSignedWebtoonUrlFrom(emptyUrls);
 
     // then
     assertThat(presignedUrls).isEmpty();
@@ -239,7 +239,7 @@ final class S3FileStorageServiceTest {
     void parseKeyFromValidUrlTest() {
       // when
       given(s3Properties.bucketName()).willReturn(TEST_BUCKET);
-      String key = s3Service.parseKeyFrom(VALID_S3_URL);
+      String key = s3Manager.parseKeyFrom(VALID_S3_URL);
 
       // then
       assertThat(key).isEqualTo(EXPECTED_KEY);
@@ -248,7 +248,7 @@ final class S3FileStorageServiceTest {
     @Test
     @DisplayName("null URL에 대해 예외 발생")
     void parseKeyFromNullUrlTest() {
-      assertThatThrownBy(() -> s3Service.parseKeyFrom(null))
+      assertThatThrownBy(() -> s3Manager.parseKeyFrom(null))
           .isInstanceOf(InvalidS3UrlException.class);
     }
 
@@ -260,7 +260,7 @@ final class S3FileStorageServiceTest {
       String invalidUrl = "not-a-url";
 
       // when + then
-      assertThatThrownBy(() -> s3Service.parseKeyFrom(invalidUrl))
+      assertThatThrownBy(() -> s3Manager.parseKeyFrom(invalidUrl))
           .isInstanceOf(InvalidS3UrlException.class);
     }
 
@@ -272,7 +272,7 @@ final class S3FileStorageServiceTest {
       String urlWithoutBucket = "https://different-bucket.s3.amazonaws.com/file.jpg";
 
       // when + then
-      assertThatThrownBy(() -> s3Service.parseKeyFrom(urlWithoutBucket))
+      assertThatThrownBy(() -> s3Manager.parseKeyFrom(urlWithoutBucket))
           .isInstanceOf(InvalidS3UrlException.class);
     }
   }

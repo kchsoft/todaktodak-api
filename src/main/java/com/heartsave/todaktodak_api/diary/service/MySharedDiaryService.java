@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.diary.service;
 
 import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryResponse;
@@ -27,7 +27,7 @@ public class MySharedDiaryService {
 
   private final MySharedDiaryRepository mySharedDiaryRepository;
   private final DiaryReactionRepository reactionRepository;
-  private final S3FileStorageService s3FileStorageService;
+  private final S3FileStorageManager s3FileStorageManager;
 
   @Transactional(readOnly = true)
   public MySharedDiaryPaginationResponse getPagination(Long memberId, Long publicDiaryId) {
@@ -52,7 +52,7 @@ public class MySharedDiaryService {
     log.info("나의 공개된 일기 이미지 URL pre-signed 과정을 시작합니다.");
     for (MySharedDiaryPreviewProjection preview : previews) {
       preview.replaceWebtoonImageUrl(
-          s3FileStorageService.preSignedFirstWebtoonUrlFrom(preview.getWebtoonImageUrl()));
+          s3FileStorageManager.preSignedFirstWebtoonUrlFrom(preview.getWebtoonImageUrl()));
     }
   }
 
@@ -73,8 +73,8 @@ public class MySharedDiaryService {
   private void replaceWithPreSignedUrls(MySharedDiaryContentOnlyProjection contentOnly) {
     log.info("나의 공개된 일기 URL pre-signed 과정을 시작합니다.");
     contentOnly.replaceWebtoonImageUrls(
-        s3FileStorageService.preSignedWebtoonUrlFrom(contentOnly.getWebtoonImageUrls()));
-    contentOnly.replaceBgmUrl(s3FileStorageService.preSignedBgmUrlFrom(contentOnly.getBgmUrl()));
+        s3FileStorageManager.preSignedWebtoonUrlFrom(contentOnly.getWebtoonImageUrls()));
+    contentOnly.replaceBgmUrl(s3FileStorageManager.preSignedBgmUrlFrom(contentOnly.getBgmUrl()));
   }
 
   private MySharedDiaryContentOnlyProjection fetchContentOnly(

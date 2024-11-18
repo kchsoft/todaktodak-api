@@ -16,7 +16,7 @@ import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentRespons
 import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.common.TestDiaryObjectFactory;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
@@ -55,7 +55,7 @@ public class DiaryServiceTest {
   @Mock private DiaryRepository mockDiaryRepository;
   @Mock private DiaryReactionRepository mockDiaryReactionRepository;
   @Mock private AiClientService mockAiClientService;
-  @Mock private S3FileStorageService mockS3Service;
+  @Mock private S3FileStorageManager mockS3Manager;
   @InjectMocks private DiaryService diaryService;
   private MemberEntity member;
   private DiaryEntity diary;
@@ -213,8 +213,8 @@ public class DiaryServiceTest {
     List<String> preSignedWebtoon = List.of("pre-sigend-webtoon");
     String preSignedBgm = "pre-sigend-bgm";
 
-    when(mockS3Service.preSignedWebtoonUrlFrom(anyList())).thenReturn(preSignedWebtoon);
-    when(mockS3Service.preSignedBgmUrlFrom(anyString())).thenReturn(preSignedBgm);
+    when(mockS3Manager.preSignedWebtoonUrlFrom(anyList())).thenReturn(preSignedWebtoon);
+    when(mockS3Manager.preSignedBgmUrlFrom(anyString())).thenReturn(preSignedBgm);
 
     DiaryResponse response = diaryService.getDiary(member.getId(), requestDate);
 

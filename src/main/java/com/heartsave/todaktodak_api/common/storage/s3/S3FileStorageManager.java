@@ -23,7 +23,7 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 @RequiredArgsConstructor
 @Slf4j
 @Service
-public class S3FileStorageService {
+public class S3FileStorageManager {
   private final S3Presigner s3Presigner;
   private final S3Properties s3Properties;
   private final S3Client s3Client;

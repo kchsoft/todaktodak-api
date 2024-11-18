@@ -4,7 +4,7 @@ import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentRespons
 import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
@@ -37,7 +37,7 @@ public class DiaryService {
   private final AiClientService aiClientService;
   private final DiaryRepository diaryRepository;
   private final MemberRepository memberRepository;
-  private final S3FileStorageService s3FileStorageService;
+  private final S3FileStorageManager s3FileStorageManager;
 
   public DiaryWriteResponse write(Long memberId, DiaryWriteRequest request) {
     DiaryEntity diary = createDiaryEntity(memberId, request);
@@ -70,7 +70,7 @@ public class DiaryService {
     if (0 == diaryRepository.deleteByIds(memberId, diaryId))
       throw new DiaryDeleteNotFoundException(DiaryErrorSpec.DELETE_NOT_FOUND, memberId, diaryId);
     log.info("DB에서 일기를 삭제했습니다.");
-    s3FileStorageService.deleteObjects(List.of(diary.getWebtoonImageUrl(), diary.getBgmUrl()));
+    s3FileStorageManager.deleteObjects(List.of(diary.getWebtoonImageUrl(), diary.getBgmUrl()));
   }
 
   @Transactional(readOnly = true)
@@ -103,8 +103,8 @@ public class DiaryService {
         .emotion(diary.getEmotion())
         .content(diary.getContent())
         .webtoonImageUrls(
-            s3FileStorageService.preSignedWebtoonUrlFrom(List.of(diary.getWebtoonImageUrl())))
-        .bgmUrl(s3FileStorageService.preSignedBgmUrlFrom(diary.getBgmUrl()))
+            s3FileStorageManager.preSignedWebtoonUrlFrom(List.of(diary.getWebtoonImageUrl())))
+        .bgmUrl(s3FileStorageManager.preSignedBgmUrlFrom(diary.getBgmUrl()))
         .aiComment(diary.getAiComment())
         .date(diary.getDiaryCreatedTime().toLocalDate())
         .build();

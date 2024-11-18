@@ -8,7 +8,7 @@ import static org.mockito.Mockito.*;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.repository.AiRepository;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.event.service.EventService;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
@@ -27,7 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class AiDiaryServiceTest {
 
   @Mock private AiRepository aiRepository;
-  @Mock private S3FileStorageService s3FileStorageService;
+  @Mock private S3FileStorageManager s3FileStorageManager;
   @Mock private MemberRepository memberRepository;
   @Mock private EventService eventService;
   @InjectMocks private AiDiaryService aiDiaryService;
@@ -42,7 +42,7 @@ class AiDiaryServiceTest {
   void setUp() {
     webtoonRequest = new WebhookWebtoonCompletionRequest(memberId, createdDate, TEST_WEBTOON_URL);
     bgmRequest = new WebhookBgmCompletionRequest(memberId, createdDate, TEST_BGM_URL);
-    when(s3FileStorageService.parseKeyFrom(anyString())).thenReturn(parseKeyUrl);
+    when(s3FileStorageManager.parseKeyFrom(anyString())).thenReturn(parseKeyUrl);
   }
 
   @Nested

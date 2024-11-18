@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.diary.service;
 
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
@@ -36,7 +36,7 @@ public class PublicDiaryService {
   private final PublicDiaryRepository publicDiaryRepository;
   private final DiaryReactionRepository diaryReactionRepository;
   private final MemberRepository memberRepository;
-  private final S3FileStorageService s3FileStorageService;
+  private final S3FileStorageManager s3FileStorageManager;
 
   @Transactional(readOnly = true)
   public PublicDiaryPaginationResponse getPublicDiaryPagination(Long memberId, Long publicDiaryId) {
@@ -60,10 +60,10 @@ public class PublicDiaryService {
     log.info("공개 일기 content url을 pre-signed url로 변경합니다.");
     for (PublicDiaryContentOnlyProjection content : diaryContents) {
       content.replaceWebtoonImageUrls(
-          s3FileStorageService.preSignedWebtoonUrlFrom(content.getWebtoonImageUrls()));
+          s3FileStorageManager.preSignedWebtoonUrlFrom(content.getWebtoonImageUrls()));
       content.replaceCharacterImageUrl(
-          s3FileStorageService.preSignedCharacterImageUrlFrom(content.getCharacterImageUrl()));
-      content.replaceBgmUrl(s3FileStorageService.preSignedBgmUrlFrom(content.getBgmUrl()));
+          s3FileStorageManager.preSignedCharacterImageUrlFrom(content.getCharacterImageUrl()));
+      content.replaceBgmUrl(s3FileStorageManager.preSignedBgmUrlFrom(content.getBgmUrl()));
     }
   }
 

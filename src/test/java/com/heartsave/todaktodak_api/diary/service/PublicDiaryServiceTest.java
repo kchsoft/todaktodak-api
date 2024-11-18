@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
@@ -50,7 +50,7 @@ class PublicDiaryServiceTest {
   @Mock private DiaryRepository mockDiaryRepository;
   @Mock private PublicDiaryRepository mockPublicDiaryRepository;
   @Mock private DiaryReactionRepository mockDiaryReactionRepository;
-  @Mock private S3FileStorageService mocksS3FileStorageService;
+  @Mock private S3FileStorageManager mocksS3FileStorageManager;
   @Mock private MemberRepository mockMemberRepository;
   @InjectMocks private PublicDiaryService publicDiaryService;
 
@@ -207,10 +207,10 @@ class PublicDiaryServiceTest {
 
     // S3 URL 생성 mock
     List<String> mockWebtoonUrls = List.of("presigned-webtoon-url");
-    when(mocksS3FileStorageService.preSignedWebtoonUrlFrom(any())).thenReturn(mockWebtoonUrls);
-    when(mocksS3FileStorageService.preSignedCharacterImageUrlFrom(any()))
+    when(mocksS3FileStorageManager.preSignedWebtoonUrlFrom(any())).thenReturn(mockWebtoonUrls);
+    when(mocksS3FileStorageManager.preSignedCharacterImageUrlFrom(any()))
         .thenReturn("presigned-character-url");
-    when(mocksS3FileStorageService.preSignedBgmUrlFrom(any())).thenReturn("presigned-bgm-url");
+    when(mocksS3FileStorageManager.preSignedBgmUrlFrom(any())).thenReturn("presigned-bgm-url");
 
     // Repository mock 설정
     when(mockPublicDiaryRepository.findNextContentOnlyById(anyLong(), any(PageRequest.class)))
@@ -254,9 +254,9 @@ class PublicDiaryServiceTest {
     verify(mockPublicDiaryRepository).findNextContentOnlyById(anyLong(), any(PageRequest.class));
     verify(mockDiaryReactionRepository).countEachByDiaryId(diary.getId());
     verify(mockDiaryReactionRepository).findMemberReaction(memberId, diary.getId());
-    verify(mocksS3FileStorageService).preSignedWebtoonUrlFrom(any());
-    verify(mocksS3FileStorageService).preSignedCharacterImageUrlFrom(any());
-    verify(mocksS3FileStorageService).preSignedBgmUrlFrom(any());
+    verify(mocksS3FileStorageManager).preSignedWebtoonUrlFrom(any());
+    verify(mocksS3FileStorageManager).preSignedCharacterImageUrlFrom(any());
+    verify(mocksS3FileStorageManager).preSignedBgmUrlFrom(any());
     verify(content).replaceBgmUrl(any());
     verify(content).replaceCharacterImageUrl(any());
     verify(content).replaceCharacterImageUrl(any());
