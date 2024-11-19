@@ -232,7 +232,10 @@ public class DiaryReactionRepositoryTest {
             .diaryEntity(diary)
             .reactionType(DiaryReactionType.LIKE)
             .build();
-    diary.addReaction(reaction);
+    diaryReactionRepository.save(reaction);
+
+    tem.flush();
+    tem.clear();
 
     DiaryReactionEntity duplicateReaction =
         DiaryReactionEntity.builder()
@@ -240,7 +243,6 @@ public class DiaryReactionRepositoryTest {
             .diaryEntity(diary)
             .reactionType(DiaryReactionType.LIKE)
             .build();
-    tem.flush();
 
     assertThatThrownBy(
             () -> {

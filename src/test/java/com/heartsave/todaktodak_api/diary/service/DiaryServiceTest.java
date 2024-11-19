@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -104,14 +105,15 @@ public class DiaryServiceTest {
   @Test
   @DisplayName("일기 삭제 요청 성공")
   void diaryDeleteSuccess() {
-    when(mockDiaryRepository.deleteByIds(anyLong(), anyLong())).thenReturn(1);
+    doNothing().when(mockDiaryRepository).delete(any(DiaryEntity.class));
     when(mockDiaryRepository.findById(diary.getId())).thenReturn(Optional.of(diary));
+    doNothing().when(mockS3Manager).deleteObjects(any(List.class));
     assertDoesNotThrow(
         () -> {
           diaryService.delete(member.getId(), diary.getId());
         },
         "예상치 못한 예외가 발생했습니다.");
-    verify(mockDiaryRepository, times(1)).deleteByIds(anyLong(), anyLong());
+    verify(mockDiaryRepository, times(1)).delete(any(DiaryEntity.class));
     verify(mockDiaryRepository, times(1)).findById(anyLong());
   }
 
@@ -127,7 +129,7 @@ public class DiaryServiceTest {
               diaryService.delete(member.getId(), diary.getId());
             },
             "Diary Not Found 예외가 발생하지 않았습니다.");
-    verify(mockDiaryRepository, times(0)).deleteByIds(anyLong(), anyLong());
+    verify(mockDiaryRepository, times(0)).delete(any(DiaryEntity.class));
     verify(mockDiaryRepository, times(1)).findById(anyLong());
     log.info(diaryException.getLogMessage());
   }

@@ -163,6 +163,9 @@ class MySharedDiaryRepositoryTest {
     Long memberId = expected.getMemberEntity().getId();
     LocalDate requestDate =
         InstantConverter.toLocalDate(expected.getDiaryEntity().getDiaryCreatedTime());
+    System.out.println(
+        "expected.getDiaryEntity().getDiaryCreatedTime() = "
+            + expected.getDiaryEntity().getDiaryCreatedTime());
     System.out.println("requestDate = " + requestDate);
 
     Optional<MySharedDiaryContentOnlyProjection> Optional_actual =
@@ -184,9 +187,13 @@ class MySharedDiaryRepositoryTest {
     assertThat(actual.getBgmUrl())
         .as("BGM URL이 일치해야 합니다")
         .contains(expected.getDiaryEntity().getBgmUrl());
-    assertThat(actual.getDiaryCreatedDate())
+    assertThat(actual.getDiaryCreatedDate().truncatedTo(ChronoUnit.SECONDS))
         .as("일기 작성 날짜가 일치해야 합니다")
-        .isEqualTo(expected.getDiaryEntity().getDiaryCreatedTime().truncatedTo(ChronoUnit.MILLIS));
+        .isEqualTo(
+            expected
+                .getDiaryEntity()
+                .getDiaryCreatedTime()
+                .truncatedTo(ChronoUnit.SECONDS)); // DB에 Instant 저장시 MILLIS 반올림, 따라서 Second 까지 검사
   }
 
   @Test
