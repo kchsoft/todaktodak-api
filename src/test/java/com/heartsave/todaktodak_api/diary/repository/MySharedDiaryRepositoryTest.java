@@ -3,13 +3,15 @@ package com.heartsave.todaktodak_api.diary.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.heartsave.todaktodak_api.common.BaseTestObject;
+import com.heartsave.todaktodak_api.common.converter.InstantConverter;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentOnlyProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +22,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @Slf4j
 @DataJpaTest
@@ -48,7 +52,7 @@ class MySharedDiaryRepositoryTest {
     for (int i = 0; i < TEST_PUBLIC_DIARY_SIZE; i++) {
       DiaryEntity diary =
           BaseTestObject.createDiaryNoIdWithMemberAndCreatedDateTime(
-              member, LocalDateTime.now().minusDays(TEST_PUBLIC_DIARY_SIZE - (i + 1)));
+              member, Instant.now().minus(TEST_PUBLIC_DIARY_SIZE - (i + 1), ChronoUnit.DAYS));
       PublicDiaryEntity publicDiary =
           PublicDiaryEntity.builder()
               .diaryEntity(diary)
@@ -113,9 +117,8 @@ class MySharedDiaryRepositoryTest {
   void shouldFindPreviewsBeforeSpecificId() {
     // given
     int pivot = 10;
-    Long middlePublicDiaryId = publicDiaries.get(pivot).getId();
+    Long middlePublicDiaryId = publicDiaries.get(pivot).getId(); // 11
     PageRequest pageRequest = PageRequest.of(0, 4);
-
     // when
     List<MySharedDiaryPreviewProjection> previews =
         mySharedDiaryRepository.findNextPreviews(member.getId(), middlePublicDiaryId, pageRequest);
@@ -125,9 +128,11 @@ class MySharedDiaryRepositoryTest {
     assertThat(previews.get(0).getPublicDiaryId())
         .as("첫 번째 미리보기의 ID가 예상과 다릅니다")
         .isEqualTo(publicDiaries.get(pivot - 1).getId());
+
     assertThat(previews.get(1).getPublicDiaryId())
         .as("두 번째 미리보기의 ID가 예상과 다릅니다")
         .isEqualTo(publicDiaries.get(pivot - 2).getId());
+
     assertThat(previews.get(2).getPublicDiaryId())
         .as("세 번째 미리보기의 ID가 예상과 다릅니다")
         .isEqualTo(publicDiaries.get(pivot - 3).getId());
@@ -156,7 +161,8 @@ class MySharedDiaryRepositoryTest {
   void findContentOnly_Success() {
     PublicDiaryEntity expected = publicDiaries.get(3);
     Long memberId = expected.getMemberEntity().getId();
-    LocalDate requestDate = expected.getDiaryEntity().getDiaryCreatedTime().toLocalDate();
+    LocalDate requestDate =
+        InstantConverter.toLocalDate(expected.getDiaryEntity().getDiaryCreatedTime());
     System.out.println("requestDate = " + requestDate);
 
     Optional<MySharedDiaryContentOnlyProjection> Optional_actual =
@@ -180,7 +186,7 @@ class MySharedDiaryRepositoryTest {
         .contains(expected.getDiaryEntity().getBgmUrl());
     assertThat(actual.getDiaryCreatedDate())
         .as("일기 작성 날짜가 일치해야 합니다")
-        .isEqualTo(expected.getDiaryEntity().getDiaryCreatedTime().toLocalDate());
+        .isEqualTo(expected.getDiaryEntity().getDiaryCreatedTime().truncatedTo(ChronoUnit.MILLIS));
   }
 
   @Test
@@ -196,4 +202,8 @@ class MySharedDiaryRepositoryTest {
     result = mySharedDiaryRepository.findContentOnly(1000L, LocalDate.now());
     assertThat(result).as("존재하지 않는 memberId로 일기 조회 시 빈 Optional이 반환되어야 합니다").isEmpty();
   }
+
+  @TestConfiguration
+  @EnableJpaAuditing
+  public static class TestJpaConfig {}
 }

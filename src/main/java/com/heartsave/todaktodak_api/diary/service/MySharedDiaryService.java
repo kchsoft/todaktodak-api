@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.diary.service;
 
+import com.heartsave.todaktodak_api.common.converter.InstantConverter;
 import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
@@ -11,7 +12,7 @@ import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreview
 import com.heartsave.todaktodak_api.diary.exception.PublicDiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.MySharedDiaryRepository;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,9 +56,9 @@ public class MySharedDiaryService {
     }
   }
 
-  public MySharedDiaryResponse getDiary(Long memberId, LocalDate requestDate) {
+  public MySharedDiaryResponse getDiary(Long memberId, Instant requestInstant) {
     log.info("나의 공개된 일기 상세 정보를 요청합니다.");
-    MySharedDiaryContentOnlyProjection contentOnly = fetchContentOnly(requestDate, memberId);
+    MySharedDiaryContentOnlyProjection contentOnly = fetchContentOnly(requestInstant, memberId);
     replaceWithPreSignedUrls(contentOnly);
 
     DiaryReactionCountProjection reactionCount =
@@ -76,15 +77,16 @@ public class MySharedDiaryService {
   }
 
   private MySharedDiaryContentOnlyProjection fetchContentOnly(
-      LocalDate requestDate, Long memberId) {
+      Instant requestDateTime, Long memberId) {
     log.info("나의 공개된 일기 content only 를 요청합니다.");
     MySharedDiaryContentOnlyProjection contentOnly =
         mySharedDiaryRepository
-            .findContentOnly(memberId, requestDate)
+            .findContentOnly(memberId, InstantConverter.toLocalDate(requestDateTime))
             .orElseThrow(
                 () ->
                     new PublicDiaryNotFoundException(
-                        PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, requestDate));
+                        PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, requestDateTime));
+
     return contentOnly;
   }
 }

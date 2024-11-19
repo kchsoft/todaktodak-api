@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -27,7 +27,7 @@ public class DiaryWriteRequest {
   @PastOrPresent(message = "Diary Writing Date is Future")
   @NotNull
   @JsonProperty("date")
-  private LocalDateTime dateTime;
+  private Instant dateTime;
 
   @Schema(description = "일기에 기록된 감정", example = "happy", required = true)
   @NotNull(message = "DiaryEmotion is Null")

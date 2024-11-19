@@ -23,7 +23,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -31,8 +31,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 @Entity
 @Getter
@@ -78,8 +76,7 @@ public class DiaryEntity extends BaseEntity {
       nullable = false,
       updatable = false,
       columnDefinition = "TIMESTAMP(3)")
-  @DateTimeFormat(iso = ISO.DATE_TIME)
-  private LocalDateTime diaryCreatedTime;
+  private Instant diaryCreatedTime;
 
   @OneToMany(
       fetch = FetchType.LAZY,

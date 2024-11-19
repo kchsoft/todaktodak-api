@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.ai.client.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.heartsave.todaktodak_api.common.converter.InstantConverter;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
@@ -19,7 +20,7 @@ public class ClientBgmRequest {
 
   private ClientBgmRequest(DiaryEntity diary, MemberEntity member) {
     this.memberId = member.getId();
-    this.date = diary.getDiaryCreatedTime().toLocalDate();
+    this.date = InstantConverter.toLocalDate(diary.getDiaryCreatedTime());
     this.content = diary.getContent();
     this.emotion = diary.getEmotion();
   }

@@ -1,10 +1,12 @@
 package com.heartsave.todaktodak_api.diary.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.heartsave.todaktodak_api.common.constant.CoreConstant.TIME_FORMAT;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentOnlyProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,8 +37,13 @@ public class MySharedDiaryResponse {
   @Schema(description = "내가 한 리액션 목록", example = "[like, empathize]")
   private final List<DiaryReactionType> myReaction;
 
-  @Schema(description = "일기 작성 날짜", example = "2024-01-01", type = "string", format = "date")
-  private final LocalDate diaryCreatedDate;
+  @Schema(
+      description = "일기 작성 날짜",
+      example = "2024-01-01'T'00:11:10.752'Z'",
+      type = "string",
+      format = "date")
+  @JsonFormat(pattern = TIME_FORMAT.ISO_DATETIME_WITH_MILLISECONDS, timezone = "UTC")
+  private final Instant diaryCreatedDate;
 
   private MySharedDiaryResponse(
       MySharedDiaryContentOnlyProjection content,
