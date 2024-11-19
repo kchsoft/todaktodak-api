@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.auth.dto.request.LoginRequest;
 import com.heartsave.todaktodak_api.auth.dto.response.LoginResponse;
+import com.heartsave.todaktodak_api.auth.repository.RefreshTokenCacheRepository;
 import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
@@ -36,6 +37,7 @@ final class JwtAuthFilterTest {
   private MockFilterChain filterChain;
   private AuthenticationManager authenticationManager;
   private ObjectMapper objectMapper;
+  private RefreshTokenCacheRepository cacheRepository;
 
   @BeforeAll
   static void setupAll() {
@@ -57,7 +59,8 @@ final class JwtAuthFilterTest {
   void setup() {
     authenticationManager = mock(AuthenticationManager.class);
     objectMapper = new ObjectMapper();
-    jwtAuthFilter = new JwtAuthFilter(authenticationManager, objectMapper);
+    cacheRepository = mock(RefreshTokenCacheRepository.class);
+    jwtAuthFilter = new JwtAuthFilter(authenticationManager, objectMapper, cacheRepository);
     request = new MockHttpServletRequest();
     response = new MockHttpServletResponse();
     filterChain = new MockFilterChain();
@@ -92,6 +95,7 @@ final class JwtAuthFilterTest {
     // LoginRequest로부터 생성될 Authentication 토큰과 정확히 매칭되도록 설정
     when(authenticationManager.authenticate(eq(expectedAuthToken)))
         .thenReturn(successAuthentication);
+    doNothing().when(cacheRepository).set(anyString(), anyString());
     jwtAuthFilter.doFilter(request, response, filterChain);
 
     // then

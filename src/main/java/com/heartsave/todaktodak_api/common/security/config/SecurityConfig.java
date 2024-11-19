@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.common.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.heartsave.todaktodak_api.auth.repository.RefreshTokenCacheRepository;
 import com.heartsave.todaktodak_api.common.security.component.AccessDeniedHandlerImpl;
 import com.heartsave.todaktodak_api.common.security.component.AuthenticationEntryPointImpl;
 import com.heartsave.todaktodak_api.common.security.component.jwt.JwtAuthFilter;
@@ -37,6 +38,7 @@ public class SecurityConfig {
   private final AuthenticationEntryPointImpl authenticationEntryPoint;
   private final OAuth2SuccessHandler oAuth2SuccessHandler;
   private final ObjectMapper objectMapper;
+  private final RefreshTokenCacheRepository refreshTokenCacheRepository;
 
   @Value("${todak.cors.allowed-origin}")
   private List<String> ALLOWED_ORIGINS;
@@ -79,7 +81,7 @@ public class SecurityConfig {
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(new JwtValidationFilter(authenticationEntryPoint), JwtAuthFilter.class)
         .addFilterBefore(
-            new JwtAuthFilter(authenticationManager, objectMapper),
+            new JwtAuthFilter(authenticationManager, objectMapper, refreshTokenCacheRepository),
             UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(new JwtLogoutFilter(), LogoutFilter.class)
         .build();
