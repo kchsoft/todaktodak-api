@@ -24,9 +24,9 @@ import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
 import com.heartsave.todaktodak_api.diary.service.DiaryService;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -56,7 +56,7 @@ public class DiaryControllerTest {
   void writeDiarySuccess() throws Exception {
     DiaryWriteRequest request =
         new DiaryWriteRequest(
-            LocalDateTime.now(), DiaryEmotion.HAPPY, BaseTestObject.DUMMY_STRING_CONTENT);
+            Instant.now(), DiaryEmotion.HAPPY, BaseTestObject.DUMMY_STRING_CONTENT);
 
     final String AI_COMMENT = "this is test ai comment";
 
@@ -115,14 +115,16 @@ public class DiaryControllerTest {
     List<DiaryIndexProjection> mockIndexes = getTestDiaryIndexProjections_2024_03_Data_Of_2();
     DiaryIndexResponse mockResponse =
         DiaryIndexResponse.builder().diaryIndexes(mockIndexes).build();
+    String yearMonth = "2024-03-01T09:12:30.123Z";
 
     // when
-    when(diaryService.getIndex(anyLong(), any(YearMonth.class))).thenReturn(mockResponse);
+    when(diaryService.getIndex(anyLong(), any(Instant.class))).thenReturn(mockResponse);
 
     // then
-    MvcResult mvcResult =
+    MvcResult mvcResult = null;
+    mvcResult =
         mockMvc
-            .perform(get("/api/v1/diary/my").param("yearMonth", "2024-03"))
+            .perform(get("/api/v1/diary/my").param("yearMonth", yearMonth))
             .andExpect(status().isOk())
             .andDo(print())
             .andReturn();
@@ -145,14 +147,15 @@ public class DiaryControllerTest {
   void getZeroOfDiaryYearMonthSuccess() throws Exception {
     // response
     DiaryIndexResponse mockResponse = new DiaryIndexResponse(new ArrayList<>());
+    String yearMonth = "2024-01-01T00:00:00.010Z";
 
     // when
-    when(diaryService.getIndex(anyLong(), any(YearMonth.class))).thenReturn(mockResponse);
+    when(diaryService.getIndex(anyLong(), any(Instant.class))).thenReturn(mockResponse);
 
     // then
     MvcResult mvcResult =
         mockMvc
-            .perform(get("/api/v1/diary/my").param("yearMonth", "2024-01"))
+            .perform(get("/api/v1/diary/my").param("yearMonth", yearMonth))
             .andExpect(status().isOk())
             .andDo(print())
             .andReturn();
@@ -166,16 +169,16 @@ public class DiaryControllerTest {
   @WithMockTodakUser
   void getDiarySuccess() throws Exception {
     // given
-    LocalDate validDate = LocalDate.now().minusDays(1); // 어제 날짜
+    Instant validDate = Instant.now().minus(1, ChronoUnit.DAYS); // 어제 날짜
     DiaryResponse mockResponse =
         DiaryResponse.builder()
             .content("테스트 일기 내용")
             .emotion(DiaryEmotion.HAPPY)
-            .date(validDate)
+            .dateTime(validDate)
             .build();
 
     // when
-    when(diaryService.getDiary(anyLong(), any(LocalDate.class))).thenReturn(mockResponse);
+    when(diaryService.getDiary(anyLong(), any(Instant.class))).thenReturn(mockResponse);
 
     // then
     MvcResult mvcResult =

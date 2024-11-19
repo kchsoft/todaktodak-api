@@ -1,8 +1,10 @@
 package com.heartsave.todaktodak_api.diary.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.heartsave.todaktodak_api.common.constant.CoreConstant.TIME_FORMAT;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,5 +36,6 @@ public class DiaryResponse {
   private String aiComment;
 
   @Schema(description = "일기 작성 날짜", example = "2024-10-26", type = "string", format = "date")
-  private LocalDate date;
+  @JsonFormat(pattern = TIME_FORMAT.ISO_DATETIME_WITH_MILLISECONDS, timezone = "UTC")
+  private Instant dateTime;
 }

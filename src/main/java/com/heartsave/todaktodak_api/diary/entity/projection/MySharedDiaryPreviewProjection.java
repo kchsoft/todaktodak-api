@@ -1,7 +1,9 @@
 package com.heartsave.todaktodak_api.diary.entity.projection;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.heartsave.todaktodak_api.common.constant.CoreConstant.TIME_FORMAT;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDate;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,7 +19,8 @@ public class MySharedDiaryPreviewProjection {
   private String webtoonImageUrl;
 
   @Schema(description = "일기 작성 날짜", example = "2024-01-01", type = "string", format = "date")
-  private final LocalDate createdDate;
+  @JsonFormat(pattern = TIME_FORMAT.ISO_DATETIME_WITH_MILLISECONDS, timezone = "UTC")
+  private final Instant createdDate;
 
   public void replaceWebtoonImageUrl(String webtoonImageUrl) {
     this.webtoonImageUrl = webtoonImageUrl;

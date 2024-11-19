@@ -1,10 +1,12 @@
 package com.heartsave.todaktodak_api.diary.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.heartsave.todaktodak_api.common.constant.CoreConstant.TIME_FORMAT;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import lombok.Getter;
 
@@ -37,7 +39,8 @@ public class PublicDiary {
   private final String bgmUrl;
 
   @Schema(description = "일기 작성 날짜", example = "2024-10-26", type = "string", format = "date")
-  private final LocalDate createdDate;
+  @JsonFormat(pattern = TIME_FORMAT.ISO_DATETIME_WITH_MILLISECONDS, timezone = "UTC")
+  private final Instant createdDate;
 
   @Schema(description = "일기에 대한 반응 수 정보")
   private final DiaryReactionCountProjection reactionCount;

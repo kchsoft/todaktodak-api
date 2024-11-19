@@ -32,10 +32,12 @@ import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +61,7 @@ public class DiaryServiceTest {
   @InjectMocks private DiaryService diaryService;
   private MemberEntity member;
   private DiaryEntity diary;
-  private final LocalDateTime NOW_DATE_TIME = LocalDateTime.now();
+  private final Instant NOW_DATE_TIME = Instant.now();
 
   @BeforeEach
   void allSetup() {
@@ -75,7 +77,7 @@ public class DiaryServiceTest {
     String AI_COMMENT = "this is test ai comment";
 
     when(mockMemberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-    when(mockDiaryRepository.existsByDate(anyLong(), any(LocalDateTime.class))).thenReturn(false);
+    when(mockDiaryRepository.existsByDate(anyLong(), any(LocalDate.class))).thenReturn(false);
     when(mockAiClientService.callDiaryContent(any(DiaryEntity.class)))
         .thenReturn(AiDiaryContentResponse.builder().aiComment("this is test ai comment").build());
 
@@ -89,7 +91,7 @@ public class DiaryServiceTest {
     DiaryWriteRequest request =
         new DiaryWriteRequest(NOW_DATE_TIME, DiaryEmotion.HAPPY, "test diary content");
     when(mockMemberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-    when(mockDiaryRepository.existsByDate(anyLong(), any(LocalDateTime.class))).thenReturn(true);
+    when(mockDiaryRepository.existsByDate(anyLong(), any(LocalDate.class))).thenReturn(true);
 
     DiaryException diaryException =
         assertThrows(
@@ -152,15 +154,21 @@ public class DiaryServiceTest {
   void yearMonthMoreThanOneSuccess() {
     int testYear = 2024;
     int testMonth = 3;
-    LocalDateTime testStart = YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay();
-    LocalDateTime testEnd = YearMonth.of(testYear, testMonth).atEndOfMonth().atTime(LocalTime.MAX);
+    Instant testStart =
+        YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC);
+    Instant testEnd =
+        YearMonth.of(testYear, testMonth)
+            .atEndOfMonth()
+            .atTime(LocalTime.MAX)
+            .toInstant(ZoneOffset.UTC);
     List<DiaryIndexProjection> testProjection =
         TestDiaryObjectFactory.getTestDiaryIndexProjections_2024_03_Data_Of_2();
+    Instant requestYearMonth =
+        LocalDate.of(testYear, testMonth, 1).atStartOfDay(ZoneId.of("UTC")).toInstant();
 
     when(mockDiaryRepository.findIndexesByMemberIdAndDateTimes(member.getId(), testStart, testEnd))
         .thenReturn(Optional.of(testProjection));
-    DiaryIndexResponse indexes =
-        diaryService.getIndex(member.getId(), YearMonth.of(testYear, testMonth));
+    DiaryIndexResponse indexes = diaryService.getIndex(member.getId(), requestYearMonth);
 
     List<DiaryIndexProjection> responseIndexes = indexes.getDiaryIndexes();
     DiaryIndexProjection first = responseIndexes.get(0);
@@ -188,14 +196,19 @@ public class DiaryServiceTest {
   void yearMonthZeroSuccess() {
     int testYear = 2024;
     int testMonth = 2;
-    LocalDateTime testStart = YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay();
-    LocalDateTime testEnd = YearMonth.of(testYear, testMonth).atEndOfMonth().atTime(LocalTime.MAX);
-
+    Instant testStart =
+        YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC);
+    Instant testEnd =
+        YearMonth.of(testYear, testMonth)
+            .atEndOfMonth()
+            .atTime(LocalTime.MAX)
+            .toInstant(ZoneOffset.UTC);
+    Instant requestYearMonth =
+        LocalDate.of(testYear, testMonth, 1).atStartOfDay(ZoneId.of("UTC")).toInstant();
     when(mockDiaryRepository.findIndexesByMemberIdAndDateTimes(member.getId(), testStart, testEnd))
         .thenReturn(Optional.empty());
 
-    DiaryIndexResponse indexes =
-        diaryService.getIndex(member.getId(), YearMonth.of(testYear, testMonth));
+    DiaryIndexResponse indexes = diaryService.getIndex(member.getId(), requestYearMonth);
 
     List<DiaryIndexProjection> responseIndexes = indexes.getDiaryIndexes();
     System.out.println("responseIndexes = " + responseIndexes);
@@ -207,7 +220,7 @@ public class DiaryServiceTest {
   @DisplayName("일기 상세 조회 성공")
   void getDiarySuccess() {
     // given
-    LocalDate requestDate = NOW_DATE_TIME.toLocalDate();
+    Instant requestDate = NOW_DATE_TIME;
     when(mockDiaryRepository.findByMemberIdAndDate(anyLong(), any(LocalDate.class)))
         .thenReturn(Optional.of(diary));
     List<String> preSignedWebtoon = List.of("pre-sigend-webtoon");
@@ -227,7 +240,7 @@ public class DiaryServiceTest {
               assertThat(r.getWebtoonImageUrls()).isEqualTo(preSignedWebtoon);
               assertThat(r.getBgmUrl()).isEqualTo(preSignedBgm);
               assertThat(r.getAiComment()).isEqualTo(diary.getAiComment());
-              assertThat(r.getDate()).isEqualTo(diary.getDiaryCreatedTime().toLocalDate());
+              assertThat(r.getDateTime()).isEqualTo(diary.getDiaryCreatedTime());
             });
 
     verify(mockDiaryRepository, times(1)).findByMemberIdAndDate(anyLong(), any(LocalDate.class));
@@ -236,7 +249,7 @@ public class DiaryServiceTest {
   @Test
   @DisplayName("일기 상세 조회 실패 - 일기를 찾을 수 없음")
   void getDiaryFail() {
-    LocalDate requestDate = NOW_DATE_TIME.toLocalDate();
+    Instant requestDate = NOW_DATE_TIME;
 
     when(mockDiaryRepository.findByMemberIdAndDate(anyLong(), any(LocalDate.class)))
         .thenReturn(Optional.empty());

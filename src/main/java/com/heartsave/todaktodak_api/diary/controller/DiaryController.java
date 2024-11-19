@@ -15,11 +15,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.PastOrPresent;
-import java.time.LocalDate;
-import java.time.YearMonth;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -90,10 +88,9 @@ public class DiaryController {
               description = "조회할 연월",
               example = "2024-10",
               required = true,
-              schema = @Schema(type = "string", format = "yyyy-MM"))
+              schema = @Schema(type = "string"))
           @RequestParam("yearMonth")
-          @DateTimeFormat(pattern = "yyyy-MM")
-          YearMonth yearMonth) {
+          Instant yearMonth) {
     return ResponseEntity.status(HttpStatus.OK).body(diaryService.getIndex(memberId, yearMonth));
   }
 
@@ -112,11 +109,11 @@ public class DiaryController {
               description = "조회할 일기의 날짜",
               example = "2024-10-26",
               required = true,
-              schema = @Schema(type = "string", format = "yyyy-MM-dd"))
+              schema = @Schema(type = "string", format = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
           @Valid
           @PastOrPresent(message = "현재 날짜 이전의 일기만 조회가 가능합니다.")
           @RequestParam("date")
-          LocalDate requestDate) {
+          Instant requestDate) {
     return ResponseEntity.status(HttpStatus.OK).body(diaryService.getDiary(memberId, requestDate));
   }
 }

@@ -2,6 +2,7 @@ package com.heartsave.todaktodak_api.diary.service;
 
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
+import com.heartsave.todaktodak_api.common.converter.InstantConverter;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
@@ -18,10 +19,7 @@ import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.YearMonth;
+import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,9 +39,10 @@ public class DiaryService {
 
   public DiaryWriteResponse write(Long memberId, DiaryWriteRequest request) {
     DiaryEntity diary = createDiaryEntity(memberId, request);
-    LocalDateTime diaryCreatedDate = diary.getDiaryCreatedTime();
+    Instant diaryCreatedTime = diary.getDiaryCreatedTime();
 
-    if (diaryRepository.existsByDate(memberId, diaryCreatedDate)) {
+    if (diaryRepository.existsByDate(
+        memberId, InstantConverter.toLocalDate(diary.getDiaryCreatedTime()))) {
       throw new DiaryDailyWritingLimitExceedException(
           DiaryErrorSpec.DAILY_WRITING_LIMIT_EXCEED, memberId);
     }
@@ -74,24 +73,25 @@ public class DiaryService {
   }
 
   @Transactional(readOnly = true)
-  public DiaryIndexResponse getIndex(Long memberId, YearMonth yearMonth) {
-    LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
-    LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(LocalTime.MAX);
+  public DiaryIndexResponse getIndex(Long memberId, Instant yearMonth) {
+    Instant startDateTime = InstantConverter.toMonthStartDateTime(yearMonth);
+    Instant endDateTime = InstantConverter.toMonthEndDateTime(yearMonth);
     log.info("해당 연월에 작성한 일기를 정보를 요청합니다.");
     List<DiaryIndexProjection> indexes =
         diaryRepository
             .findIndexesByMemberIdAndDateTimes(memberId, startDateTime, endDateTime)
             .orElseGet(List::of);
+
     log.info("해당 연월에 작성한 일기를 정보를 성공적으로 가져왔습니다.");
     return DiaryIndexResponse.builder().diaryIndexes(indexes).build();
   }
 
   @Transactional(readOnly = true)
-  public DiaryResponse getDiary(Long memberId, LocalDate requestDate) {
+  public DiaryResponse getDiary(Long memberId, Instant requestDate) {
     log.info("사용자의 나의 일기 정보를 요청합니다.");
     DiaryEntity diary =
         diaryRepository
-            .findByMemberIdAndDate(memberId, requestDate)
+            .findByMemberIdAndDate(memberId, InstantConverter.toLocalDate(requestDate))
             .orElseThrow(
                 () ->
                     new DiaryNotFoundException(
@@ -106,7 +106,7 @@ public class DiaryService {
             s3FileStorageManager.preSignedWebtoonUrlFrom(List.of(diary.getWebtoonImageUrl())))
         .bgmUrl(s3FileStorageManager.preSignedBgmUrlFrom(diary.getBgmUrl()))
         .aiComment(diary.getAiComment())
-        .date(diary.getDiaryCreatedTime().toLocalDate())
+        .dateTime(diary.getDiaryCreatedTime())
         .build();
   }
 

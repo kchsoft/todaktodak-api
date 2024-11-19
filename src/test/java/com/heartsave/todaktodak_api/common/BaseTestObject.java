@@ -4,6 +4,7 @@ import com.heartsave.todaktodak_api.common.security.domain.AuthType;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -63,7 +64,7 @@ public class BaseTestObject {
     return DiaryEntity.builder()
         .id(1L)
         .emotion(DiaryEmotion.HAPPY)
-        .diaryCreatedTime(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS))
+        .diaryCreatedTime(Instant.now())
         .content(TEST_DIARY_CONTENT)
         .memberEntity(createMember())
         .webtoonImageUrl(TEST_DEFAULT_WEBTOON_URL)
@@ -76,7 +77,7 @@ public class BaseTestObject {
     return DiaryEntity.builder()
         .id(1L)
         .emotion(DiaryEmotion.HAPPY)
-        .diaryCreatedTime(LocalDateTime.now())
+        .diaryCreatedTime(Instant.now().truncatedTo(ChronoUnit.MILLIS))
         .content(TEST_DIARY_CONTENT)
         .memberEntity(member)
         .webtoonImageUrl(TEST_DEFAULT_WEBTOON_URL)
@@ -88,7 +89,7 @@ public class BaseTestObject {
   public static DiaryEntity createDiaryNoIdWithMember(MemberEntity member) {
     return DiaryEntity.builder()
         .emotion(DiaryEmotion.HAPPY)
-        .diaryCreatedTime(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS))
+        .diaryCreatedTime(Instant.now().truncatedTo(ChronoUnit.MILLIS))
         .content(TEST_DIARY_CONTENT)
         .memberEntity(member)
         .webtoonImageUrl(TEST_DEFAULT_WEBTOON_URL)
@@ -98,7 +99,7 @@ public class BaseTestObject {
   }
 
   public static DiaryEntity createDiaryNoIdWithMemberAndCreatedDateTime(
-      MemberEntity member, LocalDateTime createdDateTime) {
+      MemberEntity member, Instant createdDateTime) {
     return DiaryEntity.builder()
         .emotion(DiaryEmotion.HAPPY)
         .diaryCreatedTime(createdDateTime)
