@@ -8,11 +8,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
+import com.heartsave.todaktodak_api.common.converter.InstantConverter;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +36,7 @@ class AiRepositoryTest {
 
   private MemberEntity member;
   private DiaryEntity diary;
-  private LocalDateTime nowDateTime = LocalDateTime.now();
+  private Instant nowDateTime = Instant.now();
 
   @BeforeEach
   void setUp() {
@@ -58,7 +60,7 @@ class AiRepositoryTest {
       String newUrl = "https://new-url/webtoon.jpg";
       WebhookWebtoonCompletionRequest request =
           new WebhookWebtoonCompletionRequest(
-              member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newUrl);
+              member.getId(), InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), newUrl);
 
       aiRepository.updateWebtoonUrl(request, request.webtoonFolderUrl());
 
@@ -91,7 +93,7 @@ class AiRepositoryTest {
       String newBgmUrl = "/music-ai/1/2024/11/06/bgm.mp3";
       WebhookBgmCompletionRequest request =
           new WebhookBgmCompletionRequest(
-              member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newBgmUrl);
+              member.getId(), InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), newBgmUrl);
 
       aiRepository.updateBgmUrl(request, request.bgmUrl());
 
@@ -136,7 +138,7 @@ class AiRepositoryTest {
       String newBgmUrl = "https://new-url/target-member-bgm.mp3";
       WebhookBgmCompletionRequest request =
           new WebhookBgmCompletionRequest(
-              member.getId(), diary.getDiaryCreatedTime().toLocalDate(), newBgmUrl);
+              member.getId(), InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), newBgmUrl);
 
       aiRepository.updateBgmUrl(request, request.bgmUrl());
 
@@ -157,7 +159,7 @@ class AiRepositoryTest {
     void returnsFalseWhenBothUrlsAreEmpty() {
       Boolean result =
           aiRepository.isContentCompleted(
-              member.getId(), diary.getDiaryCreatedTime().toLocalDate());
+              member.getId(), InstantConverter.toLocalDate(diary.getDiaryCreatedTime()));
 
       assertThat(result).isFalse();
     }
@@ -181,7 +183,7 @@ class AiRepositoryTest {
 
       Boolean result =
           aiRepository.isContentCompleted(
-              member.getId(), diaryWithBgm.getDiaryCreatedTime().toLocalDate());
+              member.getId(), InstantConverter.toLocalDate(nowDateTime));
 
       assertThat(result).isFalse();
     }
@@ -205,7 +207,7 @@ class AiRepositoryTest {
 
       Boolean result =
           aiRepository.isContentCompleted(
-              member.getId(), diaryWithWebtoon.getDiaryCreatedTime().toLocalDate());
+              member.getId(), InstantConverter.toLocalDate(nowDateTime));
 
       assertThat(result).isFalse();
     }
@@ -219,7 +221,8 @@ class AiRepositoryTest {
               .content(DUMMY_STRING_CONTENT)
               .bgmUrl(TEST_BGM_URL)
               .webtoonImageUrl(TEST_WEBTOON_URL)
-              .diaryCreatedTime(LocalDateTime.now().plusDays(1)) // BeforeEach의 diary 날짜 다르게 하기 위해
+              .diaryCreatedTime(
+                  Instant.now().plus(1, ChronoUnit.DAYS)) // BeforeEach의 diary 날짜 다르게 하기 위해
               .emotion(DiaryEmotion.HAPPY)
               .build();
 
@@ -229,7 +232,7 @@ class AiRepositoryTest {
 
       Boolean result =
           aiRepository.isContentCompleted(
-              member.getId(), completedDiary.getDiaryCreatedTime().toLocalDate());
+              member.getId(), InstantConverter.toLocalDate(completedDiary.getDiaryCreatedTime()));
 
       assertThat(result).isTrue();
     }

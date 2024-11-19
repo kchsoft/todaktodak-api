@@ -21,8 +21,9 @@ import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountPr
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection;
 import com.heartsave.todaktodak_api.diary.exception.PublicDiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.service.MySharedDiaryService;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +62,8 @@ public class MySharedDiaryControllerTest {
     List<MySharedDiaryPreviewProjection> projections = new ArrayList<>();
     for (int i = 5; i > 0; i--) {
       MySharedDiaryPreviewProjection view =
-          new MySharedDiaryPreviewProjection(i + 0L, "url_" + i, LocalDate.now().minusDays(6L + i));
+          new MySharedDiaryPreviewProjection(
+              i + 0L, "url_" + i, Instant.now().minus(6L + i, ChronoUnit.DAYS));
       projections.add(view);
     }
     return projections;
@@ -171,9 +173,9 @@ public class MySharedDiaryControllerTest {
                 return 1L;
               }
             });
-    LocalDateTime now = LocalDateTime.now();
-    when(diaryResponse.getDiaryCreatedDate()).thenReturn(now.toLocalDate());
-    when(mockMySharedDiaryService.getDiary(anyLong(), any(LocalDate.class)))
+    Instant now = Instant.now();
+    when(diaryResponse.getDiaryCreatedDate()).thenReturn(now);
+    when(mockMySharedDiaryService.getDiary(anyLong(), any(Instant.class)))
         .thenReturn(diaryResponse);
 
     MvcResult mvcResult =
@@ -189,7 +191,11 @@ public class MySharedDiaryControllerTest {
             .andExpect(jsonPath("$.bgmUrl").value(diaryResponse.getBgmUrl()))
             .andExpect(
                 jsonPath("$.diaryCreatedDate")
-                    .value(diaryResponse.getDiaryCreatedDate().toString()))
+                    .value(
+                        diaryResponse
+                            .getDiaryCreatedDate()
+                            .truncatedTo(ChronoUnit.MILLIS)
+                            .toString()))
             .andReturn();
 
     String contentAsString = mvcResult.getResponse().getContentAsString();
@@ -202,7 +208,7 @@ public class MySharedDiaryControllerTest {
             webtoonImageUrls.get(2),
             webtoonImageUrls.get(3));
 
-    verify(mockMySharedDiaryService, times(1)).getDiary(anyLong(), any(LocalDate.class));
+    verify(mockMySharedDiaryService, times(1)).getDiary(anyLong(), any(Instant.class));
   }
 
   @Test
@@ -247,12 +253,10 @@ public class MySharedDiaryControllerTest {
   @WithMockTodakUser
   @DisplayName("존재하지 않는 날짜의 일기 조회시 404 응답")
   void getMySharedDiary_WithNonExistentDate_NotFound() throws Exception {
-    LocalDateTime now = LocalDateTime.now();
-    when(mockMySharedDiaryService.getDiary(anyLong(), any(LocalDate.class)))
+    Instant now = Instant.now();
+    when(mockMySharedDiaryService.getDiary(anyLong(), any(Instant.class)))
         .thenThrow(
-            new PublicDiaryNotFoundException(
-                PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, now.toLocalDate()));
-
+            new PublicDiaryNotFoundException(PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, now));
     mockMvc
         .perform(
             get("/api/v1/diary/my/shared/detail")

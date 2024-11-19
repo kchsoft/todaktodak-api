@@ -3,14 +3,16 @@ package com.heartsave.todaktodak_api.diary.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.heartsave.todaktodak_api.common.BaseTestObject;
+import com.heartsave.todaktodak_api.common.converter.InstantConverter;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +47,7 @@ public class DiaryRepositoryTest {
   @Test
   @DisplayName("특정 날짜에 해당되는 사용자 일기 없음.")
   void notExistDiaryByDateAndMember() {
-    LocalDateTime testTime = LocalDateTime.of(2025, 10, 22, 11, 1);
+    LocalDate testTime = LocalDate.of(2025, 10, 2);
     boolean exist = diaryRepository.existsByDate(member.getId(), testTime);
     assertThat(exist).as("memberID와 날짜에 해당하는 일기가 있습니다.").isFalse();
   }
@@ -53,7 +55,9 @@ public class DiaryRepositoryTest {
   @Test
   @DisplayName("특정 날짜에 해당되는 사용자 일기가 있음.")
   void existDiaryByDateAndMember() {
-    boolean exist = diaryRepository.existsByDate(member.getId(), diary.getDiaryCreatedTime());
+    boolean exist =
+        diaryRepository.existsByDate(
+            member.getId(), InstantConverter.toLocalDate(diary.getDiaryCreatedTime()));
     assertThat(exist).as("memberID와 날짜에 해당하는 일기가 없습니다.").isTrue();
   }
 
@@ -85,11 +89,9 @@ public class DiaryRepositoryTest {
     DiaryEntity diary2 = BaseTestObject.createDiaryNoIdWithMember(member);
     diaryRepository.save(diary1);
     diaryRepository.save(diary2);
-    int testYear = diary1.getDiaryCreatedTime().getYear();
-    int testMonth = diary1.getDiaryCreatedTime().getMonthValue();
 
-    LocalDateTime testStart = YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay();
-    LocalDateTime testEnd = YearMonth.of(testYear, testMonth).atEndOfMonth().atTime(LocalTime.MAX);
+    Instant testStart = InstantConverter.toMonthStartDateTime(diary1.getDiaryCreatedTime());
+    Instant testEnd = InstantConverter.toMonthEndDateTime(diary1.getDiaryCreatedTime());
 
     List<DiaryIndexProjection> resultIndex =
         diaryRepository
@@ -125,8 +127,14 @@ public class DiaryRepositoryTest {
     int testYear = 2023;
     int testMonth = 10;
 
-    LocalDateTime testStart = YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay();
-    LocalDateTime testEnd = YearMonth.of(testYear, testMonth).atEndOfMonth().atTime(LocalTime.MAX);
+    Instant testStart =
+        YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC);
+
+    Instant testEnd =
+        YearMonth.of(testYear, testMonth)
+            .atEndOfMonth()
+            .atTime(LocalTime.MAX)
+            .toInstant(ZoneOffset.UTC);
 
     List<DiaryIndexProjection> resultIndex =
         diaryRepository
@@ -140,7 +148,7 @@ public class DiaryRepositoryTest {
   @Test
   @DisplayName("findByMemberIdAndDate - 일기를 성공적으로 조회")
   void findByMemberIdAndDateSuccess() {
-    LocalDate diaryDate = diary.getDiaryCreatedTime().toLocalDate();
+    LocalDate diaryDate = InstantConverter.toLocalDate(diary.getDiaryCreatedTime());
 
     Optional<DiaryEntity> result = diaryRepository.findByMemberIdAndDate(member.getId(), diaryDate);
 
@@ -155,17 +163,18 @@ public class DiaryRepositoryTest {
             "조회된 일기의 작성자 ID가 예상한 작성자 ID와 일치하지 않습니다. expected: %d, actual: %d",
             member.getId(), result.get().getMemberEntity().getId())
         .isEqualTo(member.getId());
-    assertThat(result.get().getDiaryCreatedTime().toLocalDate())
+    assertThat(result.get().getDiaryCreatedTime())
         .as(
             "조회된 일기의 작성 날짜가 예상한 날짜와 일치하지 않습니다. expected: %s, actual: %s",
-            diaryDate, result.get().getDiaryCreatedTime().toLocalDate())
-        .isEqualTo(diaryDate);
+            diaryDate, result.get().getDiaryCreatedTime())
+        .isEqualTo(diary.getDiaryCreatedTime());
   }
 
   @Test
   @DisplayName("findByMemberIdAndDate - 해당 날짜에 일기가 없는 경우")
   void findByMemberIdAndDateEmpty() {
-    LocalDate differentDate = diary.getDiaryCreatedTime().toLocalDate().plusDays(-1);
+    LocalDate differentDate =
+        InstantConverter.toLocalDate(diary.getDiaryCreatedTime()).plusDays(-1);
 
     Optional<DiaryEntity> result =
         diaryRepository.findByMemberIdAndDate(member.getId(), differentDate);

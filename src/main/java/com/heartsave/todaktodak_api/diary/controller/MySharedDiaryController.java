@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.PastOrPresent;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -68,12 +68,12 @@ public class MySharedDiaryController {
               name = "date",
               description = "조회할 일기 날짜",
               example = "2024-11-04",
-              schema = @Schema(type = "string", format = "date"))
+              schema = @Schema(type = "string", format = "Instant"))
           @Valid
           @PastOrPresent
           @RequestParam("date")
-          LocalDateTime requestDate) {
+          Instant requestDateTime) {
     return ResponseEntity.status(HttpStatus.OK)
-        .body(mySharedDiaryService.getDiary(memberId, requestDate.toLocalDate()));
+        .body(mySharedDiaryService.getDiary(memberId, requestDateTime));
   }
 }

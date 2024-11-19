@@ -29,11 +29,11 @@ public interface MySharedDiaryRepository extends JpaRepository<PublicDiaryEntity
                        new com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection(
                        pd.id,
                        d.webtoonImageUrl,
-                       CAST (pd.createdTime AS Localdate)
+                       pd.createdTime
                        )
                       FROM PublicDiaryEntity pd JOIN pd.diaryEntity d
                       WHERE pd.memberEntity.id = :memberId AND pd.id < :publicDiaryId
-                      ORDER BY pd.id DESC
+                      ORDER BY pd.createdTime DESC, pd.id DESC
           """)
   List<MySharedDiaryPreviewProjection> findNextPreviews(
       @Param("memberId") Long memberId,
@@ -48,7 +48,7 @@ public interface MySharedDiaryRepository extends JpaRepository<PublicDiaryEntity
                 pd.publicContent,
                 d.webtoonImageUrl,
                 d.bgmUrl,
-                CAST(d.diaryCreatedTime as LocalDate)
+                d.diaryCreatedTime
             )
             FROM PublicDiaryEntity pd
             JOIN pd.diaryEntity d

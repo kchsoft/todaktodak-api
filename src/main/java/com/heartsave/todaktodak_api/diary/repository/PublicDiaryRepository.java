@@ -24,13 +24,13 @@ public interface PublicDiaryRepository extends JpaRepository<PublicDiaryEntity, 
             pd.publicContent,
             d.webtoonImageUrl,
             d.bgmUrl,
-            CAST(d.diaryCreatedTime as LocalDate)
+            d.diaryCreatedTime
         )
         FROM PublicDiaryEntity pd
         JOIN pd.diaryEntity d
         JOIN pd.memberEntity m
         WHERE pd.id < :publicDiaryId
-        ORDER BY pd.id DESC
+        ORDER BY pd.createdTime DESC, pd.id DESC
         """)
   List<PublicDiaryContentOnlyProjection> findNextContentOnlyById(
       @Param("publicDiaryId") Long publicDiaryId, Pageable pageable);

@@ -27,7 +27,7 @@ import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -183,7 +183,7 @@ class PublicDiaryServiceTest {
     when(content.getBgmUrl()).thenReturn("bgm/music.mp3");
     when(content.getNickname()).thenReturn("nickname");
     when(content.getPublicContent()).thenReturn("content");
-    when(content.getDate()).thenReturn(LocalDate.now());
+    when(content.getDate()).thenReturn(Instant.now());
 
     // S3 URL 생성 mock
     List<String> mockWebtoonUrls = List.of("presigned-webtoon-url");

@@ -1,7 +1,9 @@
 package com.heartsave.todaktodak_api.diary.common;
 
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 public class TestDiaryObjectFactory {
@@ -15,8 +17,8 @@ public class TestDiaryObjectFactory {
               }
 
               @Override
-              public LocalDateTime getDiaryCreatedTime() {
-                return LocalDateTime.of(2024, 3, 15, 14, 30);
+              public Instant getDiaryCreatedTime() {
+                return LocalDateTime.of(2024, 3, 15, 14, 30).atZone(ZoneId.of("UTC")).toInstant();
               }
             },
             new DiaryIndexProjection() {
@@ -26,8 +28,8 @@ public class TestDiaryObjectFactory {
               }
 
               @Override
-              public LocalDateTime getDiaryCreatedTime() {
-                return LocalDateTime.of(2024, 3, 20, 16, 45);
+              public Instant getDiaryCreatedTime() {
+                return LocalDateTime.of(2024, 3, 20, 16, 45).atZone(ZoneId.of("UTC")).toInstant();
               }
             });
     return mockIndexes;
