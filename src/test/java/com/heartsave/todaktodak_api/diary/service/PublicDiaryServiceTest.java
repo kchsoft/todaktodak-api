@@ -16,10 +16,8 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorS
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
-import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
-import com.heartsave.todaktodak_api.diary.entity.DiaryReactionEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIdsProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
@@ -126,74 +124,6 @@ class PublicDiaryServiceTest {
     verify(mockDiaryRepository, times(0)).getReferenceById(anyLong());
     verify(mockMemberRepository, times(0)).getReferenceById(anyLong());
     verify(mockPublicDiaryRepository, times(0)).save(any(PublicDiaryEntity.class));
-  }
-
-  @Test
-  @DisplayName("toggleReactionStatus - 반응 추가/삭제 토글 테스트")
-  void toggleReactionStatus() {
-    when(mockPublicDiaryRepository.getReferenceById(anyLong()))
-        .thenReturn(mock(PublicDiaryEntity.class));
-    when(mockMemberRepository.getReferenceById(anyLong())).thenReturn(mock(MemberEntity.class));
-
-    PublicDiaryReactionRequest request =
-        new PublicDiaryReactionRequest(diary.getId(), DiaryReactionType.LIKE);
-    DiaryReactionEntity reactionEntity =
-        DiaryReactionEntity.builder()
-            .memberEntity(mockMemberRepository.getReferenceById(member.getId()))
-            .publicDiaryEntity(mockPublicDiaryRepository.getReferenceById(publicDiary.getId()))
-            .reactionType(DiaryReactionType.LIKE)
-            .build();
-
-    when(mockDiaryReactionRepository.hasReaction(any(), any(), any())).thenReturn(false);
-    when(mockDiaryReactionRepository.save(any(DiaryReactionEntity.class)))
-        .thenReturn(reactionEntity);
-
-    // 첫 번째 - 반응 추가
-    publicDiaryService.toggleReactionStatus(member.getId(), request);
-
-    verify(mockDiaryReactionRepository, times(1))
-        .hasReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
-    verify(mockDiaryReactionRepository, times(1)).save(any(DiaryReactionEntity.class));
-    verify(mockDiaryReactionRepository, times(0))
-        .deleteReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
-
-    // 두 번째 - 준비
-    when(mockDiaryReactionRepository.hasReaction(any(), any(), any())).thenReturn(true);
-    when(mockDiaryReactionRepository.deleteReaction(
-            member.getId(), diary.getId(), DiaryReactionType.LIKE))
-        .thenReturn(1);
-
-    // 두 번재 - 반응 삭제
-
-    publicDiaryService.toggleReactionStatus(member.getId(), request);
-
-    verify(mockDiaryReactionRepository, times(2))
-        .hasReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
-    verify(mockDiaryReactionRepository, times(1)).save(any(DiaryReactionEntity.class));
-    verify(mockDiaryReactionRepository, times(1))
-        .deleteReaction(member.getId(), diary.getId(), DiaryReactionType.LIKE);
-  }
-
-  @Test
-  @DisplayName("toggleReactionStatus - 다른 타입의 반응 추가 테스트")
-  void toggleDifferentReactionTypes() {
-    PublicDiaryReactionRequest likeRequest =
-        new PublicDiaryReactionRequest(diary.getId(), DiaryReactionType.LIKE);
-    PublicDiaryReactionRequest cheeringRequest =
-        new PublicDiaryReactionRequest(diary.getId(), DiaryReactionType.CHEERING);
-
-    when(mockDiaryReactionRepository.hasReaction(
-            anyLong(), anyLong(), any(DiaryReactionType.class)))
-        .thenReturn(false);
-
-    publicDiaryService.toggleReactionStatus(member.getId(), likeRequest);
-    publicDiaryService.toggleReactionStatus(member.getId(), cheeringRequest);
-
-    verify(mockDiaryReactionRepository, times(2))
-        .hasReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
-    verify(mockDiaryReactionRepository, times(2)).save(any(DiaryReactionEntity.class));
-    verify(mockDiaryReactionRepository, times(0))
-        .deleteReaction(anyLong(), anyLong(), any(DiaryReactionType.class));
   }
 
   @Test

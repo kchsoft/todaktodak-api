@@ -5,10 +5,8 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorS
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
-import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
-import com.heartsave.todaktodak_api.diary.entity.DiaryReactionEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIdsProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
@@ -34,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PublicDiaryService {
   private final DiaryRepository diaryRepository;
   private final PublicDiaryRepository publicDiaryRepository;
-  private final DiaryReactionRepository diaryReactionRepository;
+  private final DiaryReactionRepository reactionRepository;
   private final MemberRepository memberRepository;
   private final S3FileStorageManager s3FileStorageManager;
 
@@ -84,11 +82,11 @@ public class PublicDiaryService {
   }
 
   private DiaryReactionCountProjection fetchReactionCount(Long diaryId) {
-    return diaryReactionRepository.countEachByDiaryId(diaryId);
+    return reactionRepository.countEachByDiaryId(diaryId);
   }
 
   private List<DiaryReactionType> fetchMemberReactions(Long memberId, Long diaryId) {
-    return diaryReactionRepository.findMemberReaction(memberId, diaryId);
+    return reactionRepository.findMemberReaction(memberId, diaryId);
   }
 
   public void write(Long memberId, Long diaryId, String publicContent) {
@@ -114,30 +112,5 @@ public class PublicDiaryService {
             .publicContent(publicContent)
             .build();
     publicDiaryRepository.save(publicDiary);
-  }
-
-  public void toggleReactionStatus(Long memberId, PublicDiaryReactionRequest request) {
-    Long publicDiaryId = request.publicDiaryId();
-    DiaryReactionType reactionType = request.reactionType();
-    DiaryReactionEntity reactionEntity =
-        getDiaryReactionEntity(memberId, publicDiaryId, reactionType);
-    if (!diaryReactionRepository.hasReaction(memberId, publicDiaryId, reactionType)) {
-      diaryReactionRepository.save(reactionEntity);
-    } else {
-      diaryReactionRepository.deleteReaction(memberId, publicDiaryId, reactionType);
-    }
-  }
-
-  private DiaryReactionEntity getDiaryReactionEntity(
-      Long memberId, Long publicDiaryId, DiaryReactionType reactionType) {
-    MemberEntity memberRef = memberRepository.getReferenceById(memberId);
-    PublicDiaryEntity publicRef = publicDiaryRepository.getReferenceById(publicDiaryId);
-    DiaryReactionEntity reactionEntity =
-        DiaryReactionEntity.builder()
-            .memberEntity(memberRef)
-            .publicDiaryEntity(publicRef)
-            .reactionType(reactionType)
-            .build();
-    return reactionEntity;
   }
 }
