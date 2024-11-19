@@ -117,24 +117,25 @@ public class PublicDiaryService {
   }
 
   public void toggleReactionStatus(Long memberId, PublicDiaryReactionRequest request) {
-    Long diaryId = request.diaryId();
+    Long publicDiaryId = request.publicDiaryId();
     DiaryReactionType reactionType = request.reactionType();
-    DiaryReactionEntity reactionEntity = getDiaryReactionEntity(memberId, diaryId, reactionType);
-    if (!diaryReactionRepository.hasReaction(memberId, diaryId, reactionType)) {
+    DiaryReactionEntity reactionEntity =
+        getDiaryReactionEntity(memberId, publicDiaryId, reactionType);
+    if (!diaryReactionRepository.hasReaction(memberId, publicDiaryId, reactionType)) {
       diaryReactionRepository.save(reactionEntity);
     } else {
-      diaryReactionRepository.deleteReaction(memberId, diaryId, reactionType);
+      diaryReactionRepository.deleteReaction(memberId, publicDiaryId, reactionType);
     }
   }
 
   private DiaryReactionEntity getDiaryReactionEntity(
-      Long memberId, Long diaryId, DiaryReactionType reactionType) {
+      Long memberId, Long publicDiaryId, DiaryReactionType reactionType) {
     MemberEntity memberRef = memberRepository.getReferenceById(memberId);
-    DiaryEntity diaryRef = diaryRepository.getReferenceById(diaryId);
+    PublicDiaryEntity publicRef = publicDiaryRepository.getReferenceById(publicDiaryId);
     DiaryReactionEntity reactionEntity =
         DiaryReactionEntity.builder()
             .memberEntity(memberRef)
-            .diaryEntity(diaryRef)
+            .publicDiaryEntity(publicRef)
             .reactionType(reactionType)
             .build();
     return reactionEntity;

@@ -91,7 +91,7 @@ public class PublicDiaryController {
       throw new DiaryReactionExistException(
           DiaryReactionErrorSpec.DIARY_REACTION_EXIST,
           memberId,
-          request.diaryId(),
+          request.publicDiaryId(),
           request.reactionType());
     }
     log.info("일기장 반응 토글을 성공적으로 마쳤습니다.");

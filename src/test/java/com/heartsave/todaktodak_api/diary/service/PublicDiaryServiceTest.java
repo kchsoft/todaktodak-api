@@ -56,12 +56,19 @@ class PublicDiaryServiceTest {
 
   private MemberEntity member;
   private DiaryEntity diary;
+  private PublicDiaryEntity publicDiary;
   private final String PUBLIC_CONTENT = "테스트 공개 일기 내용";
 
   @BeforeEach
   void setup() {
     member = BaseTestObject.createMember();
     diary = BaseTestObject.createDiaryWithMember(member);
+    publicDiary =
+        PublicDiaryEntity.builder()
+            .memberEntity(member)
+            .diaryEntity(diary)
+            .publicContent("public-content")
+            .build();
   }
 
   @Test
@@ -124,7 +131,8 @@ class PublicDiaryServiceTest {
   @Test
   @DisplayName("toggleReactionStatus - 반응 추가/삭제 토글 테스트")
   void toggleReactionStatus() {
-    when(mockDiaryRepository.getReferenceById(anyLong())).thenReturn(mock(DiaryEntity.class));
+    when(mockPublicDiaryRepository.getReferenceById(anyLong()))
+        .thenReturn(mock(PublicDiaryEntity.class));
     when(mockMemberRepository.getReferenceById(anyLong())).thenReturn(mock(MemberEntity.class));
 
     PublicDiaryReactionRequest request =
@@ -132,7 +140,7 @@ class PublicDiaryServiceTest {
     DiaryReactionEntity reactionEntity =
         DiaryReactionEntity.builder()
             .memberEntity(mockMemberRepository.getReferenceById(member.getId()))
-            .diaryEntity(mockDiaryRepository.getReferenceById(diary.getId()))
+            .publicDiaryEntity(mockPublicDiaryRepository.getReferenceById(publicDiary.getId()))
             .reactionType(DiaryReactionType.LIKE)
             .build();
 

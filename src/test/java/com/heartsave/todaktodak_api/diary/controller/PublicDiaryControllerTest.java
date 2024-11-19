@@ -127,7 +127,7 @@ public class PublicDiaryControllerTest {
   @DisplayName("반응 토글 실패 - 잘못된 요청 형식")
   @WithMockTodakUser
   void toggleReaction_Fail_InvalidRequestFormat() throws Exception {
-    String invalidRequest = "{\"diaryId\": \"invalid\", \"reactionType\": \"like\"}";
+    String invalidRequest = "{\"publicDiaryId\": \"invalid\", \"reactionType\": \"like\"}";
 
     mockMvc
         .perform(

@@ -20,21 +20,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -82,11 +77,6 @@ public class DiaryEntity extends BaseEntity {
       columnDefinition = "TIMESTAMP(3)")
   private Instant diaryCreatedTime;
 
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "diaryEntity")
-  @OnDelete(action = OnDeleteAction.CASCADE)
-  @Builder.Default
-  private List<DiaryReactionEntity> reactions = new ArrayList<>();
-
   @OneToOne(
       fetch = FetchType.LAZY,
       mappedBy = "diaryEntity",
@@ -96,10 +86,6 @@ public class DiaryEntity extends BaseEntity {
 
   public void addAiContent(AiDiaryContentResponse response) {
     this.aiComment = response.getAiComment();
-  }
-
-  public void addReaction(DiaryReactionEntity reactionType) {
-    reactions.add(reactionType);
   }
 
   private DiaryEntity(DiaryWriteRequest request, MemberEntity member) {

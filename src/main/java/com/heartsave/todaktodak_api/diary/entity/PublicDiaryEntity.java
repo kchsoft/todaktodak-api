@@ -12,15 +12,20 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -51,4 +56,9 @@ public class PublicDiaryEntity extends BaseEntity {
   @Size(max = PUBLIC_DIARY_CONTENT_MAX_SIZE)
   @Column(name = "public_content", nullable = true, columnDefinition = "text")
   private String publicContent;
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "publicDiaryEntity")
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @Builder.Default
+  private List<DiaryReactionEntity> reactions = new ArrayList<>();
 }

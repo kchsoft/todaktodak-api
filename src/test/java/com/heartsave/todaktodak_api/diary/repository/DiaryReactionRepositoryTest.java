@@ -7,6 +7,7 @@ import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.DiaryReactionEntity;
+import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
@@ -31,13 +32,23 @@ public class DiaryReactionRepositoryTest {
 
   private MemberEntity member;
   private DiaryEntity diary;
+  private PublicDiaryEntity publicDiary;
 
   @BeforeEach
   void setupAll() {
     member = BaseTestObject.createMemberNoId();
     diary = BaseTestObject.createDiaryNoIdWithMember(member);
+    publicDiary =
+        PublicDiaryEntity.builder()
+            .memberEntity(member)
+            .diaryEntity(diary)
+            .publicContent("public-content")
+            .build();
     memberRepository.save(member);
     diaryRepository.save(diary);
+    tem.persist(publicDiary);
+    tem.flush();
+    tem.clear();
   }
 
   @Test
@@ -53,7 +64,7 @@ public class DiaryReactionRepositoryTest {
     diaryReactionRepository.save(
         DiaryReactionEntity.builder()
             .memberEntity(testMember)
-            .diaryEntity(diary)
+            .publicDiaryEntity(publicDiary)
             .reactionType(DiaryReactionType.LIKE)
             .build());
 
@@ -64,7 +75,7 @@ public class DiaryReactionRepositoryTest {
       diaryReactionRepository.save(
           DiaryReactionEntity.builder()
               .memberEntity(testMember)
-              .diaryEntity(diary)
+              .publicDiaryEntity(publicDiary)
               .reactionType(DiaryReactionType.SURPRISED)
               .build());
     }
@@ -76,7 +87,7 @@ public class DiaryReactionRepositoryTest {
       diaryReactionRepository.save(
           DiaryReactionEntity.builder()
               .memberEntity(testMember)
-              .diaryEntity(diary)
+              .publicDiaryEntity(publicDiary)
               .reactionType(DiaryReactionType.EMPATHIZE)
               .build());
     }
@@ -88,7 +99,7 @@ public class DiaryReactionRepositoryTest {
       diaryReactionRepository.save(
           DiaryReactionEntity.builder()
               .memberEntity(testMember)
-              .diaryEntity(diary)
+              .publicDiaryEntity(publicDiary)
               .reactionType(DiaryReactionType.CHEERING)
               .build());
     }
@@ -122,25 +133,26 @@ public class DiaryReactionRepositoryTest {
     DiaryReactionEntity reaction1 =
         DiaryReactionEntity.builder()
             .memberEntity(member)
-            .diaryEntity(diary)
+            .publicDiaryEntity(publicDiary)
             .reactionType(DiaryReactionType.LIKE)
             .build();
     DiaryReactionEntity reaction2 =
         DiaryReactionEntity.builder()
             .memberEntity(member)
-            .diaryEntity(diary)
+            .publicDiaryEntity(publicDiary)
             .reactionType(DiaryReactionType.CHEERING)
             .build();
 
     diaryReactionRepository.save(reaction1);
     diaryReactionRepository.save(reaction2);
 
-    diary.addReaction(reaction1);
-    diary.addReaction(reaction2);
+    tem.flush();
+    tem.clear();
 
     diaryRepository.delete(diary);
 
-    DiaryReactionCountProjection result = diaryReactionRepository.countEachByDiaryId(diary.getId());
+    DiaryReactionCountProjection result =
+        diaryReactionRepository.countEachByDiaryId(publicDiary.getId());
 
     assertThat(result.getLikes()).as("삭제된 일기의 반응 수가 조회되었습니다.").isEqualTo(0);
     assertThat(result.getCheering()).as("삭제된 일기의 반응 수가 조회되었습니다.").isEqualTo(0);
@@ -154,7 +166,7 @@ public class DiaryReactionRepositoryTest {
     DiaryReactionEntity reaction =
         DiaryReactionEntity.builder()
             .memberEntity(member)
-            .diaryEntity(diary)
+            .publicDiaryEntity(publicDiary)
             .reactionType(DiaryReactionType.LIKE)
             .build();
 
@@ -177,14 +189,14 @@ public class DiaryReactionRepositoryTest {
     DiaryReactionEntity likeReaction =
         DiaryReactionEntity.builder()
             .memberEntity(member)
-            .diaryEntity(diary)
+            .publicDiaryEntity(publicDiary)
             .reactionType(DiaryReactionType.LIKE)
             .build();
 
     DiaryReactionEntity cheeringReaction =
         DiaryReactionEntity.builder()
             .memberEntity(member)
-            .diaryEntity(diary)
+            .publicDiaryEntity(publicDiary)
             .reactionType(DiaryReactionType.CHEERING)
             .build();
 
@@ -205,14 +217,14 @@ public class DiaryReactionRepositoryTest {
     DiaryReactionEntity reaction1 =
         DiaryReactionEntity.builder()
             .memberEntity(member)
-            .diaryEntity(diary)
+            .publicDiaryEntity(publicDiary)
             .reactionType(DiaryReactionType.LIKE)
             .build();
 
     DiaryReactionEntity reaction2 =
         DiaryReactionEntity.builder()
             .memberEntity(anotherMember)
-            .diaryEntity(diary)
+            .publicDiaryEntity(publicDiary)
             .reactionType(DiaryReactionType.LIKE)
             .build();
 
@@ -229,21 +241,21 @@ public class DiaryReactionRepositoryTest {
     DiaryReactionEntity reaction =
         DiaryReactionEntity.builder()
             .memberEntity(member)
-            .diaryEntity(diary)
+            .publicDiaryEntity(publicDiary)
             .reactionType(DiaryReactionType.LIKE)
             .build();
     diaryReactionRepository.save(reaction);
 
     tem.flush();
-    tem.clear();
 
     DiaryReactionEntity duplicateReaction =
         DiaryReactionEntity.builder()
             .memberEntity(member)
-            .diaryEntity(diary)
+            .publicDiaryEntity(publicDiary)
             .reactionType(DiaryReactionType.LIKE)
             .build();
-
+    System.out.println("reaction = " + reaction);
+    System.out.println("duplicateReaction = " + duplicateReaction);
     assertThatThrownBy(
             () -> {
               diaryReactionRepository.save(duplicateReaction);
@@ -252,7 +264,8 @@ public class DiaryReactionRepositoryTest {
             "제약조건 위반 예외가 발생해야 합니다.")
         .isInstanceOf(ConstraintViolationException.class);
     tem.clear(); // duplicateReaction clear
-    DiaryReactionCountProjection result = diaryReactionRepository.countEachByDiaryId(diary.getId());
+    DiaryReactionCountProjection result =
+        diaryReactionRepository.countEachByDiaryId(publicDiary.getId());
     Assertions.assertThat(result.getLikes()).as("기존 반응이 유지되어야 합니다.").isEqualTo(1);
   }
 }
