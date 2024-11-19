@@ -5,6 +5,7 @@ import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.
 import com.heartsave.todaktodak_api.auth.dto.request.SignUpRequest;
 import com.heartsave.todaktodak_api.auth.dto.response.TokenReissueResponse;
 import com.heartsave.todaktodak_api.auth.exception.AuthException;
+import com.heartsave.todaktodak_api.auth.repository.RefreshTokenCacheRepository;
 import com.heartsave.todaktodak_api.common.exception.errorspec.AuthErrorSpec;
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.AuthType;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class AuthService {
+  private final RefreshTokenCacheRepository cacheRepository;
   private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -42,9 +44,15 @@ public class AuthService {
     Long id = JwtUtils.extractSubject(refreshToken);
     TodakUser user = createAuthenticationFromMember(id);
 
+    // 캐시 토큰과 동일한지 비교
+    if (!checkCache(id, refreshToken)) throw new AuthException(AuthErrorSpec.ABNORMAL_ACCESS);
+
     // 토큰 재발급 및 쿠키 갱신
     var accessToken = JwtUtils.issueToken(user, ACCESS_TYPE);
     var newRefreshToken = JwtUtils.issueToken(user, REFRESH_TYPE);
+
+    // 토큰 캐싱
+    cacheRepository.set(String.valueOf(id), newRefreshToken);
     updateRefreshTokenCookie(response, newRefreshToken);
 
     return TokenReissueResponse.builder().accessToken(accessToken).build();
@@ -77,6 +85,11 @@ public class AuthService {
       throw new AuthException(AuthErrorSpec.ABNORMAL_ACCESS);
     }
     return token;
+  }
+
+  private boolean checkCache(Long memberId, String refreshToken) {
+    var retrievedToken = cacheRepository.get(String.valueOf(memberId));
+    return retrievedToken.equals(refreshToken);
   }
 
   private void validateToken(String token) {
