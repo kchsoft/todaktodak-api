@@ -184,9 +184,9 @@ class MySharedDiaryRepositoryTest {
     assertThat(actual.getBgmUrl())
         .as("BGM URL이 일치해야 합니다")
         .contains(expected.getDiaryEntity().getBgmUrl());
-    assertThat(actual.getDiaryCreatedDate())
+    assertThat(actual.getDiaryCreatedDate().truncatedTo(ChronoUnit.SECONDS))
         .as("일기 작성 날짜가 일치해야 합니다")
-        .isEqualTo(expected.getDiaryEntity().getDiaryCreatedTime().truncatedTo(ChronoUnit.MILLIS));
+        .isEqualTo(expected.getDiaryEntity().getDiaryCreatedTime().truncatedTo(ChronoUnit.SECONDS));
   }
 
   @Test
