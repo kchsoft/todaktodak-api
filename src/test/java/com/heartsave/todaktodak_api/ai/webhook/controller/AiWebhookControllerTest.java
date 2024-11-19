@@ -13,7 +13,6 @@ import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonComplet
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiWebhookCharacterService;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
-import com.heartsave.todaktodak_api.common.config.WebConfig;
 import com.heartsave.todaktodak_api.common.converter.InstantConverter;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
@@ -32,18 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(
-    controllers = AiWebhookController.class,
-    excludeFilters = {
-      @ComponentScan.Filter(
-          type = FilterType.ASSIGNABLE_TYPE,
-          classes = {WebConfig.class})
-    })
+@WebMvcTest(controllers = AiWebhookController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class AiWebhookControllerTest {
 
