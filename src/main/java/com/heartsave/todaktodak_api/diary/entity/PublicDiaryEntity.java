@@ -24,8 +24,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -58,7 +56,6 @@ public class PublicDiaryEntity extends BaseEntity {
   private String publicContent;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "publicDiaryEntity")
-  @OnDelete(action = OnDeleteAction.CASCADE)
   @Builder.Default
   private List<DiaryReactionEntity> reactions = new ArrayList<>();
 }

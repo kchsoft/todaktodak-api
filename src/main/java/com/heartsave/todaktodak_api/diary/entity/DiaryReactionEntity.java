@@ -22,6 +22,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -52,6 +54,7 @@ public class DiaryReactionEntity extends BaseEntity {
   private MemberEntity memberEntity;
 
   @ManyToOne(fetch = FetchType.LAZY)
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumn(name = "public_diary_id", nullable = false)
   private PublicDiaryEntity publicDiaryEntity;
 
