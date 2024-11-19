@@ -59,7 +59,9 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
     } catch (Exception ex) {
       response
           .getWriter()
-          .write(objectMapper.writeValueAsString(ErrorResponse.from(AuthErrorSpec.AUTH_FAIL)));
+          .write(
+              objectMapper.writeValueAsString(
+                  ErrorResponse.from(AuthErrorSpec.valueOf(e.getMessage()))));
     }
   }
 
