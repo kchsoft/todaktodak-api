@@ -9,7 +9,6 @@ import com.heartsave.todaktodak_api.common.entity.BaseEntity;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -30,6 +29,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -50,6 +51,7 @@ public class DiaryEntity extends BaseEntity {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumn(name = "member_id", nullable = false)
   private MemberEntity memberEntity;
 
@@ -77,11 +79,7 @@ public class DiaryEntity extends BaseEntity {
       columnDefinition = "TIMESTAMP(3)")
   private Instant diaryCreatedTime;
 
-  @OneToOne(
-      fetch = FetchType.LAZY,
-      mappedBy = "diaryEntity",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true)
+  @OneToOne(fetch = FetchType.LAZY, mappedBy = "diaryEntity")
   private PublicDiaryEntity publicDiaryEntity;
 
   public void addAiContent(AiDiaryContentResponse response) {
