@@ -8,8 +8,8 @@ import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import jakarta.mail.MessagingException;
 import java.time.Duration;
 import java.util.Date;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -17,6 +17,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class EmailService {
   private final JavaMailSender mailSender;
   private final RedisTemplate<String, String> redisTemplate;
@@ -24,15 +25,6 @@ public class EmailService {
 
   @Value("${spring.mail.username}")
   private String provider;
-
-  private EmailService(
-      JavaMailSender mailSender,
-      @Qualifier("otpRedisTemplate") RedisTemplate<String, String> redisTemplate,
-      MemberRepository memberRepository) {
-    this.mailSender = mailSender;
-    this.redisTemplate = redisTemplate;
-    this.memberRepository = memberRepository;
-  }
 
   public void sendOtp(EmailCheckRequest dto) {
     String email = dto.email();
