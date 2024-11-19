@@ -60,12 +60,7 @@ public class DiaryController {
   @DeleteMapping("/{diaryId}")
   public ResponseEntity<Void> deleteDiary(
       @TodakUserId Long memberId,
-      @Parameter(
-              name = "diaryId",
-              description = "삭제할 일기 ID",
-              example = "1",
-              required = true,
-              schema = @Schema(type = "Long", minimum = "1"))
+      @Parameter(name = "diaryId", description = "삭제할 일기 ID", example = "1", required = true)
           @Valid
           @PathVariable
           @Min(value = 1, message = "diaryId의 값은 최소 1 이상이어야 합니다.")
