@@ -13,7 +13,6 @@ import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
-import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
@@ -66,8 +65,7 @@ public class DiaryService {
             .orElseThrow(
                 () ->
                     new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, diaryId));
-    if (0 == diaryRepository.deleteByIds(memberId, diaryId))
-      throw new DiaryDeleteNotFoundException(DiaryErrorSpec.DELETE_NOT_FOUND, memberId, diaryId);
+    diaryRepository.delete(diary);
     log.info("DB에서 일기를 삭제했습니다.");
     s3FileStorageManager.deleteObjects(List.of(diary.getWebtoonImageUrl(), diary.getBgmUrl()));
   }

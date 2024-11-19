@@ -33,6 +33,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -80,13 +82,8 @@ public class DiaryEntity extends BaseEntity {
       columnDefinition = "TIMESTAMP(3)")
   private Instant diaryCreatedTime;
 
-  @OneToMany(
-      fetch = FetchType.LAZY,
-      mappedBy = "diaryEntity",
-      cascade =
-          CascadeType
-              .ALL, // 현재는 JPA Level의 cascade -> Diary 삭제시, ReactionEntity에 대한 Del Query가 별도로 나간다.
-      orphanRemoval = true) // Todo : DB Level의 cascade를 설정하여 Diary Del Query 하나만 날려 cascade를 적용하자.
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "diaryEntity")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @Builder.Default
   private List<DiaryReactionEntity> reactions = new ArrayList<>();
 
