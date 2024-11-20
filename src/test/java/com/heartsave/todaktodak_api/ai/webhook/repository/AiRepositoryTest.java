@@ -5,6 +5,8 @@ import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_BGM_URL;
 import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_WEBTOON_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.heartsave.todaktodak_api.ai.webhook.domain.WebhookBgmCompletion;
+import com.heartsave.todaktodak_api.ai.webhook.domain.WebhookWebtoonCompletion;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
@@ -61,8 +63,8 @@ class AiRepositoryTest {
       WebhookWebtoonCompletionRequest request =
           new WebhookWebtoonCompletionRequest(
               member.getId(), InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), newUrl);
-
-      aiRepository.updateWebtoonUrl(request, request.webtoonFolderUrl());
+      WebhookWebtoonCompletion completion = WebhookWebtoonCompletion.from(request, newUrl);
+      aiRepository.updateWebtoonUrl(completion);
 
       DiaryEntity updatedDiary = tem.find(DiaryEntity.class, diary.getId());
       assertThat(updatedDiary.getWebtoonImageUrl()).isEqualTo(newUrl);
@@ -75,8 +77,9 @@ class AiRepositoryTest {
       LocalDate nonExistentDate = LocalDate.now().plusDays(1);
       WebhookWebtoonCompletionRequest request =
           new WebhookWebtoonCompletionRequest(member.getId(), nonExistentDate, newUrl);
+      WebhookWebtoonCompletion completion = WebhookWebtoonCompletion.from(request, newUrl);
 
-      aiRepository.updateWebtoonUrl(request, request.webtoonFolderUrl());
+      aiRepository.updateWebtoonUrl(completion);
 
       DiaryEntity unchangedDiary = tem.find(DiaryEntity.class, diary.getId());
       assertThat(unchangedDiary.getWebtoonImageUrl()).isEqualTo("");
@@ -94,8 +97,9 @@ class AiRepositoryTest {
       WebhookBgmCompletionRequest request =
           new WebhookBgmCompletionRequest(
               member.getId(), InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), newBgmUrl);
+      WebhookBgmCompletion completion = WebhookBgmCompletion.from(request, newBgmUrl);
 
-      aiRepository.updateBgmUrl(request, request.bgmUrl());
+      aiRepository.updateBgmUrl(completion);
 
       DiaryEntity updatedDiary = tem.find(DiaryEntity.class, diary.getId());
       assertThat(updatedDiary.getBgmUrl()).isEqualTo(newBgmUrl);
@@ -109,8 +113,9 @@ class AiRepositoryTest {
       LocalDate nonExistentDate = LocalDate.now().plusDays(1);
       WebhookBgmCompletionRequest request =
           new WebhookBgmCompletionRequest(member.getId(), nonExistentDate, newBgmUrl);
+      WebhookBgmCompletion completion = WebhookBgmCompletion.from(request, newBgmUrl);
 
-      aiRepository.updateBgmUrl(request, request.bgmUrl());
+      aiRepository.updateBgmUrl(completion);
 
       DiaryEntity unchangedDiary = tem.find(DiaryEntity.class, diary.getId());
       assertThat(unchangedDiary.getBgmUrl()).isEqualTo("");
@@ -139,8 +144,9 @@ class AiRepositoryTest {
       WebhookBgmCompletionRequest request =
           new WebhookBgmCompletionRequest(
               member.getId(), InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), newBgmUrl);
+      WebhookBgmCompletion completion = WebhookBgmCompletion.from(request, newBgmUrl);
 
-      aiRepository.updateBgmUrl(request, request.bgmUrl());
+      aiRepository.updateBgmUrl(completion);
 
       DiaryEntity targetDiary = tem.find(DiaryEntity.class, diary.getId());
       DiaryEntity otherDiary = tem.find(DiaryEntity.class, diary2.getId());
