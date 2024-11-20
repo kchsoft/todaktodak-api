@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.ai.webhook.service;
 
-import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_BGM_URL;
-import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_WEBTOON_URL;
+import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_BGM_KEY_URL;
+import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_WEBTOON_KEY_URL;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -42,9 +42,10 @@ class AiDiaryServiceTest {
 
   @BeforeEach
   void setUp() {
-    webtoonRequest = new WebhookWebtoonCompletionRequest(memberId, createdDate, TEST_WEBTOON_URL);
+    webtoonRequest =
+        new WebhookWebtoonCompletionRequest(memberId, createdDate, TEST_WEBTOON_KEY_URL);
 
-    bgmRequest = new WebhookBgmCompletionRequest(memberId, createdDate, TEST_BGM_URL);
+    bgmRequest = new WebhookBgmCompletionRequest(memberId, createdDate, TEST_BGM_KEY_URL);
 
     when(s3FileStorageManager.parseKeyFrom(anyString())).thenReturn(PARSED_KEY_URL);
   }

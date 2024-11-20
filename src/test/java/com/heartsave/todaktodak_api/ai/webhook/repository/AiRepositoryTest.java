@@ -1,8 +1,8 @@
 package com.heartsave.todaktodak_api.ai.webhook.repository;
 
 import static com.heartsave.todaktodak_api.common.BaseTestObject.DUMMY_STRING_CONTENT;
-import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_BGM_URL;
-import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_WEBTOON_URL;
+import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_BGM_KEY_URL;
+import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_WEBTOON_KEY_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.heartsave.todaktodak_api.ai.webhook.domain.WebhookBgmCompletion;
@@ -177,7 +177,7 @@ class AiRepositoryTest {
           DiaryEntity.builder()
               .memberEntity(member)
               .content(DUMMY_STRING_CONTENT)
-              .bgmUrl(TEST_BGM_URL)
+              .bgmUrl(TEST_BGM_KEY_URL)
               .webtoonImageUrl("")
               .diaryCreatedTime(nowDateTime)
               .emotion(DiaryEmotion.HAPPY)
@@ -203,7 +203,7 @@ class AiRepositoryTest {
               .memberEntity(member)
               .content(DUMMY_STRING_CONTENT)
               .bgmUrl("")
-              .webtoonImageUrl(TEST_WEBTOON_URL)
+              .webtoonImageUrl(TEST_WEBTOON_KEY_URL)
               .diaryCreatedTime(nowDateTime)
               .emotion(DiaryEmotion.HAPPY)
               .build();
@@ -225,8 +225,8 @@ class AiRepositoryTest {
           DiaryEntity.builder()
               .memberEntity(member)
               .content(DUMMY_STRING_CONTENT)
-              .bgmUrl(TEST_BGM_URL)
-              .webtoonImageUrl(TEST_WEBTOON_URL)
+              .bgmUrl(TEST_BGM_KEY_URL)
+              .webtoonImageUrl(TEST_WEBTOON_KEY_URL)
               .diaryCreatedTime(
                   Instant.now().plus(1, ChronoUnit.DAYS)) // BeforeEach의 diary 날짜 다르게 하기 위해
               .emotion(DiaryEmotion.HAPPY)

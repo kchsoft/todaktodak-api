@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.ai.webhook.controller;
 
-import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_BGM_URL;
-import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_WEBTOON_URL;
+import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_BGM_KEY_URL;
+import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_WEBTOON_KEY_URL;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -63,7 +63,7 @@ class AiWebhookControllerTest {
           new WebhookWebtoonCompletionRequest(
               member.getId(),
               InstantConverter.toLocalDate(diary.getDiaryCreatedTime()),
-              TEST_WEBTOON_URL);
+              TEST_WEBTOON_KEY_URL);
 
       doNothing().when(aiDiaryService).saveWebtoon(any(WebhookWebtoonCompletionRequest.class));
 
@@ -82,7 +82,9 @@ class AiWebhookControllerTest {
     void saveWebtoon_InvalidRequest_Returns400() throws Exception {
       WebhookWebtoonCompletionRequest request =
           new WebhookWebtoonCompletionRequest(
-              null, InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), TEST_WEBTOON_URL);
+              null,
+              InstantConverter.toLocalDate(diary.getDiaryCreatedTime()),
+              TEST_WEBTOON_KEY_URL);
 
       mockMvc
           .perform(
@@ -107,7 +109,7 @@ class AiWebhookControllerTest {
           new WebhookBgmCompletionRequest(
               member.getId(),
               InstantConverter.toLocalDate(diary.getDiaryCreatedTime()),
-              TEST_BGM_URL);
+              TEST_BGM_KEY_URL);
 
       doNothing().when(aiDiaryService).saveBgm(any(WebhookBgmCompletionRequest.class));
 
@@ -126,7 +128,7 @@ class AiWebhookControllerTest {
     void saveBgm_InvalidRequest_Returns400() throws Exception {
       WebhookBgmCompletionRequest request =
           new WebhookBgmCompletionRequest(
-              null, InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), TEST_BGM_URL);
+              null, InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), TEST_BGM_KEY_URL);
 
       mockMvc
           .perform(
