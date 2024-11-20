@@ -56,7 +56,7 @@ public class EmailService {
   }
 
   private String createOtp() {
-    return RandomStringUtils.randomAlphanumeric(8);
+    return RandomStringUtils.randomNumeric(6);
   }
 
   private void setMessageContent(MimeMessageHelper helper, String email, String otp)
