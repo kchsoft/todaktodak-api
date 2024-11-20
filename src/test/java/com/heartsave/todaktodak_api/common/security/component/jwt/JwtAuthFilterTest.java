@@ -10,10 +10,7 @@ import com.heartsave.todaktodak_api.auth.repository.RefreshTokenCacheRepository;
 import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
-import com.heartsave.todaktodak_api.common.security.util.CookieUtils;
-import com.heartsave.todaktodak_api.common.security.util.JwtUtils;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import com.heartsave.todaktodak_api.common.security.util.UtilConfig;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +25,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.test.util.ReflectionTestUtils;
 
 final class JwtAuthFilterTest {
   private JwtAuthFilter jwtAuthFilter;
@@ -41,18 +37,7 @@ final class JwtAuthFilterTest {
 
   @BeforeAll
   static void setupAll() {
-    // JwtUtils 초기화
-    ReflectionTestUtils.setField(JwtUtils.class, "ACCESS_TOKEN_EXPIRE_TIME_MILLI_SECOND", 10000L);
-    ReflectionTestUtils.setField(JwtUtils.class, "REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND", 100000L);
-    ReflectionTestUtils.setField(
-        JwtUtils.class,
-        "key",
-        Keys.hmacShaKeyFor(
-            Decoders.BASE64.decode(
-                "secretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkey")));
-
-    // CookieUtils 초기화
-    ReflectionTestUtils.setField(CookieUtils.class, "MAX_AGE", 10000L);
+    UtilConfig.utilSetup();
   }
 
   @BeforeEach
