@@ -3,6 +3,7 @@ package com.heartsave.todaktodak_api.common.security.component;
 import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.NO_TOKEN_REQUEST_ATTRIBUTE_KEY;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.heartsave.todaktodak_api.auth.exception.AuthException;
 import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
 import com.heartsave.todaktodak_api.common.exception.errorspec.AuthErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.ErrorSpec;
@@ -56,12 +57,16 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
     try {
       TokenErrorSpec spec = TokenErrorSpec.valueOf(e.getMessage());
       response.getWriter().write(objectMapper.writeValueAsString(ErrorResponse.from(spec)));
-    } catch (Exception ex) {
+    } catch (AuthException ex) {
       response
           .getWriter()
           .write(
               objectMapper.writeValueAsString(
                   ErrorResponse.from(AuthErrorSpec.valueOf(e.getMessage()))));
+    } catch (Exception ex) {
+      response
+          .getWriter()
+          .write(objectMapper.writeValueAsString(ErrorResponse.from(AuthErrorSpec.AUTH_FAIL)));
     }
   }
 
