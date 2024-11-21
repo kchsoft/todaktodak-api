@@ -30,7 +30,7 @@ public class DiaryReactionService {
         createDiaryReactionEntity(memberId, publicDiaryId, reactionType);
 
     if (!reactionRepository.hasReaction(memberId, publicDiaryId, reactionType)) {
-      reactionRepository.save(reactionEntity);
+      reactionRepository.save(reactionEntity); // DataIntegrityViolationException 예외 주의
     } else {
       reactionRepository.deleteReaction(memberId, publicDiaryId, reactionType);
     }
