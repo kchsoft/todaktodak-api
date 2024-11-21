@@ -64,6 +64,7 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
               objectMapper.writeValueAsString(
                   ErrorResponse.from(AuthErrorSpec.valueOf(e.getMessage()))));
     } catch (Exception ex) {
+      logger.error("예기치 못한 인증 에러 발생: {}", e.getMessage());
       response
           .getWriter()
           .write(objectMapper.writeValueAsString(ErrorResponse.from(AuthErrorSpec.AUTH_FAIL)));
