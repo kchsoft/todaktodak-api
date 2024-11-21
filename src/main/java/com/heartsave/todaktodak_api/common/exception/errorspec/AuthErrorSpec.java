@@ -16,7 +16,7 @@ public enum AuthErrorSpec implements ErrorSpec {
   EMAIL_OTP_SEND_FAIL(HttpStatus.SERVICE_UNAVAILABLE, "AUTH-006", "인증번호 전송이 실패됐습니다.", "OPT 전송 실패"),
   INCORRECT_EMAIL_OTP(HttpStatus.CONFLICT, "AUTH-007", "잘못된 인증번호입니다.", "OPT 검증 실패"),
   ABNORMAL_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH-008", "로그인이 필요합니다.", "비정상 접근 시도"),
-  AUTH_FAIL(HttpStatus.UNAUTHORIZED, "AUTH-009", "인증이 실패했습니다", "비정상 인증 에러"),
+  AUTH_FAIL(HttpStatus.UNAUTHORIZED, "AUTH-009", "로그인이 필요합니다.", "비정상 인증 에러"),
   RE_LOGIN_REQUIRED(
       HttpStatus.UNAUTHORIZED, "AUTH-010", "다시 로그인을 해야합니다.", "리프레시 토큰 유효성 검사가 실패됐습니다."),
   TEMP_USER_DIARY_CREATE_FAIL(

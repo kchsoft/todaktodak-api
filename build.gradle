@@ -55,7 +55,7 @@ dependencies {
 
     testImplementation 'com.h2database:h2:2.3.232'
     testImplementation 'com.squareup.okhttp3:mockwebserver'
-    testImplementation 'it.ozimov:embedded-redis:0.7.3'
+    testImplementation 'com.github.codemonstur:embedded-redis:1.4.3'
 }
 
 test {

@@ -7,27 +7,35 @@ import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // 소셜 로그인별로 정형화된 형식의 리소스로 가공
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class TodakOauth2Attribute {
-  private static final String NAVER = "naver";
-  private static final String KAKAO = "kakao";
-  private static final String GOOGLE = "google";
-
+  private static final Logger logger = LoggerFactory.getLogger(TodakOauth2Attribute.class);
   private final String username;
   private final String email;
   private final AuthType authType;
 
   //
   public static TodakOauth2Attribute of(Map<String, Object> attributes, String authType) {
-    return switch (authType) {
-      case NAVER -> ofNaver(attributes);
-      case KAKAO -> ofKakao(attributes);
-      case GOOGLE -> ofGoogle(attributes);
-      default -> null;
-    };
+    try {
+      AuthType type = AuthType.valueOf(authType);
+      return switch (type) {
+        case NAVER -> ofNaver(attributes);
+        case KAKAO -> ofKakao(attributes);
+        case GOOGLE -> ofGoogle(attributes);
+        default -> null;
+      };
+    } catch (IllegalArgumentException e) {
+      logger.error("지원하는 Oauth2 Client가 아닙니다. {}", e.getMessage());
+      return null;
+    } catch (Exception e) {
+      logger.error("Oauth2 리소스 변환을 실패했습니다. {}", e.getMessage());
+      return null;
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -35,7 +43,7 @@ public class TodakOauth2Attribute {
     String id = String.valueOf(attributes.get("id")); // Long -> String 변환
     Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
     String email = (String) kakaoAccount.get("email");
-    return new TodakOauth2Attribute(id + "_" + KAKAO, email, AuthType.KAKAO);
+    return new TodakOauth2Attribute(id + "_" + AuthType.KAKAO.name(), email, AuthType.KAKAO);
   }
 
   @SuppressWarnings("unchecked")
@@ -44,12 +52,14 @@ public class TodakOauth2Attribute {
     String id = (String) response.get("id");
     id = id.substring(0, Math.min(id.length(), LOGIN_ID_MAX_SIZE - 6));
     String email = (String) response.get("email");
-    return new TodakOauth2Attribute(id + "_" + NAVER, email, AuthType.NAVER);
+    return new TodakOauth2Attribute(id + "_" + AuthType.NAVER.name(), email, AuthType.NAVER);
   }
 
   private static TodakOauth2Attribute ofGoogle(Map<String, Object> attributes) {
     return new TodakOauth2Attribute(
-        attributes.get("sub") + "_" + GOOGLE, (String) attributes.get("email"), AuthType.GOOGLE);
+        attributes.get("sub") + "_" + AuthType.GOOGLE.name(),
+        (String) attributes.get("email"),
+        AuthType.GOOGLE);
   }
 
   @Override
