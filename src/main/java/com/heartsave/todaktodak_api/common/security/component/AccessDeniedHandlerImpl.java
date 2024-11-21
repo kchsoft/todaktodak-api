@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
@@ -14,6 +16,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 
 @RequiredArgsConstructor
 public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final ObjectMapper objectMapper;
 
   @Override
@@ -22,6 +25,7 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
       HttpServletResponse response,
       AccessDeniedException accessDeniedException)
       throws IOException {
+    logger.error("인가 에러가 발생했습니다: {}", accessDeniedException.getMessage());
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpStatus.FORBIDDEN.value());
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);

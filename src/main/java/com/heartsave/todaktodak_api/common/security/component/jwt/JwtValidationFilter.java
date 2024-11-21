@@ -90,6 +90,8 @@ public class JwtValidationFilter extends OncePerRequestFilter {
         | IllegalArgumentException e) {
       logger.error("유효하지 않은 토큰입니다. {}", token);
       respondAuthError(request, response, TokenErrorSpec.INVALID_TOKEN.name());
+    } catch (Exception e) {
+      logger.error("토큰 검증이 실패했습니다. {}", e.getMessage());
     }
     return false;
   }
