@@ -17,22 +17,22 @@ public interface DiaryReactionRepository extends JpaRepository<DiaryReactionEnti
         SELECT 1
         FROM DiaryReactionEntity dr
         WHERE dr.memberEntity.id = :memberId
-        AND dr.diaryEntity.id = :diaryId
+        AND dr.publicDiaryEntity.id = :publicDiaryId
         AND dr.reactionType = :reactionType
     ) THEN true ELSE false END
 """)
   boolean hasReaction(
       @Param("memberId") Long memberId,
-      @Param("diaryId") Long diaryId,
+      @Param("publicDiaryId") Long publicDiaryId,
       @Param("reactionType") DiaryReactionType reactionType);
 
   @Query(
       """
         SELECT dr.reactionType
         FROM DiaryReactionEntity dr
-        WHERE dr.memberEntity.id = :memberId AND dr.diaryEntity.id = :diaryId
+        WHERE dr.memberEntity.id = :memberId AND dr.publicDiaryEntity.id = :publicDiaryId
       """)
-  List<DiaryReactionType> findMemberReaction(Long memberId, Long diaryId);
+  List<DiaryReactionType> findMemberReaction(Long memberId, Long publicDiaryId);
 
   @Query(
       value =
@@ -43,18 +43,18 @@ public interface DiaryReactionRepository extends JpaRepository<DiaryReactionEnti
               COUNT(CASE WHEN reaction_type = 'EMPATHIZE' THEN 1 END) as empathize,
               COUNT(CASE WHEN reaction_type = 'CHEERING' THEN 1 END) as cheering
             FROM diary_reaction
-            WHERE diary_id = :diaryId
+            WHERE public_diary_id = :publicDiaryId
           """,
       nativeQuery = true)
-  DiaryReactionCountProjection countEachByDiaryId(Long diaryId);
+  DiaryReactionCountProjection countEachByDiaryId(Long publicDiaryId);
 
   @Modifying
   @Query(
       """
-        DELETE FROM DiaryReactionEntity  dr WHERE dr.memberEntity.id = :memberId AND dr.diaryEntity.id = :diaryId AND dr.reactionType = :reactionType
+        DELETE FROM DiaryReactionEntity  dr WHERE dr.memberEntity.id = :memberId AND dr.publicDiaryEntity.id = :publicDiaryId AND dr.reactionType = :reactionType
       """)
   int deleteReaction(
       @Param("memberId") Long memberId,
-      @Param("diaryId") Long diaryId,
+      @Param("publicDiaryId") Long publicDiaryId,
       @Param("reactionType") DiaryReactionType reactionType);
 }

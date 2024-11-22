@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.ai.webhook.controller;
 
-import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_BGM_URL;
-import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_WEBTOON_URL;
+import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_BGM_KEY_URL;
+import static com.heartsave.todaktodak_api.common.BaseTestObject.TEST_WEBTOON_KEY_URL;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -13,7 +13,6 @@ import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonComplet
 import com.heartsave.todaktodak_api.ai.webhook.service.AiDiaryService;
 import com.heartsave.todaktodak_api.ai.webhook.service.AiWebhookCharacterService;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
-import com.heartsave.todaktodak_api.common.config.WebConfig;
 import com.heartsave.todaktodak_api.common.converter.InstantConverter;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
@@ -32,18 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(
-    controllers = AiWebhookController.class,
-    excludeFilters = {
-      @ComponentScan.Filter(
-          type = FilterType.ASSIGNABLE_TYPE,
-          classes = {WebConfig.class})
-    })
+@WebMvcTest(controllers = AiWebhookController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class AiWebhookControllerTest {
 
@@ -72,7 +63,7 @@ class AiWebhookControllerTest {
           new WebhookWebtoonCompletionRequest(
               member.getId(),
               InstantConverter.toLocalDate(diary.getDiaryCreatedTime()),
-              TEST_WEBTOON_URL);
+              TEST_WEBTOON_KEY_URL);
 
       doNothing().when(aiDiaryService).saveWebtoon(any(WebhookWebtoonCompletionRequest.class));
 
@@ -91,7 +82,9 @@ class AiWebhookControllerTest {
     void saveWebtoon_InvalidRequest_Returns400() throws Exception {
       WebhookWebtoonCompletionRequest request =
           new WebhookWebtoonCompletionRequest(
-              null, InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), TEST_WEBTOON_URL);
+              null,
+              InstantConverter.toLocalDate(diary.getDiaryCreatedTime()),
+              TEST_WEBTOON_KEY_URL);
 
       mockMvc
           .perform(
@@ -116,7 +109,7 @@ class AiWebhookControllerTest {
           new WebhookBgmCompletionRequest(
               member.getId(),
               InstantConverter.toLocalDate(diary.getDiaryCreatedTime()),
-              TEST_BGM_URL);
+              TEST_BGM_KEY_URL);
 
       doNothing().when(aiDiaryService).saveBgm(any(WebhookBgmCompletionRequest.class));
 
@@ -135,7 +128,7 @@ class AiWebhookControllerTest {
     void saveBgm_InvalidRequest_Returns400() throws Exception {
       WebhookBgmCompletionRequest request =
           new WebhookBgmCompletionRequest(
-              null, InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), TEST_BGM_URL);
+              null, InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), TEST_BGM_KEY_URL);
 
       mockMvc
           .perform(

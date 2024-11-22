@@ -4,7 +4,7 @@ import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.
 import static com.heartsave.todaktodak_api.common.security.util.CookieUtils.*;
 
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.member.dto.request.NicknameUpdateRequest;
 import com.heartsave.todaktodak_api.member.dto.response.MemberProfileResponse;
 import com.heartsave.todaktodak_api.member.dto.response.NicknameUpdateResponse;
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MemberService {
   private final MemberRepository memberRepository;
-  private final S3FileStorageService s3Service;
+  private final S3FileStorageManager s3Manager;
 
   public NicknameUpdateResponse updateNickname(Long memberId, NicknameUpdateRequest dto) {
     MemberEntity retrievedMember = findMemberById(memberId);
@@ -35,7 +35,7 @@ public class MemberService {
     MemberProfileProjection memberProfile = getMemberProfileById(memberId);
 
     String characterPreSignedUrl =
-        s3Service.preSignedCharacterImageUrlFrom(memberProfile.getCharacterImageUrl());
+        s3Manager.preSignedCharacterImageUrlFrom(memberProfile.getCharacterImageUrl());
 
     return MemberProfileResponse.builder()
         .nickname(memberProfile.getNickname())

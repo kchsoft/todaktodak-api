@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.ai.webhook.service;
 
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookCharacterCompletionRequest;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.event.constant.EventType;
 import com.heartsave.todaktodak_api.event.entity.EventEntity;
 import com.heartsave.todaktodak_api.event.service.EventService;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AiWebhookCharacterService {
   private final MemberRepository memberRepository;
   private final EventService eventService;
-  private final S3FileStorageService s3Service;
+  private final S3FileStorageManager s3Manager;
 
   public void saveCharacterAndNotify(WebhookCharacterCompletionRequest dto) {
     MemberEntity member = saveCharacter(dto);
@@ -38,7 +38,7 @@ public class AiWebhookCharacterService {
         memberRepository
             .findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, memberId));
-    String url = s3Service.parseKeyFrom(dto.characterProfileImageUrl());
+    String url = s3Manager.parseKeyFrom(dto.characterProfileImageUrl());
     retrievedMember.updateCharacterInfo(
         dto.characterInfo(), dto.characterStyle(), dto.seedNum(), url);
     return retrievedMember;

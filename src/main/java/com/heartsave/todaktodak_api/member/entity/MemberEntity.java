@@ -35,6 +35,7 @@ public class MemberEntity extends BaseEntity {
   private String characterImageUrl;
 
   // AI 컨텐츠 사전 정보
+  @Column(columnDefinition = "text")
   private String characterInfo;
 
   @Enumerated(EnumType.STRING)
@@ -46,10 +47,6 @@ public class MemberEntity extends BaseEntity {
   private Integer characterSeed;
 
   private String characterStyle;
-
-  public static MemberEntity createById(Long id) {
-    return MemberEntity.builder().id(id).build();
-  }
 
   public void updateNickname(String newNickName) {
     nickname = newNickName;

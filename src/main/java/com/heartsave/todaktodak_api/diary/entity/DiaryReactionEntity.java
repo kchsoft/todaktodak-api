@@ -21,6 +21,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -36,9 +39,10 @@ import lombok.NoArgsConstructor;
     name = "diary_reaction",
     uniqueConstraints = {
       @UniqueConstraint(
-          columnNames = {"member_id", "diary_id", "reaction_type"},
+          columnNames = {"member_id", "public_diary_id", "reaction_type"},
           name = "uk_member_diary_reaction")
     })
+@ToString
 public class DiaryReactionEntity extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DIARY_REACTION_SEQ_GENERATOR")
@@ -46,12 +50,14 @@ public class DiaryReactionEntity extends BaseEntity {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumn(name = "member_id", nullable = false)
   private MemberEntity memberEntity;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "diary_id", nullable = false)
-  private DiaryEntity diaryEntity;
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @JoinColumn(name = "public_diary_id", nullable = false)
+  private PublicDiaryEntity publicDiaryEntity;
 
   @Column(name = "reaction_type", nullable = false)
   @Enumerated(EnumType.STRING)

@@ -9,7 +9,7 @@ import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.security.util.CookieUtils;
 import com.heartsave.todaktodak_api.common.security.util.JwtUtils;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.member.domain.TodakRole;
 import com.heartsave.todaktodak_api.member.dto.response.CharacterRegisterResponse;
 import com.heartsave.todaktodak_api.member.dto.response.CharacterTemporaryImageResponse;
@@ -28,13 +28,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class CharacterService {
   private final MemberRepository memberRepository;
   private final AiClientService aiClientService;
-  private final S3FileStorageService s3Service;
+  private final S3FileStorageManager s3Manager;
 
   @Transactional(readOnly = true)
   public CharacterTemporaryImageResponse getPastCharacterImage(Long memberId) {
     MemberEntity member = findMemberById(memberId);
     return CharacterTemporaryImageResponse.builder()
-        .characterImageUrl(s3Service.preSignedCharacterImageUrlFrom(member.getCharacterImageUrl()))
+        .characterImageUrl(s3Manager.preSignedCharacterImageUrlFrom(member.getCharacterImageUrl()))
         .build();
   }
 
