@@ -38,11 +38,10 @@ public class EmailService {
     try {
       var helper = new MimeMessageHelper(message, true, "UTF-8");
       setMessageContent(helper, email, otp);
+      mailSender.send(message);
     } catch (MessagingException e) {
       throw new AuthException(AuthErrorSpec.EMAIL_OTP_SEND_FAIL);
     }
-
-    mailSender.send(message);
     cacheRepository.set(email, otp);
   }
 
