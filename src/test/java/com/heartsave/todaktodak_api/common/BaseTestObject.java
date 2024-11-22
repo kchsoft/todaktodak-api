@@ -3,6 +3,7 @@ package com.heartsave.todaktodak_api.common;
 import com.heartsave.todaktodak_api.common.security.domain.AuthType;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.member.domain.TodakRole;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -35,6 +36,12 @@ public class BaseTestObject {
   private static String TEST_CHARACTER_STYLE = "romance";
   private static int TEST_CHARACTER_SEED = 13564;
 
+  public static MemberEntity createTempMember() {
+    var member = createMember();
+    member.updateRole(TodakRole.ROLE_TEMP.name());
+    return member;
+  }
+
   public static MemberEntity createMember() {
     return MemberEntity.builder()
         .id(1L)
@@ -47,6 +54,7 @@ public class BaseTestObject {
         .characterImageUrl(TEST_CHARACTER_IMAGE_URL)
         .characterStyle(TEST_CHARACTER_STYLE)
         .characterSeed(TEST_CHARACTER_SEED)
+        .role(TodakRole.ROLE_USER)
         .build();
   }
 
