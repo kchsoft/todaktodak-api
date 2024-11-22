@@ -3,15 +3,16 @@ package com.heartsave.todaktodak_api.auth.service;
 import com.heartsave.todaktodak_api.auth.dto.request.EmailCheckRequest;
 import com.heartsave.todaktodak_api.auth.dto.request.EmailOtpCheckRequest;
 import com.heartsave.todaktodak_api.auth.exception.AuthException;
+import com.heartsave.todaktodak_api.auth.repository.OtpCacheRepository;
 import com.heartsave.todaktodak_api.common.exception.errorspec.AuthErrorSpec;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import jakarta.mail.MessagingException;
-import java.time.Duration;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -19,8 +20,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class EmailService {
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final JavaMailSender mailSender;
-  private final RedisTemplate<String, String> redisTemplate;
+  private final OtpCacheRepository cacheRepository;
   private final MemberRepository memberRepository;
 
   @Value("${spring.mail.username}")
@@ -41,17 +43,17 @@ public class EmailService {
     }
 
     mailSender.send(message);
-    redisTemplate.opsForValue().set("OTP:" + email, otp, Duration.ofMinutes(3));
+    cacheRepository.set(email, otp);
   }
 
   public boolean verifyOtp(EmailOtpCheckRequest dto) {
-    var key = "OTP:" + dto.email();
-    String actualOtp = redisTemplate.opsForValue().get(key);
+    String actualOtp = cacheRepository.get(dto.email());
 
     if (actualOtp != null && actualOtp.equals(dto.emailOtp())) {
-      redisTemplate.delete(key);
+      cacheRepository.delete(dto.email());
       return true;
     }
+    logger.info("이메일 인증 실패 {}", dto.emailOtp());
     return false;
   }
 
