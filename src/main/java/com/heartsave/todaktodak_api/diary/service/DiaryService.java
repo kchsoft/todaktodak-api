@@ -1,13 +1,11 @@
 package com.heartsave.todaktodak_api.diary.service;
 
-import static com.heartsave.todaktodak_api.common.constant.CoreConstant.URL.DEFAULT_URL;
-
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
 import com.heartsave.todaktodak_api.common.converter.InstantConverter;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
@@ -15,7 +13,6 @@ import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
-import com.heartsave.todaktodak_api.diary.exception.DiaryDeleteNotFoundException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
@@ -37,7 +34,7 @@ public class DiaryService {
   private final AiClientService aiClientService;
   private final DiaryRepository diaryRepository;
   private final MemberRepository memberRepository;
-  private final S3FileStorageService s3FileStorageService;
+  private final S3FileStorageManager s3FileStorageManager;
 
   public DiaryWriteResponse write(Long memberId, DiaryWriteRequest request) {
     DiaryEntity diary = createDiaryEntity(memberId, request);
@@ -62,18 +59,21 @@ public class DiaryService {
 
   public void delete(Long memberId, Long diaryId) {
     log.info("DB에 일기를 삭제를 요청합니다.");
-    if (0 == diaryRepository.deleteByIds(memberId, diaryId))
-      throw new DiaryDeleteNotFoundException(DiaryErrorSpec.DELETE_NOT_FOUND, memberId, diaryId);
+    DiaryEntity diary =
+        diaryRepository
+            .findById(diaryId)
+            .orElseThrow(
+                () ->
+                    new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, diaryId));
+    diaryRepository.delete(diary);
     log.info("DB에서 일기를 삭제했습니다.");
-
-    // TODO :  s3에서 webtoon,bgm,comment 삭제 요청
-    return;
+    s3FileStorageManager.deleteObjects(List.of(diary.getWebtoonImageUrl(), diary.getBgmUrl()));
   }
 
+  @Transactional(readOnly = true)
   public DiaryIndexResponse getIndex(Long memberId, Instant yearMonth) {
     Instant startDateTime = InstantConverter.toMonthStartDateTime(yearMonth);
     Instant endDateTime = InstantConverter.toMonthEndDateTime(yearMonth);
-
     log.info("해당 연월에 작성한 일기를 정보를 요청합니다.");
     List<DiaryIndexProjection> indexes =
         diaryRepository
@@ -84,6 +84,7 @@ public class DiaryService {
     return DiaryIndexResponse.builder().diaryIndexes(indexes).build();
   }
 
+  @Transactional(readOnly = true)
   public DiaryResponse getDiary(Long memberId, Instant requestDate) {
     log.info("사용자의 나의 일기 정보를 요청합니다.");
     DiaryEntity diary =
@@ -100,8 +101,8 @@ public class DiaryService {
         .emotion(diary.getEmotion())
         .content(diary.getContent())
         .webtoonImageUrls(
-            s3FileStorageService.preSignedWebtoonUrlFrom(List.of(diary.getWebtoonImageUrl())))
-        .bgmUrl(s3FileStorageService.preSignedBgmUrlFrom(diary.getBgmUrl()))
+            s3FileStorageManager.preSignedWebtoonUrlFrom(List.of(diary.getWebtoonImageUrl())))
+        .bgmUrl(s3FileStorageManager.preSignedBgmUrlFrom(diary.getBgmUrl()))
         .aiComment(diary.getAiComment())
         .dateTime(diary.getDiaryCreatedTime())
         .build();
@@ -112,13 +113,6 @@ public class DiaryService {
         memberRepository
             .findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, memberId));
-    return DiaryEntity.builder()
-        .memberEntity(member)
-        .emotion(request.getEmotion())
-        .content(request.getContent())
-        .diaryCreatedTime((request.getDateTime()))
-        .webtoonImageUrl(DEFAULT_URL)
-        .bgmUrl(DEFAULT_URL)
-        .build();
+    return DiaryEntity.createDefault(request, member);
   }
 }

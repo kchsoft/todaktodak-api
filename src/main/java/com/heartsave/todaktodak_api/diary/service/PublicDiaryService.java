@@ -1,21 +1,23 @@
 package com.heartsave.todaktodak_api.diary.service;
 
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageService;
+import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
+import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
-import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
-import com.heartsave.todaktodak_api.diary.entity.DiaryReactionEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIdsProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
+import com.heartsave.todaktodak_api.diary.exception.PublicDiaryExistException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class PublicDiaryService {
   private final DiaryRepository diaryRepository;
   private final PublicDiaryRepository publicDiaryRepository;
-  private final DiaryReactionRepository diaryReactionRepository;
-  private final S3FileStorageService s3FileStorageService;
+  private final DiaryReactionRepository reactionRepository;
+  private final MemberRepository memberRepository;
+  private final S3FileStorageManager s3FileStorageManager;
 
+  @Transactional(readOnly = true)
   public PublicDiaryPaginationResponse getPublicDiaryPagination(Long memberId, Long publicDiaryId) {
     List<PublicDiaryContentOnlyProjection> diaryContents = fetchDiaryContents(publicDiaryId);
     replaceWithPreSignedUrls(diaryContents);
@@ -54,10 +58,10 @@ public class PublicDiaryService {
     log.info("공개 일기 content url을 pre-signed url로 변경합니다.");
     for (PublicDiaryContentOnlyProjection content : diaryContents) {
       content.replaceWebtoonImageUrls(
-          s3FileStorageService.preSignedWebtoonUrlFrom(content.getWebtoonImageUrls()));
+          s3FileStorageManager.preSignedWebtoonUrlFrom(content.getWebtoonImageUrls()));
       content.replaceCharacterImageUrl(
-          s3FileStorageService.preSignedCharacterImageUrlFrom(content.getCharacterImageUrl()));
-      content.replaceBgmUrl(s3FileStorageService.preSignedBgmUrlFrom(content.getBgmUrl()));
+          s3FileStorageManager.preSignedCharacterImageUrlFrom(content.getCharacterImageUrl()));
+      content.replaceBgmUrl(s3FileStorageManager.preSignedBgmUrlFrom(content.getBgmUrl()));
     }
   }
 
@@ -78,48 +82,35 @@ public class PublicDiaryService {
   }
 
   private DiaryReactionCountProjection fetchReactionCount(Long diaryId) {
-    return diaryReactionRepository.countEachByDiaryId(diaryId);
+    return reactionRepository.countEachByDiaryId(diaryId);
   }
 
   private List<DiaryReactionType> fetchMemberReactions(Long memberId, Long diaryId) {
-    return diaryReactionRepository.findMemberReaction(memberId, diaryId);
+    return reactionRepository.findMemberReaction(memberId, diaryId);
   }
 
-  public void write(Long memberId, String publicContent, Long diaryId) {
-    DiaryEntity diary =
+  public void write(Long memberId, Long diaryId, String publicContent) {
+    DiaryIdsProjection ids =
         diaryRepository
-            .findById(diaryId) // Todo : exist 로 최적화
+            .findIdsById(diaryId)
             .orElseThrow(
                 () ->
                     new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, diaryId));
+
+    if (ids.getPublicDiaryId() != null) {
+      throw new PublicDiaryExistException(
+          PublicDiaryErrorSpec.PUBLIC_DIARY_EXIST, memberId, ids.getPublicDiaryId());
+    }
+
+    DiaryEntity diaryRef = diaryRepository.getReferenceById(diaryId);
+    MemberEntity memberRef = memberRepository.getReferenceById(memberId);
+
     PublicDiaryEntity publicDiary =
         PublicDiaryEntity.builder()
-            .diaryEntity(diary)
-            .memberEntity(diary.getMemberEntity())
+            .diaryEntity(diaryRef)
+            .memberEntity(memberRef)
             .publicContent(publicContent)
             .build();
     publicDiaryRepository.save(publicDiary);
-  }
-
-  public void toggleReactionStatus(Long memberId, PublicDiaryReactionRequest request) {
-    Long diaryId = request.diaryId();
-    DiaryReactionType reactionType = request.reactionType();
-    DiaryReactionEntity reactionEntity = getDiaryReactionEntity(memberId, diaryId, reactionType);
-    if (!diaryReactionRepository.hasReaction(memberId, diaryId, reactionType)) {
-      diaryReactionRepository.save(reactionEntity); // Todo: Optimistic Lock , Pessimistic Lock 학습
-    } else {
-      diaryReactionRepository.deleteReaction(memberId, diaryId, reactionType);
-    }
-  }
-
-  private DiaryReactionEntity getDiaryReactionEntity(
-      Long memberId, Long diaryId, DiaryReactionType reactionType) {
-    DiaryReactionEntity reactionEntity =
-        DiaryReactionEntity.builder()
-            .memberEntity(MemberEntity.createById(memberId))
-            .diaryEntity(DiaryEntity.createById(diaryId))
-            .reactionType(reactionType)
-            .build();
-    return reactionEntity;
   }
 }

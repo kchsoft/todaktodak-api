@@ -13,6 +13,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -21,9 +23,10 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 @RequiredArgsConstructor
 @Slf4j
 @Service
-public class S3FileStorageService {
+public class S3FileStorageManager {
   private final S3Presigner s3Presigner;
   private final S3Properties s3Properties;
+  private final S3Client s3Client;
 
   // TODO: 존재하지 않는 이미지 key에 대한 예외 처리 필요
   public List<String> preSignedWebtoonUrlFrom(List<String> s3FolderUrl) {
@@ -75,7 +78,24 @@ public class S3FileStorageService {
             .getObjectRequest(
                 GetObjectRequest.builder().bucket(s3Properties.bucketName()).key(key).build())
             .build();
+    String preSignedUrl = s3Presigner.presignGetObject(preSignRequest).url().toString();
+    log.info("pre-signed KEY={}, URL{}", key, preSignedUrl);
+    return preSignedUrl;
+  }
 
-    return s3Presigner.presignGetObject(preSignRequest).url().toString();
+  // TODO: 존재하지 않는 key에 대한 예외 처리 필요
+  public void deleteObject(String key) {
+    if (DEFAULT_URL.equals(key)) return;
+
+    DeleteObjectRequest request =
+        DeleteObjectRequest.builder().bucket(s3Properties.bucketName()).key(key).build();
+
+    log.info("S3에 일기 컨텐츠 삭제를 요청합니다.");
+    s3Client.deleteObject(request);
+    log.info("S3에서 일기 컨텐츠를 삭제했습니다.");
+  }
+
+  public void deleteObjects(List<String> keys) {
+    keys.forEach(this::deleteObject);
   }
 }

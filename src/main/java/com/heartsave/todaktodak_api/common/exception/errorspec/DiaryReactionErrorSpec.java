@@ -6,8 +6,12 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum AiErrorSpec implements ErrorSpec {
-  IMAGE_PROCESS_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "AI-001", "이미지 생성에 실패했습니다.", "이미지 처리 실패");
+public enum DiaryReactionErrorSpec implements ErrorSpec {
+  DIARY_REACTION_EXIST(
+      HttpStatus.BAD_REQUEST,
+      "DIARY_REACTION-001",
+      "잠시 후 다시 시도해 주세요.",
+      "일기 반응 요청이 동시에 요청되어 데이터 무결성 예외가 발생했습니다.");
 
   private final HttpStatus status;
   private final String code;

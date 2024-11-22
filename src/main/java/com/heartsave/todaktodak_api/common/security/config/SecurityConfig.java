@@ -105,6 +105,6 @@ public class SecurityConfig {
 
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
-    return (web) -> web.ignoring().requestMatchers("/api/v1/ai/webhook/**", "/favicon.ico");
+    return (web) -> web.ignoring().requestMatchers("/favicon.ico");
   }
 }

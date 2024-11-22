@@ -50,6 +50,7 @@ public class MySharedDiaryController {
           @Min(0L)
           @RequestParam(name = "after", defaultValue = "0")
           Long publicDiaryId) {
+    log.info("사용자 ID={}", memberId);
     return ResponseEntity.status(HttpStatus.OK)
         .body(mySharedDiaryService.getPagination(memberId, publicDiaryId));
   }
