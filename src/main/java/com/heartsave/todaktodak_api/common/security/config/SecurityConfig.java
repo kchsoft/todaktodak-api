@@ -40,8 +40,8 @@ public class SecurityConfig {
   private final ObjectMapper objectMapper;
   private final RefreshTokenCacheRepository refreshTokenCacheRepository;
 
-  @Value("${todak.cors.allowed-origin}")
-  private List<String> ALLOWED_ORIGINS;
+  @Value("${client.server.origin}")
+  private String CLIENT_SERVER_ORIGIN;
 
   @Bean
   @Profile("!test")
@@ -98,7 +98,7 @@ public class SecurityConfig {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowCredentials(true);
     configuration.setAllowedMethods(List.of("HEAD", "OPTION", "GET", "POST", "PATCH", "DELETE"));
-    configuration.setAllowedOrigins(ALLOWED_ORIGINS);
+    configuration.setAllowedOrigins(List.of(CLIENT_SERVER_ORIGIN));
     configuration.addAllowedHeader("*");
     return configuration;
   }

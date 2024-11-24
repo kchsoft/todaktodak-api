@@ -23,22 +23,19 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final RefreshTokenCacheRepository cacheRepository;
 
-  @Value("${base.url}")
-  private String BASE_URL;
-
-  @Value("${base.port}")
-  private String BASE_PORT;
+  @Value("${client.server.origin}")
+  private String CLIENT_SERVER_ORIGIN;
 
   @Override
   public void onAuthenticationSuccess(
       HttpServletRequest request, HttpServletResponse response, Authentication authentication)
       throws IOException {
-    logger.info("OAUTH2 SUCCESS: {}", authentication.getPrincipal());
+    logger.info("OAUTH2 로그인 성공: {}", authentication.getPrincipal());
     String refreshToken =
         JwtUtils.issueToken((TodakUser) authentication.getPrincipal(), REFRESH_TYPE);
     cacheRepository.set(
         String.valueOf(((TodakUser) authentication.getPrincipal()).getId()), refreshToken);
     response.addCookie(CookieUtils.createValidCookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken));
-    response.sendRedirect(BASE_URL + ":" + BASE_PORT + "/home");
+    response.sendRedirect(CLIENT_SERVER_ORIGIN + "/home");
   }
 }
