@@ -35,8 +35,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfig {
   private final TodakOauth2UserDetailsService oauth2UserDetailsService;
-  private final AuthenticationEntryPointImpl authenticationEntryPoint;
   private final OAuth2SuccessHandler oAuth2SuccessHandler;
+  private final Oauth2FailureHandler oauth2FailureHandler;
+  private final AuthenticationEntryPointImpl authenticationEntryPoint;
   private final ObjectMapper objectMapper;
   private final RefreshTokenCacheRepository refreshTokenCacheRepository;
 
@@ -60,7 +61,7 @@ public class SecurityConfig {
                 oauth2
                     .userInfoEndpoint((config) -> config.userService(oauth2UserDetailsService))
                     .successHandler(oAuth2SuccessHandler)
-                    .failureHandler(new Oauth2FailureHandler(objectMapper)))
+                    .failureHandler(oauth2FailureHandler))
         .authorizeHttpRequests(
             authorize ->
                 authorize
