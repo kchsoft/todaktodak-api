@@ -6,6 +6,7 @@ import com.heartsave.todaktodak_api.auth.dto.request.SignUpRequest;
 import com.heartsave.todaktodak_api.auth.dto.response.TokenReissueResponse;
 import com.heartsave.todaktodak_api.auth.exception.AuthException;
 import com.heartsave.todaktodak_api.auth.repository.RefreshTokenCacheRepository;
+import com.heartsave.todaktodak_api.common.exception.ErrorFieldBuilder;
 import com.heartsave.todaktodak_api.common.exception.errorspec.AuthErrorSpec;
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.AuthType;
@@ -39,13 +40,15 @@ public class AuthService {
     // 토큰 유효성 검사
     var refreshToken = extractRefreshToken(request);
     validateToken(refreshToken);
-
     // 인증 정보 생성
     Long id = JwtUtils.extractSubject(refreshToken);
     TodakUser user = createAuthenticationFromMember(id);
 
     // 캐시 토큰과 동일한지 비교
-    if (!checkCache(id, refreshToken)) throw new AuthException(AuthErrorSpec.ABNORMAL_ACCESS);
+    if (!checkCache(id, refreshToken))
+      throw new AuthException(
+          AuthErrorSpec.ABNORMAL_ACCESS,
+          ErrorFieldBuilder.builder().add("reason", "캐시 토큰과 동일하지 않아요.").build());
 
     // 토큰 재발급 및 쿠키 갱신
     var accessToken = JwtUtils.issueToken(user, ACCESS_TYPE);
@@ -78,17 +81,24 @@ public class AuthService {
     var refreshTokenCookie =
         CookieUtils.extractCookie(request, JwtConstant.REFRESH_TOKEN_COOKIE_KEY);
     if (refreshTokenCookie == null) {
-      throw new AuthException(AuthErrorSpec.ABNORMAL_ACCESS);
+      throw new AuthException(
+          AuthErrorSpec.ABNORMAL_ACCESS,
+          ErrorFieldBuilder.builder().add("message", "리프레시 토큰 쿠키가 없어요.").build());
     }
     String token = refreshTokenCookie.getValue();
     if (token == null) {
-      throw new AuthException(AuthErrorSpec.ABNORMAL_ACCESS);
+      throw new AuthException(
+          AuthErrorSpec.ABNORMAL_ACCESS,
+          ErrorFieldBuilder.builder().add("message", "리프레시 토큰 쿠키가 없어요.").build());
     }
     return token;
   }
 
   private boolean checkCache(Long memberId, String refreshToken) {
     var retrievedToken = cacheRepository.get(String.valueOf(memberId));
+    //    logger.info("쿠키 토큰={}", refreshToken);
+    //    logger.info("캐시 토큰={}", retrievedToken);
+    //    logger.info("쿠키 토큰과 캐시 토큰이 동일한가?={}", refreshToken.equals(retrievedToken));
     return retrievedToken.equals(refreshToken);
   }
 
@@ -96,14 +106,18 @@ public class AuthService {
     try {
       JwtUtils.extractAllClaims(token);
       if (!isRefreshTokenType(token)) {
-        throw new AuthException(AuthErrorSpec.ABNORMAL_ACCESS);
+        throw new AuthException(
+            AuthErrorSpec.ABNORMAL_ACCESS,
+            ErrorFieldBuilder.builder().add("message", "올바른 토큰 유형이 아니에요.").build());
       }
     } catch (ExpiredJwtException e) {
-      logger.error("토큰이 만료됐습니다. {}", token);
-      throw new AuthException(AuthErrorSpec.RE_LOGIN_REQUIRED);
+      throw new AuthException(
+          AuthErrorSpec.RE_LOGIN_REQUIRED,
+          ErrorFieldBuilder.builder().add("message", "리프레시 토큰이 만료됐어요.").build());
     } catch (Exception e) {
-      logger.error("유효하지 않은 토큰입니다. {}", token);
-      throw new AuthException(AuthErrorSpec.ABNORMAL_ACCESS);
+      throw new AuthException(
+          AuthErrorSpec.ABNORMAL_ACCESS,
+          ErrorFieldBuilder.builder().add("message", "유효하지 않은 리프레시 토큰이이에요.").build());
     }
   }
 
