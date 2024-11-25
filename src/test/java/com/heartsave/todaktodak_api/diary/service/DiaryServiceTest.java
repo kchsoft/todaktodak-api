@@ -107,7 +107,7 @@ public class DiaryServiceTest {
   void diaryDeleteSuccess() {
     doNothing().when(mockDiaryRepository).delete(any(DiaryEntity.class));
     when(mockDiaryRepository.findById(diary.getId())).thenReturn(Optional.of(diary));
-    doNothing().when(mockS3Manager).deleteObjects(any(List.class));
+    doNothing().when(mockS3Manager).deleteDiaries(any(List.class));
     assertDoesNotThrow(
         () -> {
           diaryService.delete(member.getId(), diary.getId());
