@@ -96,9 +96,6 @@ public class AuthService {
 
   private boolean checkCache(Long memberId, String refreshToken) {
     var retrievedToken = cacheRepository.get(String.valueOf(memberId));
-    //    logger.info("쿠키 토큰={}", refreshToken);
-    //    logger.info("캐시 토큰={}", retrievedToken);
-    //    logger.info("쿠키 토큰과 캐시 토큰이 동일한가?={}", refreshToken.equals(retrievedToken));
     return retrievedToken.equals(refreshToken);
   }
 
