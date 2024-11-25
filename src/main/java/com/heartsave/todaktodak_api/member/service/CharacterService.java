@@ -1,6 +1,5 @@
 package com.heartsave.todaktodak_api.member.service;
 
-import static com.heartsave.todaktodak_api.common.constant.CoreConstant.URL.TEMP_CHARACTER_IMAGE_URL_PREFIX;
 import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.REFRESH_TOKEN_COOKIE_KEY;
 
 import com.heartsave.todaktodak_api.ai.client.dto.request.ClientCharacterRequest;
@@ -11,6 +10,7 @@ import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.security.util.CookieUtils;
 import com.heartsave.todaktodak_api.common.security.util.JwtUtils;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
+import com.heartsave.todaktodak_api.member.domain.CharacterCache;
 import com.heartsave.todaktodak_api.member.domain.TodakRole;
 import com.heartsave.todaktodak_api.member.dto.response.CharacterImageResponse;
 import com.heartsave.todaktodak_api.member.dto.response.CharacterRegisterResponse;
@@ -97,11 +97,12 @@ public class CharacterService {
 
   @Nullable
   private String getTempCharacterImageUrl(MemberEntity member) {
-    if (!characterCacheRepository.existsById(member.getId())) {
+    CharacterCache cache = characterCacheRepository.findById(member.getId()).orElse(null);
+    if (cache == null) {
       logger.warn("최근에 {}의 캐릭터가 생성된 적이 없습니다.", member.getId());
       return null;
     }
-    String tempCharacterImageUrl = TEMP_CHARACTER_IMAGE_URL_PREFIX + member.getCharacterImageUrl();
+    String tempCharacterImageUrl = cache.characterImageUrl();
     return getPreSignedCharacterImageUrl(tempCharacterImageUrl);
   }
 
