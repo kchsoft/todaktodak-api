@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.common.storage.s3;
 
 import static com.heartsave.todaktodak_api.common.constant.CoreConstant.URL.DEFAULT_URL;
+import static com.heartsave.todaktodak_api.common.constant.CoreConstant.URL.TEMP_CHARACTER_IMAGE_URL_PREFIX;
 
 import com.heartsave.todaktodak_api.common.config.properties.S3Properties;
 import com.heartsave.todaktodak_api.common.exception.errorspec.S3ErrorSpec;
@@ -14,9 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
@@ -28,6 +27,8 @@ public class S3FileStorageManager {
   private final S3Properties s3Properties;
   private final S3Client s3Client;
 
+  private final String IMAGE_FILE_FORMAT = ".webp";
+
   // TODO: 존재하지 않는 이미지 key에 대한 예외 처리 필요
   public List<String> preSignedWebtoonUrlFrom(List<String> s3FolderUrl) {
     if (s3FolderUrl.isEmpty()) return List.of();
@@ -35,14 +36,16 @@ public class S3FileStorageManager {
     List<String> s3ImageUrls = new ArrayList<>();
     String folderUrl = s3FolderUrl.getFirst();
     for (int order = 1; order <= 4; order++) {
-      s3ImageUrls.add(folderUrl + order + ".webp");
+      s3ImageUrls.add(folderUrl + order + IMAGE_FILE_FORMAT);
     }
 
     return s3ImageUrls.stream().map(this::preSign).toList();
   }
 
   public String preSignedFirstWebtoonUrlFrom(String key) {
-    return key == null ? preSign(s3Properties.defaultKey().webtoon()) : preSign(key + "1.webp");
+    return key == null
+        ? preSign(s3Properties.defaultKey().webtoon())
+        : preSign(key + "1" + IMAGE_FILE_FORMAT);
   }
 
   public String preSignedCharacterImageUrlFrom(String key) {
@@ -68,7 +71,6 @@ public class S3FileStorageManager {
     return path.substring(1);
   }
 
-  // TODO: presigned url 캐싱 관리
   private String preSign(String key) throws NoSuchKeyException {
     if (key.equals(DEFAULT_URL)) return DEFAULT_URL;
 
@@ -83,19 +85,60 @@ public class S3FileStorageManager {
     return preSignedUrl;
   }
 
-  // TODO: 존재하지 않는 key에 대한 예외 처리 필요
-  public void deleteObject(String key) {
-    if (DEFAULT_URL.equals(key)) return;
-
-    DeleteObjectRequest request =
-        DeleteObjectRequest.builder().bucket(s3Properties.bucketName()).key(key).build();
+  public void deleteDiary(String key) {
+    if (DEFAULT_URL.equals(key) || !isObjectExist(key)) return;
 
     log.info("S3에 일기 컨텐츠 삭제를 요청합니다.");
-    s3Client.deleteObject(request);
+    deleteObject(key);
     log.info("S3에서 일기 컨텐츠를 삭제했습니다.");
   }
 
-  public void deleteObjects(List<String> keys) {
-    keys.forEach(this::deleteObject);
+  public void deleteDiaries(List<String> keys) {
+    keys.forEach(this::deleteDiary);
+  }
+
+  // 객체 메타데이터 조회로 존재 확인
+  public boolean isObjectExist(String key) {
+    try {
+      var headObjectRequest =
+          HeadObjectRequest.builder().bucket(s3Properties.bucketName()).key(key).build();
+      s3Client.headObject(headObjectRequest);
+      return true;
+    } catch (NoSuchKeyException e) {
+      log.error("{}라는 S3 객체가 존재하지 않습니다.", key);
+      return false;
+    } catch (Exception e) {
+      log.error("S3 객체 조회 중 문제가 발생했습니다={}", e.getMessage());
+      return false;
+    }
+  }
+
+  // 생성된 임시 캐릭터를 프로필로 등록
+  public boolean replaceCharacterImageUrl(String key) {
+    String originKey = TEMP_CHARACTER_IMAGE_URL_PREFIX + key;
+    try {
+      copyObject(originKey, key);
+      deleteObject(originKey);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  private void copyObject(String from, String to) {
+    CopyObjectRequest copyObjectRequest =
+        CopyObjectRequest.builder()
+            .sourceBucket(s3Properties.bucketName())
+            .sourceKey(from)
+            .destinationBucket(s3Properties.bucketName())
+            .destinationKey(to)
+            .build();
+    s3Client.copyObject(copyObjectRequest);
+  }
+
+  private void deleteObject(String key) {
+    DeleteObjectRequest deleteObjectRequest =
+        DeleteObjectRequest.builder().bucket(s3Properties.bucketName()).key(key).build();
+    s3Client.deleteObject(deleteObjectRequest);
   }
 }
