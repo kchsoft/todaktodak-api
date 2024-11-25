@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
         .body(ErrorResponse.from(e.getErrorSpec()));
   }
 
-  // 유효성 검사 실패
+  // 유효성 검사 실패(@Valid)
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> handleInvalidException(MethodArgumentNotValidException e) {
     var errors = extractValidationErrors(e);
@@ -36,6 +36,7 @@ public class GlobalExceptionHandler {
     return ResponseEntity.badRequest().body(ErrorResponse.validError(errors.toString()));
   }
 
+  // 잘못된 타입 변환 발생(@RequestParam)
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
   public ResponseEntity<ErrorResponse> handleTypeMismatchException(
       MethodArgumentTypeMismatchException e) {

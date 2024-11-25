@@ -28,7 +28,8 @@ public class TodakOauth2UserDetailsService extends DefaultOAuth2UserService {
     OAuth2User user = super.loadUser(request);
     TodakOauth2Attribute attribute =
         TodakOauth2Attribute.of(
-            user.getAttributes(), request.getClientRegistration().getRegistrationId());
+            user.getAttributes(),
+            request.getClientRegistration().getRegistrationId().toUpperCase());
     if (attribute == null) return null;
     logger.info("OAUTH2 RESOURCE - {}", attribute);
     // 회원 저장

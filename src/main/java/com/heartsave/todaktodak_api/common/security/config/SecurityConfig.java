@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.common.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.heartsave.todaktodak_api.auth.repository.RefreshTokenCacheRepository;
 import com.heartsave.todaktodak_api.common.security.component.AccessDeniedHandlerImpl;
 import com.heartsave.todaktodak_api.common.security.component.AuthenticationEntryPointImpl;
 import com.heartsave.todaktodak_api.common.security.component.jwt.JwtAuthFilter;
@@ -34,12 +35,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfig {
   private final TodakOauth2UserDetailsService oauth2UserDetailsService;
-  private final AuthenticationEntryPointImpl authenticationEntryPoint;
   private final OAuth2SuccessHandler oAuth2SuccessHandler;
+  private final Oauth2FailureHandler oauth2FailureHandler;
+  private final AuthenticationEntryPointImpl authenticationEntryPoint;
   private final ObjectMapper objectMapper;
+  private final RefreshTokenCacheRepository refreshTokenCacheRepository;
 
-  @Value("${todak.cors.allowed-origin}")
-  private List<String> ALLOWED_ORIGINS;
+  @Value("${client.server.origin}")
+  private String CLIENT_SERVER_ORIGIN;
 
   @Bean
   @Profile("!test")
@@ -58,7 +61,7 @@ public class SecurityConfig {
                 oauth2
                     .userInfoEndpoint((config) -> config.userService(oauth2UserDetailsService))
                     .successHandler(oAuth2SuccessHandler)
-                    .failureHandler(new Oauth2FailureHandler(objectMapper)))
+                    .failureHandler(oauth2FailureHandler))
         .authorizeHttpRequests(
             authorize ->
                 authorize
@@ -79,7 +82,7 @@ public class SecurityConfig {
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(new JwtValidationFilter(authenticationEntryPoint), JwtAuthFilter.class)
         .addFilterBefore(
-            new JwtAuthFilter(authenticationManager, objectMapper),
+            new JwtAuthFilter(authenticationManager, objectMapper, refreshTokenCacheRepository),
             UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(new JwtLogoutFilter(), LogoutFilter.class)
         .build();
@@ -96,7 +99,7 @@ public class SecurityConfig {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowCredentials(true);
     configuration.setAllowedMethods(List.of("HEAD", "OPTION", "GET", "POST", "PATCH", "DELETE"));
-    configuration.setAllowedOrigins(ALLOWED_ORIGINS);
+    configuration.setAllowedOrigins(List.of(CLIENT_SERVER_ORIGIN));
     configuration.addAllowedHeader("*");
     return configuration;
   }

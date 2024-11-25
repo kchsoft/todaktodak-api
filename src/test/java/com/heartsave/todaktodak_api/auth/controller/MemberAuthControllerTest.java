@@ -24,7 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = AuthController.class)
 @Import(TestSecurityConfig.class)
-class AuthControllerTest {
+class MemberAuthControllerTest {
   @Autowired private MockMvc mockMvc;
 
   @MockBean private AuthService authService;

@@ -8,6 +8,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.auth.dto.request.LoginRequest;
 import com.heartsave.todaktodak_api.auth.dto.response.LoginResponse;
+import com.heartsave.todaktodak_api.auth.repository.RefreshTokenCacheRepository;
 import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
 import com.heartsave.todaktodak_api.common.exception.errorspec.AuthErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
@@ -27,14 +28,19 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final AuthenticationManager authenticationManager;
   private final ObjectMapper objectMapper;
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private final RefreshTokenCacheRepository cacheRepository;
   private static final String LOGIN_URL = "/api/v1/auth/login";
 
-  public JwtAuthFilter(AuthenticationManager authenticationManager, ObjectMapper objectMapper) {
+  public JwtAuthFilter(
+      AuthenticationManager authenticationManager,
+      ObjectMapper objectMapper,
+      RefreshTokenCacheRepository cacheRepository) {
     this.authenticationManager = authenticationManager;
     this.objectMapper = objectMapper;
+    this.cacheRepository = cacheRepository;
     setFilterProcessesUrl(LOGIN_URL);
   }
 
@@ -61,8 +67,12 @@ public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
     var accessToken = JwtUtils.issueToken(user, ACCESS_TYPE);
     var refreshToken = JwtUtils.issueToken(user, REFRESH_TYPE);
     var refreshCookie = CookieUtils.createValidCookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken);
-    CookieUtils.updateCookie(response, refreshCookie);
 
+    // 캐싱
+    cacheRepository.set(String.valueOf(user.getId()), refreshToken);
+
+    // 응답
+    CookieUtils.updateCookie(response, refreshCookie);
     LoginResponse dto = getResponseBody(authentication, accessToken);
     response.getWriter().write(objectMapper.writeValueAsString(dto));
   }

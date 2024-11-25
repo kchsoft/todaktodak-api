@@ -6,13 +6,11 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.auth.dto.request.LoginRequest;
 import com.heartsave.todaktodak_api.auth.dto.response.LoginResponse;
+import com.heartsave.todaktodak_api.auth.repository.RefreshTokenCacheRepository;
 import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
-import com.heartsave.todaktodak_api.common.security.util.CookieUtils;
-import com.heartsave.todaktodak_api.common.security.util.JwtUtils;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import com.heartsave.todaktodak_api.common.security.util.UtilConfig;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +25,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.test.util.ReflectionTestUtils;
 
 final class JwtAuthFilterTest {
   private JwtAuthFilter jwtAuthFilter;
@@ -36,28 +33,19 @@ final class JwtAuthFilterTest {
   private MockFilterChain filterChain;
   private AuthenticationManager authenticationManager;
   private ObjectMapper objectMapper;
+  private RefreshTokenCacheRepository cacheRepository;
 
   @BeforeAll
   static void setupAll() {
-    // JwtUtils 초기화
-    ReflectionTestUtils.setField(JwtUtils.class, "ACCESS_TOKEN_EXPIRE_TIME_MILLI_SECOND", 10000L);
-    ReflectionTestUtils.setField(JwtUtils.class, "REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND", 100000L);
-    ReflectionTestUtils.setField(
-        JwtUtils.class,
-        "key",
-        Keys.hmacShaKeyFor(
-            Decoders.BASE64.decode(
-                "secretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkey")));
-
-    // CookieUtils 초기화
-    ReflectionTestUtils.setField(CookieUtils.class, "MAX_AGE", 10000L);
+    UtilConfig.utilSetup();
   }
 
   @BeforeEach
   void setup() {
     authenticationManager = mock(AuthenticationManager.class);
     objectMapper = new ObjectMapper();
-    jwtAuthFilter = new JwtAuthFilter(authenticationManager, objectMapper);
+    cacheRepository = mock(RefreshTokenCacheRepository.class);
+    jwtAuthFilter = new JwtAuthFilter(authenticationManager, objectMapper, cacheRepository);
     request = new MockHttpServletRequest();
     response = new MockHttpServletResponse();
     filterChain = new MockFilterChain();
@@ -92,6 +80,7 @@ final class JwtAuthFilterTest {
     // LoginRequest로부터 생성될 Authentication 토큰과 정확히 매칭되도록 설정
     when(authenticationManager.authenticate(eq(expectedAuthToken)))
         .thenReturn(successAuthentication);
+    doNothing().when(cacheRepository).set(anyString(), anyString());
     jwtAuthFilter.doFilter(request, response, filterChain);
 
     // then

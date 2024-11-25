@@ -7,9 +7,8 @@ import static org.mockito.Mockito.*;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.security.util.JwtUtils;
+import com.heartsave.todaktodak_api.common.security.util.UtilConfig;
 import com.heartsave.todaktodak_api.member.domain.TodakRole;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.ServletException;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,14 +35,7 @@ class JwtValidationFilterTest {
 
   @BeforeAll
   static void beforeAll() {
-    // JwtUtils 초기화
-    ReflectionTestUtils.setField(JwtUtils.class, "REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND", 100000L);
-    ReflectionTestUtils.setField(
-        JwtUtils.class,
-        "key",
-        Keys.hmacShaKeyFor(
-            Decoders.BASE64.decode(
-                "secretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkey")));
+    UtilConfig.jwtUtilSetup();
   }
 
   @BeforeEach

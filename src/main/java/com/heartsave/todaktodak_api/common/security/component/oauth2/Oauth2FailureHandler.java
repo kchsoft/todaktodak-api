@@ -9,13 +9,23 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.stereotype.Component;
 
+@Component
 @RequiredArgsConstructor
 public class Oauth2FailureHandler implements AuthenticationFailureHandler {
+  private static final Logger logger = LoggerFactory.getLogger(Oauth2FailureHandler.class);
+
+  @Value("${client.server.origin}")
+  private String CLIENT_SERVER_ORIGIN;
+
   private final ObjectMapper objectMapper;
 
   @Override
@@ -30,6 +40,7 @@ public class Oauth2FailureHandler implements AuthenticationFailureHandler {
 
   private void setResponseBody(HttpServletResponse response, OAuth2AuthenticationException e)
       throws IOException {
+    logger.error("Oauth2 인증이 실패되어서 로그인 페이지로 리다이렉트합니다..{}", CLIENT_SERVER_ORIGIN);
     // 중복 이메일로 회원가입
     if (DUPLICATED_EMAIL_ERROR.getErrorCode().equals(e.getError().getErrorCode())) {
       response
@@ -45,5 +56,6 @@ public class Oauth2FailureHandler implements AuthenticationFailureHandler {
           .write(
               objectMapper.writeValueAsString(ErrorResponse.from(AuthErrorSpec.OAUTH_LOGIN_FAIL)));
     }
+    response.sendRedirect(CLIENT_SERVER_ORIGIN + "/login");
   }
 }
