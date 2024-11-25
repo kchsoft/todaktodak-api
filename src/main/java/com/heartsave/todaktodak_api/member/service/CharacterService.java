@@ -21,6 +21,8 @@ import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Transactional
 public class CharacterService {
+  private static final Logger logger = LoggerFactory.getLogger(CharacterService.class);
   private final AiClientService aiClientService;
   private final S3FileStorageManager s3Manager;
   private final MemberRepository memberRepository;
@@ -44,6 +47,7 @@ public class CharacterService {
         .build();
   }
 
+  // TODO: 화풍 동적 변경 필요
   public void createCharacterImage(MultipartFile file, Long memberId) {
     MemberEntity member = findMemberById(memberId);
     ClientCharacterRequest dto =
@@ -84,13 +88,19 @@ public class CharacterService {
   }
 
   private String getRegisteredCharacterImageUrl(MemberEntity member) {
-    if (member.getCharacterImageUrl() == null) return null;
+    if (member.getCharacterImageUrl() == null) {
+      logger.warn("{}의 캐릭터는 등록된 적이 없습니다.", member.getId());
+      return null;
+    }
     return getPreSignedCharacterImageUrl(member.getCharacterImageUrl());
   }
 
   @Nullable
   private String getTempCharacterImageUrl(MemberEntity member) {
-    if (!characterCacheRepository.existsById(member.getId())) return null;
+    if (!characterCacheRepository.existsById(member.getId())) {
+      logger.warn("최근에 {}의 캐릭터가 생성된 적이 없습니다.", member.getId());
+      return null;
+    }
     String tempCharacterImageUrl = TEMP_CHARACTER_IMAGE_URL_PREFIX + member.getCharacterImageUrl();
     return getPreSignedCharacterImageUrl(tempCharacterImageUrl);
   }
