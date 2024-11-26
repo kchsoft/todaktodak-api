@@ -50,6 +50,6 @@ public class CharacterController {
   @PostMapping("/register")
   public ResponseEntity<CharacterRegisterResponse> completeCharacterRegister(
       @TodakUserId Long memberId, HttpServletResponse response) {
-    return ResponseEntity.ok(characterService.changeRoleAndReissueToken(memberId, response));
+    return ResponseEntity.ok(characterService.registerCharacterAndChangeRole(memberId, response));
   }
 }
