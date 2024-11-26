@@ -13,6 +13,7 @@ import com.heartsave.todaktodak_api.event.exception.EventException;
 import com.heartsave.todaktodak_api.event.service.EventService;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
+import com.heartsave.todaktodak_api.member.repository.CharacterCacheRepository;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,7 @@ final class AiWebhookCharacterServiceTest {
   @Mock private MemberRepository memberRepository;
   @Mock private S3FileStorageManager s3FileStorageManager;
   @Mock private EventService eventService;
+  @Mock private CharacterCacheRepository characterCacheRepository;
   @InjectMocks private AiWebhookCharacterService characterService;
 
   private MemberEntity member;
@@ -49,7 +51,7 @@ final class AiWebhookCharacterServiceTest {
 
   @Test
   @DisplayName("캐릭터 웹훅에 대한 알림 성공")
-  void saveCharacterAndNotify_success() {
+  void cacheTempCharacterAndNotify_success() {
     // given
     when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
     ArgumentCaptor<EventEntity> eventCaptor = ArgumentCaptor.forClass(EventEntity.class);
@@ -76,7 +78,7 @@ final class AiWebhookCharacterServiceTest {
 
   @Test
   @DisplayName("캐릭터 웹훅에 대한 알림 실패 - 이벤트 전송 오류")
-  void saveCharacterAndNotify_eventSendFail() {
+  void cacheTempCharacterAndNotify_eventSendFail() {
     // given
     when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
     doThrow(new EventException(EventErrorSpec.EVENT_CONNECT_FAIL))
@@ -93,7 +95,7 @@ final class AiWebhookCharacterServiceTest {
 
   @Test
   @DisplayName("캐릭터 웹훅에 대한 알림 실패 - 존재하지 않는 회원")
-  void saveCharacterAndNotify_memberNotFound() {
+  void cacheTempCharacterAndNotify_memberNotFound() {
     // given
     when(memberRepository.findById(member.getId())).thenReturn(Optional.empty());
 
