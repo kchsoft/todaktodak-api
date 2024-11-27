@@ -115,9 +115,13 @@ public class S3FileStorageManager {
 
   // 생성된 임시 캐릭터를 프로필로 등록
   public void replaceCharacterImageUrl(String tempKey) {
-    String key = tempKey.substring(TEMP_CHARACTER_IMAGE_URL_PREFIX.length());
-    copyObject(tempKey, key);
-    deleteObject(tempKey);
+    String key = tempKey.replace(TEMP_CHARACTER_IMAGE_URL_PREFIX, "");
+    try {
+      copyObject(tempKey, key);
+      deleteObject(tempKey);
+    } catch (NoSuchKeyException e) {
+      throw new InvalidS3UrlException(S3ErrorSpec.INVALID_S3_URL, tempKey + "->" + key);
+    }
   }
 
   private void copyObject(String from, String to) {

@@ -62,7 +62,6 @@ public class MemberEntity extends BaseEntity {
     characterInfo = cache.characterInfo();
     characterStyle = cache.characterStyle();
     characterSeed = cache.characterSeed();
-    characterImageUrl =
-        cache.characterImageUrl().substring(TEMP_CHARACTER_IMAGE_URL_PREFIX.length());
+    characterImageUrl = cache.characterImageUrl().replace(TEMP_CHARACTER_IMAGE_URL_PREFIX, "");
   }
 }
