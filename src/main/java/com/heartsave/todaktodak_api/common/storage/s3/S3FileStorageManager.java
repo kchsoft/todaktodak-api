@@ -85,7 +85,7 @@ public class S3FileStorageManager {
     return preSignedUrl;
   }
 
-  public void deleteDiary(String key) {
+  public void deleteDiaryContent(String key) {
     if (DEFAULT_URL.equals(key) || !isObjectExist(key)) return;
 
     log.info("S3에 일기 컨텐츠 삭제를 요청합니다.");
@@ -93,8 +93,8 @@ public class S3FileStorageManager {
     log.info("S3에서 일기 컨텐츠를 삭제했습니다.");
   }
 
-  public void deleteDiaries(List<String> keys) {
-    keys.forEach(this::deleteDiary);
+  public void deleteDiaryContents(List<String> keys) {
+    keys.forEach(this::deleteDiaryContent);
   }
 
   // 객체 메타데이터 조회로 존재 확인

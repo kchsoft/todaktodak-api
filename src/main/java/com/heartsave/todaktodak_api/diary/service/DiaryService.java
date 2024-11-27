@@ -67,7 +67,8 @@ public class DiaryService {
                     new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, diaryId));
     diaryRepository.delete(diary);
     log.info("DB에서 일기를 삭제했습니다.");
-    s3FileStorageManager.deleteDiaries(List.of(diary.getWebtoonImageUrl(), diary.getBgmUrl()));
+    s3FileStorageManager.deleteDiaryContents(
+        List.of(diary.getWebtoonImageUrl(), diary.getBgmUrl()));
   }
 
   @Transactional(readOnly = true)
