@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 public final class CoreConstant {
   public static class URL {
     public static final String DEFAULT_URL = "";
-    public static final String CHARACTER_IMAGE_URL_PREFIX = "profile";
     public static final String TEMP_CHARACTER_IMAGE_URL_PREFIX = "temp_";
   }
 
