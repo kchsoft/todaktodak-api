@@ -24,7 +24,6 @@ public class AiWebhookCharacterService {
   private final MemberRepository memberRepository;
   private final CharacterCacheRepository characterCacheRepository;
 
-  @Transactional(readOnly = true)
   public void saveCharacterAndNotify(WebhookCharacterCompletionRequest dto) {
     MemberEntity member = cacheTempCharacter(dto);
 

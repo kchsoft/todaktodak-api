@@ -6,9 +6,4 @@ public interface EventService {
   void save(EventEntity event);
 
   void send(EventEntity event);
-
-  default void saveAndSend(EventEntity event) {
-    save(event);
-    send(event);
-  }
 }
