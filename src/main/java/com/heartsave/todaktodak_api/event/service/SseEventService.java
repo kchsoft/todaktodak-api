@@ -28,6 +28,7 @@ public class SseEventService implements EventService {
 
   @Override
   public void save(EventEntity event) {
+    logger.info("{}에 대한 이벤트를 저장합니다.", event.getMemberEntity().getId());
     eventRepository.save(event);
   }
 

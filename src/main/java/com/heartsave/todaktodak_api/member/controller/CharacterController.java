@@ -1,8 +1,8 @@
 package com.heartsave.todaktodak_api.member.controller;
 
 import com.heartsave.todaktodak_api.auth.annotation.TodakUserId;
+import com.heartsave.todaktodak_api.member.dto.response.CharacterImageResponse;
 import com.heartsave.todaktodak_api.member.dto.response.CharacterRegisterResponse;
-import com.heartsave.todaktodak_api.member.dto.response.CharacterTemporaryImageResponse;
 import com.heartsave.todaktodak_api.member.service.CharacterService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -26,9 +26,8 @@ public class CharacterController {
         @ApiResponse(responseCode = "404", description = "회원 조회 실패")
       })
   @GetMapping
-  public ResponseEntity<CharacterTemporaryImageResponse> getPastCharacterImage(
-      @TodakUserId Long memberId) {
-    return ResponseEntity.ok(characterService.getPastCharacterImage(memberId));
+  public ResponseEntity<CharacterImageResponse> getCharacterImage(@TodakUserId Long memberId) {
+    return ResponseEntity.ok(characterService.getCharacterImage(memberId));
   }
 
   @ApiResponses(
@@ -51,6 +50,6 @@ public class CharacterController {
   @PostMapping("/register")
   public ResponseEntity<CharacterRegisterResponse> completeCharacterRegister(
       @TodakUserId Long memberId, HttpServletResponse response) {
-    return ResponseEntity.ok(characterService.changeRoleAndReissueToken(memberId, response));
+    return ResponseEntity.ok(characterService.registerCharacterAndChangeRole(memberId, response));
   }
 }

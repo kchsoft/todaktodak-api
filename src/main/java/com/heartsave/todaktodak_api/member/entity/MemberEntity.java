@@ -1,9 +1,11 @@
 package com.heartsave.todaktodak_api.member.entity;
 
 import static com.heartsave.todaktodak_api.common.constant.ConstraintConstant.Member.*;
+import static com.heartsave.todaktodak_api.common.constant.CoreConstant.URL.TEMP_CHARACTER_IMAGE_URL_PREFIX;
 
 import com.heartsave.todaktodak_api.common.entity.BaseEntity;
 import com.heartsave.todaktodak_api.common.security.domain.AuthType;
+import com.heartsave.todaktodak_api.member.domain.CharacterCache;
 import com.heartsave.todaktodak_api.member.domain.TodakRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -56,11 +58,10 @@ public class MemberEntity extends BaseEntity {
     this.role = TodakRole.valueOf(role);
   }
 
-  public void updateCharacterInfo(
-      String characterInfo, String characterStyle, Integer characterSeed, String characterUrl) {
-    this.characterInfo = characterInfo;
-    this.characterStyle = characterStyle;
-    this.characterSeed = characterSeed;
-    this.characterImageUrl = characterUrl;
+  public void updateCharacterInfo(CharacterCache cache) {
+    characterInfo = cache.characterInfo();
+    characterStyle = cache.characterStyle();
+    characterSeed = cache.characterSeed();
+    characterImageUrl = cache.characterImageUrl().replace(TEMP_CHARACTER_IMAGE_URL_PREFIX, "");
   }
 }

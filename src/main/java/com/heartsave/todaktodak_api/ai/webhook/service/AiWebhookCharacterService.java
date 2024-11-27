@@ -6,8 +6,10 @@ import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.event.constant.EventType;
 import com.heartsave.todaktodak_api.event.entity.EventEntity;
 import com.heartsave.todaktodak_api.event.service.EventService;
+import com.heartsave.todaktodak_api.member.domain.CharacterCache;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
+import com.heartsave.todaktodak_api.member.repository.CharacterCacheRepository;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,12 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class AiWebhookCharacterService {
-  private final MemberRepository memberRepository;
   private final EventService eventService;
   private final S3FileStorageManager s3Manager;
+  private final MemberRepository memberRepository;
+  private final CharacterCacheRepository characterCacheRepository;
 
   public void saveCharacterAndNotify(WebhookCharacterCompletionRequest dto) {
-    MemberEntity member = saveCharacter(dto);
+    MemberEntity member = getMember(dto);
+    cacheTempCharacter(dto);
 
     eventService.send(
         EventEntity.builder()
@@ -32,15 +36,21 @@ public class AiWebhookCharacterService {
             .build());
   }
 
-  private MemberEntity saveCharacter(WebhookCharacterCompletionRequest dto) {
-    Long memberId = dto.memberId();
-    MemberEntity retrievedMember =
-        memberRepository
-            .findById(memberId)
-            .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, memberId));
+  private MemberEntity getMember(WebhookCharacterCompletionRequest dto) {
+    return memberRepository
+        .findById(dto.memberId())
+        .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, dto.memberId()));
+  }
+
+  private void cacheTempCharacter(WebhookCharacterCompletionRequest dto) {
     String url = s3Manager.parseKeyFrom(dto.characterProfileImageUrl());
-    retrievedMember.updateCharacterInfo(
-        dto.characterInfo(), dto.characterStyle(), dto.seedNum(), url);
-    return retrievedMember;
+    characterCacheRepository.save(
+        CharacterCache.builder()
+            .id(dto.memberId())
+            .characterInfo(dto.characterInfo())
+            .characterStyle(dto.characterStyle())
+            .characterSeed(dto.seedNum())
+            .characterImageUrl(url)
+            .build());
   }
 }
