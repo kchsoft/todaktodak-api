@@ -25,7 +25,8 @@ public class AiWebhookCharacterService {
   private final CharacterCacheRepository characterCacheRepository;
 
   public void saveCharacterAndNotify(WebhookCharacterCompletionRequest dto) {
-    MemberEntity member = cacheTempCharacter(dto);
+    MemberEntity member = getMember(dto);
+    cacheTempCharacter(dto);
 
     eventService.send(
         EventEntity.builder()
@@ -35,12 +36,13 @@ public class AiWebhookCharacterService {
             .build());
   }
 
-  private MemberEntity cacheTempCharacter(WebhookCharacterCompletionRequest dto) {
-    Long memberId = dto.memberId();
-    MemberEntity retrievedMember =
-        memberRepository
-            .findById(memberId)
-            .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, memberId));
+  private MemberEntity getMember(WebhookCharacterCompletionRequest dto) {
+    return memberRepository
+        .findById(dto.memberId())
+        .orElseThrow(() -> new MemberNotFoundException(MemberErrorSpec.NOT_FOUND, dto.memberId()));
+  }
+
+  private void cacheTempCharacter(WebhookCharacterCompletionRequest dto) {
     String url = s3Manager.parseKeyFrom(dto.characterProfileImageUrl());
     characterCacheRepository.save(
         CharacterCache.builder()
@@ -50,6 +52,5 @@ public class AiWebhookCharacterService {
             .characterSeed(dto.seedNum())
             .characterImageUrl(url)
             .build());
-    return retrievedMember;
   }
 }
