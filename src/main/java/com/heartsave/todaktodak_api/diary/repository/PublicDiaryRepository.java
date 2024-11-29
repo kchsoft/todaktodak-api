@@ -15,15 +15,19 @@ public interface PublicDiaryRepository extends JpaRepository<PublicDiaryEntity, 
 
   @Query(
       """
-        SELECT new com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryPageIndexProjection(
-            MAX(pd1.id),
-            pd1.createdTime
-          )
-          FROM PublicDiaryEntity pd1
-          WHERE pd1.createdTime = (
-            SELECT MAX(pd2.createdTime)
-            FROM PublicDiaryEntity pd2
-          )
+            SELECT new com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryPageIndexProjection(
+                pd1.id,
+                pd1.createdTime
+              )
+              FROM PublicDiaryEntity pd1
+              WHERE pd1.id = (
+                SELECT MAX(pd2.id)
+                FROM PublicDiaryEntity pd2
+                WHERE pd2.createdTime = (
+                  SELECT MAX(pd3.createdTime)
+                  FROM PublicDiaryEntity pd3
+                )
+              )
 """)
   Optional<PublicDiaryPageIndexProjection> findLatestCreatedTimeAndId();
 
