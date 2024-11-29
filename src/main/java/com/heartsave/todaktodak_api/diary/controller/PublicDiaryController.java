@@ -1,8 +1,9 @@
 package com.heartsave.todaktodak_api.diary.controller;
 
 import com.heartsave.todaktodak_api.auth.annotation.TodakUserId;
+import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryPageRequest;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryWriteRequest;
-import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPaginationResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPageResponse;
 import com.heartsave.todaktodak_api.diary.service.PublicDiaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PastOrPresent;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -38,14 +41,18 @@ public class PublicDiaryController {
         @ApiResponse(responseCode = "400", description = "잘못된 요청")
       })
   @GetMapping
-  public ResponseEntity<PublicDiaryPaginationResponse> getPublicDiaries(
+  public ResponseEntity<PublicDiaryPageResponse> getPagination(
       @TodakUserId Long memberId,
-      @Valid @Min(0L) @RequestParam(name = "after", defaultValue = "0", required = false)
-          Long publicDiaryId) {
-    log.info("공개 일기를 조회를 요청합니다. after = {}", publicDiaryId);
-    PublicDiaryPaginationResponse response =
-        publicDiaryService.getPublicDiaryPagination(memberId, publicDiaryId);
+      @Min(0L) @RequestParam(name = "after", defaultValue = "0", required = false)
+          Long publicDiaryId,
+      @PastOrPresent
+          @RequestParam(name = "date", defaultValue = "1970-01-01T00:00:00Z", required = false)
+          Instant createdTime) {
+    PublicDiaryPageRequest request = new PublicDiaryPageRequest(publicDiaryId, createdTime);
+    log.info("공개 일기를 조회를 요청합니다. after = {}", request.publicDiaryId());
+    PublicDiaryPageResponse response = publicDiaryService.getPagination(memberId, request);
     log.info("공개 일기 조회를 성공적으로 마쳤습니다.");
+    System.out.println("response = " + response);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 

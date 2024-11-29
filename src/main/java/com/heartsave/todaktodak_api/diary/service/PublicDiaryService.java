@@ -4,15 +4,18 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
+import com.heartsave.todaktodak_api.diary.domain.PublicDiaryPageIndex;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
-import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPaginationResponse;
+import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryPageRequest;
+import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPageResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIdsProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.exception.PublicDiaryExistException;
+import com.heartsave.todaktodak_api.diary.factory.PublicDiaryPageIndexFactory;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
@@ -32,31 +35,28 @@ import org.springframework.transaction.annotation.Transactional;
 public class PublicDiaryService {
   private final DiaryRepository diaryRepository;
   private final PublicDiaryRepository publicDiaryRepository;
+  private final PublicDiaryPageIndexFactory pageIndexFactory;
   private final DiaryReactionRepository reactionRepository;
   private final MemberRepository memberRepository;
   private final S3FileStorageManager s3FileStorageManager;
 
   @Transactional(readOnly = true)
-  public PublicDiaryPaginationResponse getPublicDiaryPagination(Long memberId, Long publicDiaryId) {
-    List<PublicDiaryContentOnlyProjection> diaryContents = fetchDiaryContents(publicDiaryId);
-    replaceWithPreSignedUrls(diaryContents);
-    return createPaginationResponse(diaryContents, memberId);
+  public PublicDiaryPageResponse getPagination(Long memberId, PublicDiaryPageRequest request) {
+    PublicDiaryPageIndex pageIndex = pageIndexFactory.createFrom(request);
+    List<PublicDiaryContentProjection> contentProjections = fetchContents(pageIndex);
+    replaceWithPreSignedUrls(contentProjections);
+    return createPageResponse(contentProjections, memberId);
   }
 
-  private List<PublicDiaryContentOnlyProjection> fetchDiaryContents(Long publicDiaryId) {
+  private List<PublicDiaryContentProjection> fetchContents(PublicDiaryPageIndex pageIndex) {
     log.info("공개 일기 content 정보를 조회합니다.");
-    if (publicDiaryId == 0) publicDiaryId = getFirstPaginationId(); // 공개 일기 조회 API 첫 호출
-    return publicDiaryRepository.findNextContentOnlyById(
-        publicDiaryId, PageRequest.of(0, 5)); // 현재 ID 제외, 다음 ID 포함 5개 조회
+    return publicDiaryRepository.findNextContent(
+        pageIndex, PageRequest.of(0, 5)); // 현재 ID 제외, 다음 ID 포함 5개 조회
   }
 
-  private Long getFirstPaginationId() {
-    return publicDiaryRepository.findLatestId().map(id -> id + 1).orElse(1L);
-  }
-
-  private void replaceWithPreSignedUrls(List<PublicDiaryContentOnlyProjection> diaryContents) {
+  private void replaceWithPreSignedUrls(List<PublicDiaryContentProjection> contentProjections) {
     log.info("공개 일기 content url을 pre-signed url로 변경합니다.");
-    for (PublicDiaryContentOnlyProjection content : diaryContents) {
+    for (PublicDiaryContentProjection content : contentProjections) {
       content.replaceWebtoonImageUrls(
           s3FileStorageManager.preSignedWebtoonUrlFrom(content.getWebtoonImageUrls()));
       content.replaceCharacterImageUrl(
@@ -65,11 +65,11 @@ public class PublicDiaryService {
     }
   }
 
-  private PublicDiaryPaginationResponse createPaginationResponse(
-      List<PublicDiaryContentOnlyProjection> diaryContents, Long memberId) {
-    PublicDiaryPaginationResponse response = new PublicDiaryPaginationResponse();
+  private PublicDiaryPageResponse createPageResponse(
+      List<PublicDiaryContentProjection> contentProjection, Long memberId) {
+    PublicDiaryPageResponse response = new PublicDiaryPageResponse();
     log.info("공개 일기 Reaction 정보를 조회합니다.");
-    diaryContents.stream()
+    contentProjection.stream()
         .map(
             content -> {
               DiaryReactionCountProjection reactionCount = fetchReactionCount(content.getDiaryId());

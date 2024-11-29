@@ -194,7 +194,6 @@ class MySharedDiaryRepositoryTest {
                 .getDiaryEntity()
                 .getDiaryCreatedTime()
                 .truncatedTo(ChronoUnit.SECONDS)); // DB에 Instant 저장시 MILLIS 반올림, 따라서 Second 까지 검사
-
   }
 
   @Test
@@ -213,5 +212,5 @@ class MySharedDiaryRepositoryTest {
 
   @TestConfiguration
   @EnableJpaAuditing
-  public static class TestJpaConfig {}
+  public static class TestAuditConfig {}
 }
