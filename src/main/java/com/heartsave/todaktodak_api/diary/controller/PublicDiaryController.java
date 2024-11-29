@@ -43,10 +43,8 @@ public class PublicDiaryController {
   @GetMapping
   public ResponseEntity<PublicDiaryPageResponse> getPagination(
       @TodakUserId Long memberId,
-      @Min(0L) @RequestParam(name = "after", defaultValue = "0", required = false)
-          Long publicDiaryId,
-      @PastOrPresent
-          @RequestParam(name = "date", defaultValue = "1970-01-01T00:00:00Z", required = false)
+      @Min(0L) @RequestParam(name = "after", defaultValue = "0") Long publicDiaryId,
+      @PastOrPresent @RequestParam(name = "date", defaultValue = "1970-01-01T00:00:00Z")
           Instant createdTime) {
     PublicDiaryPageRequest request = new PublicDiaryPageRequest(publicDiaryId, createdTime);
     log.info("공개 일기를 조회를 요청합니다. after = {}", request.publicDiaryId());
