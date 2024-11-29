@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
-import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryPageRequest;
+import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPageResponse;
 import com.heartsave.todaktodak_api.diary.service.PublicDiaryService;
@@ -79,7 +79,7 @@ public class PublicDiaryControllerTest {
     // request 설정
     Long publicDiaryId = 1L;
     Instant createdTime = Instant.now();
-    PublicDiaryPageRequest request = new PublicDiaryPageRequest(publicDiaryId, createdTime);
+    DiaryPageRequest request = new DiaryPageRequest(publicDiaryId, createdTime);
 
     // response 설정
     PublicDiaryPageResponse response = new PublicDiaryPageResponse();
@@ -107,7 +107,7 @@ public class PublicDiaryControllerTest {
   @WithMockTodakUser
   void getPublicDiaryPagination_Success_DefaultParameter() throws Exception {
     PublicDiaryPageResponse response = new PublicDiaryPageResponse();
-    PublicDiaryPageRequest request = new PublicDiaryPageRequest(PAGE_DEFAULT_ID, PAGE_DEFAULT_TIME);
+    DiaryPageRequest request = new DiaryPageRequest(PAGE_DEFAULT_ID, PAGE_DEFAULT_TIME);
     PublicDiary publicDiary = mock(PublicDiary.class);
     response.addPublicDiary(publicDiary);
     when(publicDiaryService.getPagination(anyLong(), eq(request))).thenReturn(response);

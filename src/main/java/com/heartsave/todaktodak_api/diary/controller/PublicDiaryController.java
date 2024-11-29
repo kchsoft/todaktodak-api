@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.diary.controller;
 
 import com.heartsave.todaktodak_api.auth.annotation.TodakUserId;
-import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryPageRequest;
+import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPageResponse;
 import com.heartsave.todaktodak_api.diary.service.PublicDiaryService;
@@ -46,7 +46,7 @@ public class PublicDiaryController {
       @Min(0L) @RequestParam(name = "after", defaultValue = "0") Long publicDiaryId,
       @PastOrPresent @RequestParam(name = "date", defaultValue = "1970-01-01T00:00:00Z")
           Instant createdTime) {
-    PublicDiaryPageRequest request = new PublicDiaryPageRequest(publicDiaryId, createdTime);
+    DiaryPageRequest request = new DiaryPageRequest(publicDiaryId, createdTime);
     log.info("공개 일기를 조회를 요청합니다. after = {}", request.publicDiaryId());
     PublicDiaryPageResponse response = publicDiaryService.getPagination(memberId, request);
     log.info("공개 일기 조회를 성공적으로 마쳤습니다.");

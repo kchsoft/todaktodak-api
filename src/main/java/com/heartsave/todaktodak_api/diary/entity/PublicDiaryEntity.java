@@ -41,7 +41,9 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(
     name = "public_diary",
     indexes = {
-      @Index(name = "idx_public_diary_created_time_id", columnList = "created_time DESC, id DESC")
+      @Index(name = "idx_public_diary_id_created_time", columnList = "created_time DESC, id DESC"),
+      @Index(name = "idx_member_id_public_diary_id", columnList = "member_id, id DESC"),
+      @Index(name = "idx_member_id_created_time", columnList = "member_id, created_time DESC")
     })
 public class PublicDiaryEntity extends BaseEntity {
 

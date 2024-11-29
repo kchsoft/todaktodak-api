@@ -5,14 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
-import com.heartsave.todaktodak_api.diary.domain.PublicDiaryPageIndex;
-import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryPageRequest;
+import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
+import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryPageIndexProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
-import com.heartsave.todaktodak_api.diary.factory.PublicDiaryPageIndexFactory;
+import com.heartsave.todaktodak_api.diary.factory.DiaryPageIndexFactory;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.util.List;
@@ -35,13 +35,13 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
     includeFilters =
         @ComponentScan.Filter(
             type = FilterType.ASSIGNABLE_TYPE,
-            classes = PublicDiaryPageIndexFactory.class))
+            classes = DiaryPageIndexFactory.class))
 public class PublicDiaryRepositoryTest {
 
   @Autowired private PublicDiaryRepository publicDiaryRepository;
   @Autowired private MemberRepository memberRepository;
   @Autowired private DiaryRepository diaryRepository;
-  @Autowired private PublicDiaryPageIndexFactory indexFactory;
+  @Autowired private DiaryPageIndexFactory indexFactory;
   @Autowired private TestEntityManager tem;
 
   private MemberEntity member;
@@ -175,7 +175,7 @@ public class PublicDiaryRepositoryTest {
   void findLatestId_Success() {
     diary2 = diaryRepository.findById(diary2.getId()).get();
     PublicDiaryPageIndexProjection indexProjection =
-        publicDiaryRepository.findLatestIdAndCreatedTime().get();
+        publicDiaryRepository.findLatestCreatedTimeAndId().get();
 
     PublicDiaryEntity findPublicDiary =
         publicDiaryRepository.findById(indexProjection.getPublicDiaryId()).orElse(null);
@@ -198,17 +198,17 @@ public class PublicDiaryRepositoryTest {
     // page 5개
     Pageable pageable = PageRequest.of(0, 5);
 
-    PublicDiaryPageRequest request1 =
-        new PublicDiaryPageRequest(publicDiary1.getId(), publicDiary1.getCreatedTime());
-    PublicDiaryPageIndex pageIndex1 = indexFactory.createFrom(request1);
+    DiaryPageRequest request1 =
+        new DiaryPageRequest(publicDiary1.getId(), publicDiary1.getCreatedTime());
+    DiaryPageIndex pageIndex1 = indexFactory.createFrom(request1);
     List<PublicDiaryContentProjection> contentOnly1 =
-        publicDiaryRepository.findNextContent(pageIndex1, pageable);
+        publicDiaryRepository.findNextContents(pageIndex1, pageable);
 
-    PublicDiaryPageRequest request2 =
-        new PublicDiaryPageRequest(publicDiary2.getId(), publicDiary2.getCreatedTime());
-    PublicDiaryPageIndex pageIndex2 = indexFactory.createFrom(request2);
+    DiaryPageRequest request2 =
+        new DiaryPageRequest(publicDiary2.getId(), publicDiary2.getCreatedTime());
+    DiaryPageIndex pageIndex2 = indexFactory.createFrom(request2);
     List<PublicDiaryContentProjection> contentOnly2 =
-        publicDiaryRepository.findNextContent(pageIndex2, pageable);
+        publicDiaryRepository.findNextContents(pageIndex2, pageable);
 
     assertThat(contentOnly1.size()).isNotEqualTo(contentOnly2.size());
     assertThat(contentOnly2).hasSize(2);

@@ -4,9 +4,9 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
-import com.heartsave.todaktodak_api.diary.domain.PublicDiaryPageIndex;
+import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
-import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryPageRequest;
+import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPageResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
@@ -15,7 +15,7 @@ import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountPr
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.exception.PublicDiaryExistException;
-import com.heartsave.todaktodak_api.diary.factory.PublicDiaryPageIndexFactory;
+import com.heartsave.todaktodak_api.diary.factory.DiaryPageIndexFactory;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
@@ -35,22 +35,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class PublicDiaryService {
   private final DiaryRepository diaryRepository;
   private final PublicDiaryRepository publicDiaryRepository;
-  private final PublicDiaryPageIndexFactory pageIndexFactory;
+  private final DiaryPageIndexFactory pageIndexFactory;
   private final DiaryReactionRepository reactionRepository;
   private final MemberRepository memberRepository;
   private final S3FileStorageManager s3FileStorageManager;
 
   @Transactional(readOnly = true)
-  public PublicDiaryPageResponse getPagination(Long memberId, PublicDiaryPageRequest request) {
-    PublicDiaryPageIndex pageIndex = pageIndexFactory.createFrom(request);
+  public PublicDiaryPageResponse getPagination(Long memberId, DiaryPageRequest request) {
+    DiaryPageIndex pageIndex = pageIndexFactory.createFrom(request);
     List<PublicDiaryContentProjection> contentProjections = fetchContents(pageIndex);
     replaceWithPreSignedUrls(contentProjections);
     return createPageResponse(contentProjections, memberId);
   }
 
-  private List<PublicDiaryContentProjection> fetchContents(PublicDiaryPageIndex pageIndex) {
+  private List<PublicDiaryContentProjection> fetchContents(DiaryPageIndex pageIndex) {
     log.info("공개 일기 content 정보를 조회합니다.");
-    return publicDiaryRepository.findNextContent(
+    return publicDiaryRepository.findNextContents(
         pageIndex, PageRequest.of(0, 5)); // 현재 ID 제외, 다음 ID 포함 5개 조회
   }
 

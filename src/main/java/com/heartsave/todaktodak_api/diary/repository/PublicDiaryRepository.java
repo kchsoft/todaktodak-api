@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.diary.repository;
 
-import com.heartsave.todaktodak_api.diary.domain.PublicDiaryPageIndex;
+import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryPageIndexProjection;
@@ -25,7 +25,7 @@ public interface PublicDiaryRepository extends JpaRepository<PublicDiaryEntity, 
             FROM PublicDiaryEntity pd2
           )
 """)
-  Optional<PublicDiaryPageIndexProjection> findLatestIdAndCreatedTime();
+  Optional<PublicDiaryPageIndexProjection> findLatestCreatedTimeAndId();
 
   @Query(
       """
@@ -45,6 +45,6 @@ public interface PublicDiaryRepository extends JpaRepository<PublicDiaryEntity, 
         WHERE pd.createdTime <= :#{#index.createdTime} AND pd.id < :#{#index.publicDiaryId}
         ORDER BY pd.createdTime DESC, pd.id DESC
         """)
-  List<PublicDiaryContentProjection> findNextContent(
-      @Param("index") PublicDiaryPageIndex index, Pageable pageable);
+  List<PublicDiaryContentProjection> findNextContents(
+      @Param("index") DiaryPageIndex index, Pageable pageable);
 }

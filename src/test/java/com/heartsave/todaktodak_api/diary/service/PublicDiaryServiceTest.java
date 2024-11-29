@@ -15,9 +15,9 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
-import com.heartsave.todaktodak_api.diary.domain.PublicDiaryPageIndex;
+import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
-import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryPageRequest;
+import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPageResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
@@ -26,7 +26,7 @@ import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountPr
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.exception.PublicDiaryExistException;
-import com.heartsave.todaktodak_api.diary.factory.PublicDiaryPageIndexFactory;
+import com.heartsave.todaktodak_api.diary.factory.DiaryPageIndexFactory;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
@@ -54,7 +54,7 @@ class PublicDiaryServiceTest {
   @Mock private DiaryReactionRepository mockDiaryReactionRepository;
   @Mock private S3FileStorageManager mocksS3FileStorageManager;
   @Mock private MemberRepository mockMemberRepository;
-  @Mock private PublicDiaryPageIndexFactory mockIndexFactory;
+  @Mock private DiaryPageIndexFactory mockIndexFactory;
   @InjectMocks private PublicDiaryService publicDiaryService;
 
   private MemberEntity member;
@@ -137,7 +137,7 @@ class PublicDiaryServiceTest {
     // request 설정
     Long publicDiaryId = 1L;
     Instant createdTime = Instant.now();
-    PublicDiaryPageRequest request = new PublicDiaryPageRequest(publicDiaryId, createdTime);
+    DiaryPageRequest request = new DiaryPageRequest(publicDiaryId, createdTime);
     Long memberId = member.getId();
 
     // Projection mock 데이터 준비
@@ -159,8 +159,8 @@ class PublicDiaryServiceTest {
     when(mocksS3FileStorageManager.preSignedBgmUrlFrom(any())).thenReturn("presigned-bgm-url");
 
     // Repository mock 설정
-    when(mockPublicDiaryRepository.findNextContent(
-            any(PublicDiaryPageIndex.class), any(PageRequest.class)))
+    when(mockPublicDiaryRepository.findNextContents(
+            any(DiaryPageIndex.class), any(PageRequest.class)))
         .thenReturn(List.of(content));
 
     // 반응 정보 mock
@@ -169,7 +169,7 @@ class PublicDiaryServiceTest {
     when(mockDiaryReactionRepository.findMemberReaction(memberId, diary.getId()))
         .thenReturn(List.of(DiaryReactionType.LIKE));
 
-    when(mockIndexFactory.createFrom(request)).thenReturn(mock(PublicDiaryPageIndex.class));
+    when(mockIndexFactory.createFrom(request)).thenReturn(mock(DiaryPageIndex.class));
 
     // when
     PublicDiaryPageResponse response = publicDiaryService.getPagination(member.getId(), request);
@@ -200,7 +200,7 @@ class PublicDiaryServiceTest {
 
     // 메서드 호출 검증
     verify(mockPublicDiaryRepository)
-        .findNextContent(any(PublicDiaryPageIndex.class), any(PageRequest.class));
+        .findNextContents(any(DiaryPageIndex.class), any(PageRequest.class));
     verify(mockDiaryReactionRepository).countEachByDiaryId(diary.getId());
     verify(mockDiaryReactionRepository).findMemberReaction(memberId, diary.getId());
     verify(mocksS3FileStorageManager).preSignedWebtoonUrlFrom(any());
@@ -215,36 +215,35 @@ class PublicDiaryServiceTest {
   @DisplayName(
       "getPublicDiaryPaginationResponse - 최신 일기 조회 (publicDiaryId = 0,createdTime = Instant.EPOCH)")
   void getPublicDiaryPaginationResponse_LatestDiary() {
-    PublicDiaryPageRequest request = new PublicDiaryPageRequest(PAGE_DEFAULT_ID, PAGE_DEFAULT_TIME);
+    DiaryPageRequest request = new DiaryPageRequest(PAGE_DEFAULT_ID, PAGE_DEFAULT_TIME);
     PublicDiaryContentProjection content = mock(PublicDiaryContentProjection.class);
     DiaryReactionCountProjection reactionCount = mock(DiaryReactionCountProjection.class);
     List<DiaryReactionType> reactionType = mock(List.class);
-    when(mockPublicDiaryRepository.findNextContent(
-            any(PublicDiaryPageIndex.class), any(PageRequest.class)))
+    when(mockPublicDiaryRepository.findNextContents(
+            any(DiaryPageIndex.class), any(PageRequest.class)))
         .thenReturn(List.of(content));
     when(mockDiaryReactionRepository.countEachByDiaryId(anyLong())).thenReturn(reactionCount);
     when(mockDiaryReactionRepository.findMemberReaction(anyLong(), anyLong()))
         .thenReturn(reactionType);
-    when(mockIndexFactory.createFrom(request)).thenReturn(mock(PublicDiaryPageIndex.class));
+    when(mockIndexFactory.createFrom(request)).thenReturn(mock(DiaryPageIndex.class));
 
     PublicDiaryPageResponse response = publicDiaryService.getPagination(member.getId(), request);
 
     assertThat(response.getDiaries().size()).as("조회된 일기가 1개 있어야 한다").isEqualTo(1L);
     assertThat(response.getIsEnd()).as("다음 페이지 조회가 가능하므로 isEnd는 false여야 한다").isFalse();
     verify(mockPublicDiaryRepository)
-        .findNextContent(any(PublicDiaryPageIndex.class), any(PageRequest.class));
-    verify(mockIndexFactory).createFrom(any(PublicDiaryPageRequest.class));
+        .findNextContents(any(DiaryPageIndex.class), any(PageRequest.class));
+    verify(mockIndexFactory).createFrom(any(DiaryPageRequest.class));
   }
 
   @Test
   @DisplayName("getPublicDiaryPaginationResponse - 조회 결과가 없는 경우")
   void getPublicDiaryPaginationResponse_EmptyResult() {
-    PublicDiaryPageRequest request =
-        new PublicDiaryPageRequest(999L, Instant.now().plus(10L, ChronoUnit.DAYS));
-    when(mockPublicDiaryRepository.findNextContent(
-            any(PublicDiaryPageIndex.class), any(PageRequest.class)))
+    DiaryPageRequest request = new DiaryPageRequest(999L, Instant.now().plus(10L, ChronoUnit.DAYS));
+    when(mockPublicDiaryRepository.findNextContents(
+            any(DiaryPageIndex.class), any(PageRequest.class)))
         .thenReturn(List.of());
-    when(mockIndexFactory.createFrom(request)).thenReturn(mock(PublicDiaryPageIndex.class));
+    when(mockIndexFactory.createFrom(request)).thenReturn(mock(DiaryPageIndex.class));
 
     PublicDiaryPageResponse response = publicDiaryService.getPagination(member.getId(), request);
 

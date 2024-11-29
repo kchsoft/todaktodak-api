@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.diary.controller;
 
 import com.heartsave.todaktodak_api.auth.annotation.TodakUserId;
+import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryResponse;
 import com.heartsave.todaktodak_api.diary.service.MySharedDiaryService;
@@ -39,20 +40,23 @@ public class MySharedDiaryController {
         @ApiResponse(responseCode = "400", description = "잘못된 요청")
       })
   @GetMapping
-  public ResponseEntity<MySharedDiaryPaginationResponse> getMySharedDiaryPagination(
+  public ResponseEntity<MySharedDiaryPaginationResponse> getPage(
       @TodakUserId Long memberId,
       @Parameter(
               name = "after",
               description = "마지막으로 조회된 공개 일기 ID",
               example = "0",
               schema = @Schema(type = "Long", minimum = "0", defaultValue = "0"))
-          @Valid
           @Min(0L)
-          @RequestParam(name = "after", defaultValue = "0")
-          Long publicDiaryId) {
+          @RequestParam(name = "after", defaultValue = "0", required = false)
+          Long publicDiaryId,
+      @PastOrPresent
+          @RequestParam(name = "date", defaultValue = "1970-01-01T00:00:00Z", required = false)
+          Instant createdTime) {
     log.info("사용자 ID={}", memberId);
+    DiaryPageRequest request = new DiaryPageRequest(publicDiaryId, createdTime);
     return ResponseEntity.status(HttpStatus.OK)
-        .body(mySharedDiaryService.getPagination(memberId, publicDiaryId));
+        .body(mySharedDiaryService.getPage(memberId, request));
   }
 
   @Operation(summary = "특정 날짜의 나의 공개된 일기 상세 조회")
