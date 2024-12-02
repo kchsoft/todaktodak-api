@@ -8,9 +8,9 @@ import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryPageIndexProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryPageIndexProjection;
 import com.heartsave.todaktodak_api.diary.factory.DiaryPageIndexFactory;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.time.Instant;
@@ -80,8 +80,9 @@ class MySharedDiaryRepositoryTest {
   @Test
   @DisplayName("최신 공개 일기 ID를 성공적으로 조회한다")
   void shouldFindLatestPublicDiaryId() {
-    Optional<PublicDiaryPageIndexProjection> indexProjection =
-        mySharedDiaryRepository.findLatestCreatedTimeAndId(member.getId());
+    Optional<DiaryPageIndexProjection> indexProjection =
+        mySharedDiaryRepository.findFirstByMemberEntity_IdOrderByCreatedTimeDescIdDesc(
+            member.getId());
     assertThat(indexProjection).as("최신 공개 일기 ID가 존재해야 합니다").isPresent();
     assertThat(indexProjection.get().getPublicDiaryId())
         .as("최신 공개 일기 ID는 마지막으로 생성된 일기의 ID와 일치해야 합니다")
@@ -96,8 +97,9 @@ class MySharedDiaryRepositoryTest {
     tem.flush();
     tem.clear();
 
-    Optional<PublicDiaryPageIndexProjection> indexProjection =
-        mySharedDiaryRepository.findLatestCreatedTimeAndId(newMember.getId());
+    Optional<DiaryPageIndexProjection> indexProjection =
+        mySharedDiaryRepository.findFirstByMemberEntity_IdOrderByCreatedTimeDescIdDesc(
+            newMember.getId());
     assertThat(indexProjection).as("공개 일기가 없는 경우 빈 Optional을 반환해야 합니다").isEmpty();
     System.out.println("indexProjection = " + indexProjection);
   }

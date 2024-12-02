@@ -2,8 +2,8 @@ package com.heartsave.todaktodak_api.diary.repository;
 
 import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryPageIndexProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryPageIndexProjection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
@@ -13,23 +13,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface PublicDiaryRepository extends JpaRepository<PublicDiaryEntity, Long> {
 
-  @Query(
-      """
-            SELECT new com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryPageIndexProjection(
-                pd1.id,
-                pd1.createdTime
-              )
-              FROM PublicDiaryEntity pd1
-              WHERE pd1.id = (
-                SELECT MAX(pd2.id)
-                FROM PublicDiaryEntity pd2
-                WHERE pd2.createdTime = (
-                  SELECT MAX(pd3.createdTime)
-                  FROM PublicDiaryEntity pd3
-                )
-              )
-""")
-  Optional<PublicDiaryPageIndexProjection> findLatestCreatedTimeAndId();
+  Optional<DiaryPageIndexProjection> findFirstByOrderByCreatedTimeDescIdDesc();
 
   @Query(
       """

@@ -5,7 +5,7 @@ import static com.heartsave.todaktodak_api.common.constant.CoreConstant.DIARY.PA
 
 import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
-import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryPageIndexProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryPageIndexProjection;
 import com.heartsave.todaktodak_api.diary.repository.MySharedDiaryRepository;
 import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
 import java.time.Instant;
@@ -34,14 +34,11 @@ public class DiaryPageIndexFactory {
     Instant createdTime = request.createdTime();
 
     if (publicDiaryId == PAGE_DEFAULT_ID || createdTime.equals(PAGE_DEFAULT_TIME)) {
-      PublicDiaryPageIndexProjection indexProjection =
+      DiaryPageIndexProjection indexProjection =
           mySharedDiaryRepository
-              .findLatestCreatedTimeAndId(memberId)
-              .orElse(
-                  PublicDiaryPageIndexProjection.builder()
-                      .publicDiaryId(PAGE_DEFAULT_ID)
-                      .createdTime(PAGE_DEFAULT_TIME)
-                      .build());
+              .findFirstByMemberEntity_IdOrderByCreatedTimeDescIdDesc(memberId)
+              .orElse(createPageIndexProjection());
+
       return Optional.of(DiaryPageIndex.fromLatest(indexProjection));
     }
 
@@ -53,17 +50,27 @@ public class DiaryPageIndexFactory {
     Instant createdTime = request.createdTime();
 
     if (publicDiaryId == PAGE_DEFAULT_ID || createdTime.equals(PAGE_DEFAULT_TIME)) {
-      PublicDiaryPageIndexProjection indexProjection =
+      DiaryPageIndexProjection indexProjection =
           publicDiaryRepository
-              .findLatestCreatedTimeAndId()
-              .orElse(
-                  PublicDiaryPageIndexProjection.builder()
-                      .publicDiaryId(PAGE_DEFAULT_ID)
-                      .createdTime(PAGE_DEFAULT_TIME)
-                      .build());
+              .findFirstByOrderByCreatedTimeDescIdDesc()
+              .orElse(createPageIndexProjection());
       return Optional.of(DiaryPageIndex.fromLatest(indexProjection));
     }
 
     return Optional.empty();
+  }
+
+  private DiaryPageIndexProjection createPageIndexProjection() {
+    return new DiaryPageIndexProjection() {
+      @Override
+      public Long getPublicDiaryId() {
+        return PAGE_DEFAULT_ID;
+      }
+
+      @Override
+      public Instant getCreatedTime() {
+        return PAGE_DEFAULT_TIME;
+      }
+    };
   }
 }

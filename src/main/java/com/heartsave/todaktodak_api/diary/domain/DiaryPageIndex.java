@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.diary.domain;
 
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
-import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryPageIndexProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryPageIndexProjection;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ public class DiaryPageIndex {
   private final Long publicDiaryId;
   private final Instant createdTime;
 
-  public static DiaryPageIndex fromLatest(PublicDiaryPageIndexProjection projection) {
+  public static DiaryPageIndex fromLatest(DiaryPageIndexProjection projection) {
     return new DiaryPageIndex(projection.getPublicDiaryId() + 1L, projection.getCreatedTime());
   }
 

@@ -9,8 +9,8 @@ import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryPageIndexProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryPageIndexProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.factory.DiaryPageIndexFactory;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
@@ -174,8 +174,8 @@ public class PublicDiaryRepositoryTest {
   @DisplayName("최신 공개 일기 ID 조회 성공")
   void findLatestId_Success() {
     diary2 = diaryRepository.findById(diary2.getId()).get();
-    PublicDiaryPageIndexProjection indexProjection =
-        publicDiaryRepository.findLatestCreatedTimeAndId().get();
+    DiaryPageIndexProjection indexProjection =
+        publicDiaryRepository.findFirstByOrderByCreatedTimeDescIdDesc().get();
 
     PublicDiaryEntity findPublicDiary =
         publicDiaryRepository.findById(indexProjection.getPublicDiaryId()).orElse(null);
