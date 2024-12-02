@@ -49,7 +49,7 @@ public class PublicDiaryController {
     DiaryPageRequest request = new DiaryPageRequest(publicDiaryId, createdTime);
     log.info("공개 일기를 조회를 요청합니다. after = {}", request.publicDiaryId());
     PublicDiaryPageResponse response = publicDiaryService.getPagination(memberId, request);
-    log.info("공개 일기 조회를 성공적으로 마쳤습니다.");
+    log.info("공개 일기 조회를 성공적으로 마쳤습니다. after = {}", request.publicDiaryId());
     System.out.println("response = " + response);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
