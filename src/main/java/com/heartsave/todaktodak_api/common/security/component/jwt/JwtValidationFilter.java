@@ -109,7 +109,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
   private void setAuthentication(String token) {
     var authentication = getAuthentication(token);
     SecurityContextHolder.getContext().setAuthentication(authentication);
-    logger.info("인증 정보 구성 완료: {}", authentication);
+    logger.info("인증 정보 구성 완료: {}", authentication.getPrincipal());
   }
 
   private Authentication getAuthentication(String token) {

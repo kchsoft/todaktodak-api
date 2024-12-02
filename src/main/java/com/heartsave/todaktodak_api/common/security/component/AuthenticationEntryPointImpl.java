@@ -32,6 +32,8 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
       HttpServletResponse response,
       AuthenticationException authException)
       throws IOException {
+    logger.error(
+        "인증이 실패했어요. 예외 타입={}, 예외 메시지={}", authException.getClass(), authException.getMessage());
     setResponseWithMessage(request, response, authException);
   }
 
