@@ -36,15 +36,10 @@ public class DiaryService {
   private final MemberRepository memberRepository;
   private final S3FileStorageManager s3FileStorageManager;
 
-  public DiaryWriteResponse write(Long memberId, DiaryWriteRequest request) {
-    DiaryEntity diary = createDiaryEntity(memberId, request);
-    Instant diaryCreatedTime = diary.getDiaryCreatedTime();
+  public DiaryWriteResponse write(Long memberId, DiaryWriteRequest request, String zoneName) {
 
-    if (diaryRepository.existsByDate(
-        memberId, InstantConverter.toLocalDate(diary.getDiaryCreatedTime()))) {
-      throw new DiaryDailyWritingLimitExceedException(
-          DiaryErrorSpec.DAILY_WRITING_LIMIT_EXCEED, memberId);
-    }
+    DiaryEntity diary = createDiaryEntity(memberId, request);
+    validateDailyDiaryLimit(memberId, diary, zoneName);
 
     log.info("AI 컨텐츠 생성 요청을 시작합니다.");
     AiDiaryContentResponse response = aiClientService.callDiaryContent(diary);
@@ -55,6 +50,17 @@ public class DiaryService {
     diaryRepository.save(diary);
     log.info("DB에 일기를 저장하였습니다.");
     return DiaryWriteResponse.builder().aiComment(response.getAiComment()).build();
+  }
+
+  private void validateDailyDiaryLimit(Long memberId, DiaryEntity diary, String zoneName) {
+    Instant diaryCreatedTime = diary.getDiaryCreatedTime();
+    if (diaryRepository.existsByMemberEntity_IdAndDiaryCreatedTimeBetween(
+        memberId,
+        InstantConverter.toDayStartAtZone(diaryCreatedTime, zoneName),
+        InstantConverter.toDayEndAtZone(diaryCreatedTime, zoneName))) {
+      throw new DiaryDailyWritingLimitExceedException(
+          DiaryErrorSpec.DAILY_WRITING_LIMIT_EXCEED, memberId);
+    }
   }
 
   public void delete(Long memberId, Long diaryId) {
