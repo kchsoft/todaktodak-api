@@ -16,6 +16,6 @@ public final class CoreConstant {
 
   public static class HEADER {
     public static final String TIME_ZONE_KEY = "Todak-Time-Zone";
-    public static final String DEFAULT_TIME_ZONE = "UTC";
+    public static final String DEFAULT_TIME_ZONE = "Asia/Seoul";
   }
 }

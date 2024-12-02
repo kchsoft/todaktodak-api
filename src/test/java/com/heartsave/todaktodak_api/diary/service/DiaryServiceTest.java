@@ -39,7 +39,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -162,26 +161,30 @@ public class DiaryServiceTest {
     int testYear = 2024;
     int testMonth = 3;
     Instant testStart =
-        YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC);
+        YearMonth.of(testYear, testMonth)
+            .atDay(1)
+            .atStartOfDay(ZoneId.of(DEFAULT_TIME_ZONE))
+            .toInstant();
     Instant testEnd =
         YearMonth.of(testYear, testMonth)
             .atEndOfMonth()
             .atTime(LocalTime.MAX)
-            .toInstant(ZoneOffset.UTC);
+            .atZone(ZoneId.of(DEFAULT_TIME_ZONE))
+            .toInstant();
     List<DiaryYearMonthProjection> testProjection =
         TestDiaryObjectFactory.getTestDiaryIndexProjections_2024_03_Data_Of_2();
     Instant requestYearMonth =
-        LocalDate.of(testYear, testMonth, 1).atStartOfDay(ZoneId.of("UTC")).toInstant();
+        LocalDate.of(testYear, testMonth, 1).atStartOfDay(ZoneId.of(DEFAULT_TIME_ZONE)).toInstant();
 
     when(mockDiaryRepository.findYearMonthsByMemberIdAndInstants(
             member.getId(), testStart, testEnd))
         .thenReturn(Optional.of(testProjection));
-    DiaryYearMonthResponse yearMonths =
+    DiaryYearMonthResponse response =
         diaryService.getYearMonth(member.getId(), requestYearMonth, DEFAULT_TIME_ZONE);
 
-    List<DiaryYearMonthProjection> responseIndexes = yearMonths.getDiaryYearMonths();
-    DiaryYearMonthProjection first = responseIndexes.get(0);
-    DiaryYearMonthProjection second = responseIndexes.get(1);
+    List<DiaryYearMonthProjection> responseYearMonth = response.getDiaryYearMonths();
+    DiaryYearMonthProjection first = responseYearMonth.get(0);
+    DiaryYearMonthProjection second = responseYearMonth.get(1);
 
     assertThat(first.getId())
         .as("설정 Diary ID와 응답 DiaryID가 서로 다릅니다.")
@@ -206,14 +209,18 @@ public class DiaryServiceTest {
     int testYear = 2024;
     int testMonth = 2;
     Instant testStart =
-        YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC);
+        YearMonth.of(testYear, testMonth)
+            .atDay(1)
+            .atStartOfDay(ZoneId.of(DEFAULT_TIME_ZONE))
+            .toInstant();
     Instant testEnd =
         YearMonth.of(testYear, testMonth)
             .atEndOfMonth()
             .atTime(LocalTime.MAX)
-            .toInstant(ZoneOffset.UTC);
+            .atZone(ZoneId.of(DEFAULT_TIME_ZONE))
+            .toInstant();
     Instant requestYearMonth =
-        LocalDate.of(testYear, testMonth, 1).atStartOfDay(ZoneId.of("UTC")).toInstant();
+        LocalDate.of(testYear, testMonth, 1).atStartOfDay(ZoneId.of(DEFAULT_TIME_ZONE)).toInstant();
     when(mockDiaryRepository.findYearMonthsByMemberIdAndInstants(
             member.getId(), testStart, testEnd))
         .thenReturn(Optional.empty());
@@ -232,7 +239,8 @@ public class DiaryServiceTest {
   void getDiarySuccess() {
     // given
     Instant requestDate = NOW_DATE_TIME;
-    when(mockDiaryRepository.findByMemberIdAndDate(anyLong(), any(LocalDate.class)))
+    when(mockDiaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
+            anyLong(), any(Instant.class)))
         .thenReturn(Optional.of(diary));
     List<String> preSignedWebtoon = List.of("pre-sigend-webtoon");
     String preSignedBgm = "pre-sigend-bgm";
@@ -254,7 +262,8 @@ public class DiaryServiceTest {
               assertThat(r.getDateTime()).isEqualTo(diary.getDiaryCreatedTime());
             });
 
-    verify(mockDiaryRepository, times(1)).findByMemberIdAndDate(anyLong(), any(LocalDate.class));
+    verify(mockDiaryRepository, times(1))
+        .findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(anyLong(), any(Instant.class));
   }
 
   @Test
@@ -262,7 +271,8 @@ public class DiaryServiceTest {
   void getDiaryFail() {
     Instant requestDate = NOW_DATE_TIME;
 
-    when(mockDiaryRepository.findByMemberIdAndDate(anyLong(), any(LocalDate.class)))
+    when(mockDiaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
+            anyLong(), any(Instant.class)))
         .thenReturn(Optional.empty());
 
     DiaryException diaryException =
@@ -270,7 +280,8 @@ public class DiaryServiceTest {
             DiaryNotFoundException.class, () -> diaryService.getDiary(member.getId(), requestDate));
 
     assertThat(diaryException.getErrorSpec()).isEqualTo(DiaryErrorSpec.DIARY_NOT_FOUND);
-    verify(mockDiaryRepository, times(1)).findByMemberIdAndDate(anyLong(), any(LocalDate.class));
+    verify(mockDiaryRepository, times(1))
+        .findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(anyLong(), any(Instant.class));
     verify(mockDiaryReactionRepository, times(0)).countEachByDiaryId(anyLong());
   }
 }

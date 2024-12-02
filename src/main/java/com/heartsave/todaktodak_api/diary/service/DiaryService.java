@@ -92,15 +92,14 @@ public class DiaryService {
   }
 
   @Transactional(readOnly = true)
-  public DiaryResponse getDiary(Long memberId, Instant requestDate) {
+  public DiaryResponse getDiary(Long memberId, Instant request) {
     log.info("사용자의 나의 일기 정보를 요청합니다.");
     DiaryEntity diary =
         diaryRepository
-            .findByMemberIdAndDate(memberId, InstantUtils.toLocalDate(requestDate))
+            .findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(memberId, request)
             .orElseThrow(
                 () ->
-                    new DiaryNotFoundException(
-                        DiaryErrorSpec.DIARY_NOT_FOUND, memberId, requestDate));
+                    new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, request));
     log.info("사용자의 나의 일기 정보를 성공적으로 가져왔습니다.");
 
     return DiaryResponse.builder()

@@ -1,6 +1,5 @@
 package com.heartsave.todaktodak_api.diary.controller;
 
-import static com.heartsave.todaktodak_api.diary.common.TestDiaryObjectFactory.getTestDiaryIndexProjections_2024_03_Data_Of_2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -18,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
+import com.heartsave.todaktodak_api.diary.common.TestDiaryObjectFactory;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
@@ -113,7 +113,8 @@ public class DiaryControllerTest {
   @Test
   void getManyOfDiaryYearMonthSuccess() throws Exception {
     // response
-    List<DiaryYearMonthProjection> mockIndexes = getTestDiaryIndexProjections_2024_03_Data_Of_2();
+    List<DiaryYearMonthProjection> mockIndexes =
+        TestDiaryObjectFactory.getTestDiaryIndexProjections_2024_03_Data_Of_2();
     DiaryYearMonthResponse mockResponse =
         DiaryYearMonthResponse.builder().diaryYearMonths(mockIndexes).build();
     String yearMonth = "2024-03-01T09:12:30.123Z";

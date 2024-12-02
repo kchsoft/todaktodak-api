@@ -116,7 +116,7 @@ public class DiaryController {
           @Valid
           @PastOrPresent(message = "현재 날짜 이전의 일기만 조회가 가능합니다.")
           @RequestParam("date")
-          Instant requestDate) {
-    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getDiary(memberId, requestDate));
+          Instant request) {
+    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getDiary(memberId, request));
   }
 }

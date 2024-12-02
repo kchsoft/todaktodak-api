@@ -12,12 +12,12 @@ import com.heartsave.todaktodak_api.diary.entity.projection.DiaryYearMonthProjec
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -165,9 +165,11 @@ public class DiaryRepositoryTest {
   @Test
   @DisplayName("findByMemberIdAndDate - 일기를 성공적으로 조회")
   void findByMemberIdAndDateSuccess() {
-    LocalDate diaryDate = InstantUtils.toLocalDate(diary.getDiaryCreatedTime());
+    Instant diaryDate = diary.getDiaryCreatedTime();
 
-    Optional<DiaryEntity> result = diaryRepository.findByMemberIdAndDate(member.getId(), diaryDate);
+    Optional<DiaryEntity> result =
+        diaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
+            member.getId(), diaryDate);
 
     assertThat(result).as("해당 날짜(%s)에 작성된 일기를 찾을 수 없습니다.", diaryDate).isPresent();
     assertThat(result.get().getId())
@@ -190,10 +192,11 @@ public class DiaryRepositoryTest {
   @Test
   @DisplayName("findByMemberIdAndDate - 해당 날짜에 일기가 없는 경우")
   void findByMemberIdAndDateEmpty() {
-    LocalDate differentDate = InstantUtils.toLocalDate(diary.getDiaryCreatedTime()).plusDays(-1);
+    Instant differentDate = diary.getDiaryCreatedTime().minus(1L, ChronoUnit.DAYS);
 
     Optional<DiaryEntity> result =
-        diaryRepository.findByMemberIdAndDate(member.getId(), differentDate);
+        diaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
+            member.getId(), differentDate);
 
     assertThat(result).as("존재하지 않아야 할 날짜(%s)에 일기가 조회되었습니다.", differentDate).isEmpty();
   }

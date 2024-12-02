@@ -4,7 +4,6 @@ import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIdsProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryYearMonthProjection;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,17 +28,14 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
             FROM DiaryEntity d
             WHERE d.memberEntity.id = :memberId AND d.diaryCreatedTime BETWEEN :startTime AND :endTime
             ORDER BY d.diaryCreatedTime ASC
-""")
+          """)
   Optional<List<DiaryYearMonthProjection>> findYearMonthsByMemberIdAndInstants(
       @Param("memberId") Long memberId,
       @Param("startTime") Instant startTime,
       @Param("endTime") Instant endTime);
 
-  @Query(
-      value =
-          " SELECT d FROM DiaryEntity  d WHERE d.memberEntity.id = :memberId AND CAST (d.diaryCreatedTime as DATE) = :diaryDate ")
-  Optional<DiaryEntity> findByMemberIdAndDate(
-      @Param("memberId") Long memberId, @Param("diaryDate") LocalDate diaryDate);
+  Optional<DiaryEntity> findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
+      Long memberId, Instant diaryCreatedTime);
 
   @Query(
       value =
