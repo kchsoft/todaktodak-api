@@ -4,6 +4,7 @@ import static com.heartsave.todaktodak_api.diary.common.TestDiaryObjectFactory.g
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,10 +20,10 @@ import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
-import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryYearMonthResponse;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryYearMonthProjection;
 import com.heartsave.todaktodak_api.diary.service.DiaryService;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -60,7 +61,7 @@ public class DiaryControllerTest {
 
     final String AI_COMMENT = "this is test ai comment";
 
-    when(diaryService.write(anyLong(), any(DiaryWriteRequest.class)))
+    when(diaryService.write(anyLong(), any(DiaryWriteRequest.class), anyString()))
         .thenReturn(DiaryWriteResponse.builder().aiComment(AI_COMMENT).build());
     MvcResult mvcResult =
         mockMvc
@@ -72,7 +73,7 @@ public class DiaryControllerTest {
             .andDo(print())
             .andReturn();
 
-    verify(diaryService, times(1)).write(anyLong(), any(DiaryWriteRequest.class));
+    verify(diaryService, times(1)).write(anyLong(), any(DiaryWriteRequest.class), anyString());
     MockHttpServletResponse response = mvcResult.getResponse();
     assertThat(response.getContentAsString()).contains(AI_COMMENT);
   }
@@ -112,13 +113,14 @@ public class DiaryControllerTest {
   @Test
   void getManyOfDiaryYearMonthSuccess() throws Exception {
     // response
-    List<DiaryIndexProjection> mockIndexes = getTestDiaryIndexProjections_2024_03_Data_Of_2();
-    DiaryIndexResponse mockResponse =
-        DiaryIndexResponse.builder().diaryIndexes(mockIndexes).build();
+    List<DiaryYearMonthProjection> mockIndexes = getTestDiaryIndexProjections_2024_03_Data_Of_2();
+    DiaryYearMonthResponse mockResponse =
+        DiaryYearMonthResponse.builder().diaryYearMonths(mockIndexes).build();
     String yearMonth = "2024-03-01T09:12:30.123Z";
 
     // when
-    when(diaryService.getIndex(anyLong(), any(Instant.class))).thenReturn(mockResponse);
+    when(diaryService.getYearMonth(anyLong(), any(Instant.class), anyString()))
+        .thenReturn(mockResponse);
 
     // then
     MvcResult mvcResult = null;
@@ -134,11 +136,11 @@ public class DiaryControllerTest {
 
     assertThat(contentAsString)
         .as("설정된 diary index와 응답 index가 서로 다릅니다.")
-        .contains(objectMapper.writeValueAsString(mockResponse.getDiaryIndexes().get(0)));
+        .contains(objectMapper.writeValueAsString(mockResponse.getDiaryYearMonths().get(0)));
 
     assertThat(contentAsString)
         .as("설정된 diary index와 응답 index가 서로 다릅니다.")
-        .contains(objectMapper.writeValueAsString(mockResponse.getDiaryIndexes().get(1)));
+        .contains(objectMapper.writeValueAsString(mockResponse.getDiaryYearMonths().get(1)));
   }
 
   @DisplayName("연월 일기 작성 현황 0건 성공")
@@ -146,11 +148,12 @@ public class DiaryControllerTest {
   @Test
   void getZeroOfDiaryYearMonthSuccess() throws Exception {
     // response
-    DiaryIndexResponse mockResponse = new DiaryIndexResponse(new ArrayList<>());
+    DiaryYearMonthResponse mockResponse = new DiaryYearMonthResponse(new ArrayList<>());
     String yearMonth = "2024-01-01T00:00:00.010Z";
 
     // when
-    when(diaryService.getIndex(anyLong(), any(Instant.class))).thenReturn(mockResponse);
+    when(diaryService.getYearMonth(anyLong(), any(Instant.class), anyString()))
+        .thenReturn(mockResponse);
 
     // then
     MvcResult mvcResult =

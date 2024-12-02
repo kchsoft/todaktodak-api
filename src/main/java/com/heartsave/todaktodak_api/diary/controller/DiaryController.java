@@ -1,10 +1,13 @@
 package com.heartsave.todaktodak_api.diary.controller;
 
+import static com.heartsave.todaktodak_api.common.constant.CoreConstant.HEADER.DEFAULT_TIME_ZONE;
+import static com.heartsave.todaktodak_api.common.constant.CoreConstant.HEADER.TIME_ZONE_KEY;
+
 import com.heartsave.todaktodak_api.auth.annotation.TodakUserId;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
-import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryYearMonthResponse;
 import com.heartsave.todaktodak_api.diary.service.DiaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -49,7 +52,7 @@ public class DiaryController {
   public ResponseEntity<DiaryWriteResponse> writeDiary(
       @TodakUserId Long memberId,
       @Valid @RequestBody DiaryWriteRequest writeRequest,
-      @RequestHeader(name = "Todak-Time-Zone", defaultValue = "UTC") String zoneName) {
+      @RequestHeader(name = TIME_ZONE_KEY, defaultValue = DEFAULT_TIME_ZONE) String zoneName) {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(diaryService.write(memberId, writeRequest, zoneName));
   }
@@ -79,7 +82,7 @@ public class DiaryController {
         @ApiResponse(responseCode = "400", description = "잘못된 요청")
       })
   @GetMapping
-  public ResponseEntity<DiaryIndexResponse> getDiaryIndex(
+  public ResponseEntity<DiaryYearMonthResponse> getDiaryYearMonthInfo(
       @TodakUserId Long memberId,
       @Parameter(
               name = "yearMonth",
@@ -88,8 +91,10 @@ public class DiaryController {
               required = true,
               schema = @Schema(type = "string"))
           @RequestParam("yearMonth")
-          Instant yearMonth) {
-    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getIndex(memberId, yearMonth));
+          Instant request,
+      @RequestHeader(name = TIME_ZONE_KEY, defaultValue = DEFAULT_TIME_ZONE) String zoneName) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(diaryService.getYearMonth(memberId, request, zoneName));
   }
 
   @Operation(summary = "일기 상세 조회")

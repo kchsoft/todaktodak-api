@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 
 @Schema(description = "연월 일기 작성 현황 API 응답 데이터")
-public interface DiaryIndexProjection {
+public interface DiaryYearMonthProjection {
 
   @JsonProperty("diaryId")
   Long getId();

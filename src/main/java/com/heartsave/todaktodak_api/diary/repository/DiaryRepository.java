@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.diary.repository;
 
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIdsProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryYearMonthProjection;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -24,11 +24,16 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
 
   @Query(
       value =
-          "SELECT d.id as id, d.diaryCreatedTime as diaryCreatedTime FROM DiaryEntity d WHERE d.memberEntity.id = :memberId AND d.diaryCreatedTime BETWEEN :startDateTime AND :endDateTime ORDER BY d.diaryCreatedTime ASC")
-  Optional<List<DiaryIndexProjection>> findIndexesByMemberIdAndDateTimes(
+          """
+            SELECT d.id as id, d.diaryCreatedTime as diaryCreatedTime
+            FROM DiaryEntity d
+            WHERE d.memberEntity.id = :memberId AND d.diaryCreatedTime BETWEEN :startTime AND :endTime
+            ORDER BY d.diaryCreatedTime ASC
+""")
+  Optional<List<DiaryYearMonthProjection>> findYearMonthsByMemberIdAndInstants(
       @Param("memberId") Long memberId,
-      @Param("startDateTime") Instant startDateTime,
-      @Param("endDateTime") Instant endDateTime);
+      @Param("startTime") Instant startTime,
+      @Param("endTime") Instant endTime);
 
   @Query(
       value =

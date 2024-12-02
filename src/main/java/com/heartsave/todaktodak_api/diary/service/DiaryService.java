@@ -2,16 +2,16 @@ package com.heartsave.todaktodak_api.diary.service;
 
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.ai.client.service.AiClientService;
-import com.heartsave.todaktodak_api.common.converter.InstantConverter;
+import com.heartsave.todaktodak_api.common.converter.InstantUtils;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
-import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryYearMonthResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryYearMonthProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
@@ -56,8 +56,8 @@ public class DiaryService {
     Instant diaryCreatedTime = diary.getDiaryCreatedTime();
     if (diaryRepository.existsByMemberEntity_IdAndDiaryCreatedTimeBetween(
         memberId,
-        InstantConverter.toDayStartAtZone(diaryCreatedTime, zoneName),
-        InstantConverter.toDayEndAtZone(diaryCreatedTime, zoneName))) {
+        InstantUtils.toDayStartAtZone(diaryCreatedTime, zoneName),
+        InstantUtils.toDayEndAtZone(diaryCreatedTime, zoneName))) {
       throw new DiaryDailyWritingLimitExceedException(
           DiaryErrorSpec.DAILY_WRITING_LIMIT_EXCEED, memberId);
     }
@@ -78,17 +78,17 @@ public class DiaryService {
   }
 
   @Transactional(readOnly = true)
-  public DiaryIndexResponse getIndex(Long memberId, Instant yearMonth) {
-    Instant startDateTime = InstantConverter.toMonthStartDateTime(yearMonth);
-    Instant endDateTime = InstantConverter.toMonthEndDateTime(yearMonth);
+  public DiaryYearMonthResponse getYearMonth(Long memberId, Instant request, String zoneName) {
+    Instant startTime = InstantUtils.toMonthStartAtZone(request, zoneName);
+    Instant endTime = InstantUtils.toMonthEndAtZone(request, zoneName);
     log.info("해당 연월에 작성한 일기를 정보를 요청합니다.");
-    List<DiaryIndexProjection> indexes =
+    List<DiaryYearMonthProjection> yearMonthProjection =
         diaryRepository
-            .findIndexesByMemberIdAndDateTimes(memberId, startDateTime, endDateTime)
+            .findYearMonthsByMemberIdAndInstants(memberId, startTime, endTime)
             .orElseGet(List::of);
 
     log.info("해당 연월에 작성한 일기를 정보를 성공적으로 가져왔습니다.");
-    return DiaryIndexResponse.builder().diaryIndexes(indexes).build();
+    return DiaryYearMonthResponse.builder().diaryYearMonths(yearMonthProjection).build();
   }
 
   @Transactional(readOnly = true)
@@ -96,7 +96,7 @@ public class DiaryService {
     log.info("사용자의 나의 일기 정보를 요청합니다.");
     DiaryEntity diary =
         diaryRepository
-            .findByMemberIdAndDate(memberId, InstantConverter.toLocalDate(requestDate))
+            .findByMemberIdAndDate(memberId, InstantUtils.toLocalDate(requestDate))
             .orElseThrow(
                 () ->
                     new DiaryNotFoundException(

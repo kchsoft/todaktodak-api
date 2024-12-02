@@ -13,4 +13,9 @@ public final class CoreConstant {
   public static class TIME_FORMAT {
     public static final String ISO_DATETIME_WITH_MILLISECONDS = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
   }
+
+  public static class HEADER {
+    public static final String TIME_ZONE_KEY = "Todak-Time-Zone";
+    public static final String DEFAULT_TIME_ZONE = "UTC";
+  }
 }

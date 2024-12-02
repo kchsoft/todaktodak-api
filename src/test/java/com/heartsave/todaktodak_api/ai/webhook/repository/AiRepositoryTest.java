@@ -10,7 +10,7 @@ import com.heartsave.todaktodak_api.ai.webhook.domain.WebhookWebtoonCompletion;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionRequest;
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
-import com.heartsave.todaktodak_api.common.converter.InstantConverter;
+import com.heartsave.todaktodak_api.common.converter.InstantUtils;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
@@ -62,7 +62,7 @@ class AiRepositoryTest {
       String newUrl = "https://new-url/webtoon.jpg";
       WebhookWebtoonCompletionRequest request =
           new WebhookWebtoonCompletionRequest(
-              member.getId(), InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), newUrl);
+              member.getId(), InstantUtils.toLocalDate(diary.getDiaryCreatedTime()), newUrl);
       WebhookWebtoonCompletion completion = WebhookWebtoonCompletion.from(request, newUrl);
       aiRepository.updateWebtoonUrl(completion);
 
@@ -96,7 +96,7 @@ class AiRepositoryTest {
       String newBgmUrl = "/music-ai/1/2024/11/06/bgm.mp3";
       WebhookBgmCompletionRequest request =
           new WebhookBgmCompletionRequest(
-              member.getId(), InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), newBgmUrl);
+              member.getId(), InstantUtils.toLocalDate(diary.getDiaryCreatedTime()), newBgmUrl);
       WebhookBgmCompletion completion = WebhookBgmCompletion.from(request, newBgmUrl);
 
       aiRepository.updateBgmUrl(completion);
@@ -143,7 +143,7 @@ class AiRepositoryTest {
       String newBgmUrl = "https://new-url/target-member-bgm.mp3";
       WebhookBgmCompletionRequest request =
           new WebhookBgmCompletionRequest(
-              member.getId(), InstantConverter.toLocalDate(diary.getDiaryCreatedTime()), newBgmUrl);
+              member.getId(), InstantUtils.toLocalDate(diary.getDiaryCreatedTime()), newBgmUrl);
       WebhookBgmCompletion completion = WebhookBgmCompletion.from(request, newBgmUrl);
 
       aiRepository.updateBgmUrl(completion);
@@ -165,7 +165,7 @@ class AiRepositoryTest {
     void returnsFalseWhenBothUrlsAreEmpty() {
       Boolean result =
           aiRepository.isContentCompleted(
-              member.getId(), InstantConverter.toLocalDate(diary.getDiaryCreatedTime()));
+              member.getId(), InstantUtils.toLocalDate(diary.getDiaryCreatedTime()));
 
       assertThat(result).isFalse();
     }
@@ -188,8 +188,7 @@ class AiRepositoryTest {
       tem.clear();
 
       Boolean result =
-          aiRepository.isContentCompleted(
-              member.getId(), InstantConverter.toLocalDate(nowDateTime));
+          aiRepository.isContentCompleted(member.getId(), InstantUtils.toLocalDate(nowDateTime));
 
       assertThat(result).isFalse();
     }
@@ -212,8 +211,7 @@ class AiRepositoryTest {
       tem.clear();
 
       Boolean result =
-          aiRepository.isContentCompleted(
-              member.getId(), InstantConverter.toLocalDate(nowDateTime));
+          aiRepository.isContentCompleted(member.getId(), InstantUtils.toLocalDate(nowDateTime));
 
       assertThat(result).isFalse();
     }
@@ -238,7 +236,7 @@ class AiRepositoryTest {
 
       Boolean result =
           aiRepository.isContentCompleted(
-              member.getId(), InstantConverter.toLocalDate(completedDiary.getDiaryCreatedTime()));
+              member.getId(), InstantUtils.toLocalDate(completedDiary.getDiaryCreatedTime()));
 
       assertThat(result).isTrue();
     }

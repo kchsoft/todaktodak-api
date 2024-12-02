@@ -4,10 +4,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
-public class InstantConverter {
+public class InstantUtils {
   public static LocalDate toLocalDate(Instant instant) {
     return instant.atZone(ZoneId.of("UTC")).toLocalDate();
   }
@@ -16,9 +15,9 @@ public class InstantConverter {
     return instant.atZone(ZoneId.of("UTC")).toLocalDateTime();
   }
 
-  public static Instant toMonthStartDateTime(Instant yearMonth) {
+  public static Instant toMonthStartAtZone(Instant yearMonth, String zoneId) {
     return yearMonth
-        .atZone(ZoneOffset.UTC)
+        .atZone(ZoneId.of(zoneId))
         .withDayOfMonth(1)
         .withHour(0)
         .withMinute(0)
@@ -27,9 +26,9 @@ public class InstantConverter {
         .toInstant();
   }
 
-  public static Instant toMonthEndDateTime(Instant yearMonth) {
+  public static Instant toMonthEndAtZone(Instant yearMonth, String zoneId) {
     return yearMonth
-        .atZone(ZoneOffset.UTC)
+        .atZone(ZoneId.of(zoneId))
         .withDayOfMonth(1)
         .plusMonths(1)
         .minusNanos(1)

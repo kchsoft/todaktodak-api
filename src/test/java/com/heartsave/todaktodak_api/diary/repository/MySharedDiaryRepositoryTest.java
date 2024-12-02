@@ -3,7 +3,7 @@ package com.heartsave.todaktodak_api.diary.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.heartsave.todaktodak_api.common.BaseTestObject;
-import com.heartsave.todaktodak_api.common.converter.InstantConverter;
+import com.heartsave.todaktodak_api.common.converter.InstantUtils;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentOnlyProjection;
@@ -162,7 +162,7 @@ class MySharedDiaryRepositoryTest {
     PublicDiaryEntity expected = publicDiaries.get(3);
     Long memberId = expected.getMemberEntity().getId();
     LocalDate requestDate =
-        InstantConverter.toLocalDate(expected.getDiaryEntity().getDiaryCreatedTime());
+        InstantUtils.toLocalDate(expected.getDiaryEntity().getDiaryCreatedTime());
     System.out.println(
         "expected.getDiaryEntity().getDiaryCreatedTime() = "
             + expected.getDiaryEntity().getDiaryCreatedTime());
@@ -194,7 +194,6 @@ class MySharedDiaryRepositoryTest {
                 .getDiaryEntity()
                 .getDiaryCreatedTime()
                 .truncatedTo(ChronoUnit.SECONDS)); // DB에 Instant 저장시 MILLIS 반올림, 따라서 Second 까지 검사
-
   }
 
   @Test

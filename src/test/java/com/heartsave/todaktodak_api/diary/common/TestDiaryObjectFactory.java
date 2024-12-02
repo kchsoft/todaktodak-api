@@ -1,16 +1,16 @@
 package com.heartsave.todaktodak_api.diary.common;
 
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryYearMonthProjection;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
 public class TestDiaryObjectFactory {
-  public static List<DiaryIndexProjection> getTestDiaryIndexProjections_2024_03_Data_Of_2() {
-    List<DiaryIndexProjection> mockIndexes =
+  public static List<DiaryYearMonthProjection> getTestDiaryIndexProjections_2024_03_Data_Of_2() {
+    List<DiaryYearMonthProjection> mockIndexes =
         List.of(
-            new DiaryIndexProjection() {
+            new DiaryYearMonthProjection() {
               @Override
               public Long getId() {
                 return 1L;
@@ -21,7 +21,7 @@ public class TestDiaryObjectFactory {
                 return LocalDateTime.of(2024, 3, 15, 14, 30).atZone(ZoneId.of("UTC")).toInstant();
               }
             },
-            new DiaryIndexProjection() {
+            new DiaryYearMonthProjection() {
               @Override
               public Long getId() {
                 return 2L;
