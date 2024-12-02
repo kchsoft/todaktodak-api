@@ -27,4 +27,17 @@ public class SseEmitterRepository {
   public Optional<SseEmitter> get(Long memberId) {
     return Optional.ofNullable(emitterRepository.get(memberId));
   }
+
+  public synchronized void saveThreadSafe(SseEmitter emitter, Long memberId) {
+    if (emitterRepository.containsKey(memberId)) {
+      logger.info("재연결을 위해 {}의 에미터가 연결을 종료했습니다.", memberId);
+      emitterRepository.get(memberId).complete();
+      delete(memberId);
+    }
+    save(emitter, memberId);
+  }
+
+  public int getCount() {
+    return emitterRepository.size();
+  }
 }
