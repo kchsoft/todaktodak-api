@@ -24,9 +24,12 @@ final class SseEmitterRepositoryTest {
   void saveTest() {
     // when
     SseEmitter savedEmitter = emitterRepository.put(MEMBER_ID, sseEmitter);
+    int emitterCount = emitterRepository.getCount();
 
     // then
+    assertThat(savedEmitter).isNotNull();
     assertThat(savedEmitter).isEqualTo(sseEmitter);
+    assertThat(emitterCount).isEqualTo(1);
   }
 
   @Test
@@ -38,23 +41,11 @@ final class SseEmitterRepositoryTest {
     // when
     emitterRepository.delete(MEMBER_ID);
     Optional<SseEmitter> result = emitterRepository.get(MEMBER_ID);
+    int emitterCount = emitterRepository.getCount();
 
     // then
     assertThat(result).isEmpty();
-  }
-
-  @Test
-  @DisplayName("연결된 회원의 Emitter 조회")
-  void get_existedMember() {
-    // given
-    emitterRepository.put(MEMBER_ID, sseEmitter);
-
-    // when
-    Optional<SseEmitter> result = emitterRepository.get(MEMBER_ID);
-
-    // then
-    assertThat(result).isPresent();
-    assertThat(result.get()).isEqualTo(sseEmitter);
+    assertThat(emitterCount).isEqualTo(0);
   }
 
   @Test
