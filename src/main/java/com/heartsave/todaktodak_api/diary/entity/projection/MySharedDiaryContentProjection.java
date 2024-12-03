@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Schema(description = "공개된 일기 상세 내용 Projection")
 @Getter
-public class MySharedDiaryContentOnlyProjection {
+public class MySharedDiaryContentProjection {
 
   @Schema(description = "공개된 일기 ID", example = "1")
   private final Long publicDiaryId;
@@ -32,7 +32,7 @@ public class MySharedDiaryContentOnlyProjection {
   @JsonFormat(pattern = TIME_FORMAT.ISO_DATETIME_WITH_MILLISECONDS)
   private final Instant diaryCreatedDate;
 
-  public MySharedDiaryContentOnlyProjection(
+  public MySharedDiaryContentProjection(
       Long publicDiaryId,
       Long diaryId,
       String publicContent,
