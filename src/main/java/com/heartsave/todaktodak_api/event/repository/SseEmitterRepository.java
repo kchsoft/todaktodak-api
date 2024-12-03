@@ -13,7 +13,13 @@ public class SseEmitterRepository {
   // key: 회원 ID
   private final ConcurrentHashMap<Long, SseEmitter> emitterRepository = new ConcurrentHashMap<>();
 
-  public SseEmitter save(SseEmitter emitter, Long memberId) {
+  public synchronized SseEmitter put(Long memberId, SseEmitter emitter) {
+    SseEmitter oldEmitter = emitterRepository.get(memberId);
+    if (oldEmitter != null) {
+      logger.info("재연결을 위해 {}의 에미터 연결을 종료합니다.", memberId);
+      oldEmitter.complete();
+      delete(memberId);
+    }
     emitterRepository.put(memberId, emitter);
     logger.info("회원 {}의 Emitter 추가", memberId);
     return emitter;
@@ -26,15 +32,6 @@ public class SseEmitterRepository {
 
   public Optional<SseEmitter> get(Long memberId) {
     return Optional.ofNullable(emitterRepository.get(memberId));
-  }
-
-  public synchronized void saveThreadSafe(SseEmitter emitter, Long memberId) {
-    if (emitterRepository.containsKey(memberId)) {
-      logger.info("재연결을 위해 {}의 에미터가 연결을 종료했습니다.", memberId);
-      emitterRepository.get(memberId).complete();
-      delete(memberId);
-    }
-    save(emitter, memberId);
   }
 
   public int getCount() {
