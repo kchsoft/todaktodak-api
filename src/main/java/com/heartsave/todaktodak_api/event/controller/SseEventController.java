@@ -1,7 +1,8 @@
 package com.heartsave.todaktodak_api.event.controller;
 
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.auth.annotation.TodakUserId;
 import com.heartsave.todaktodak_api.event.service.SseEventService;
+import com.heartsave.todaktodak_api.event.service.SseManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -9,8 +10,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,8 +23,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/event")
 public class SseEventController {
+  private static final Logger logger = LoggerFactory.getLogger(SseEventController.class);
+  private final SseManager sseManager;
   private final SseEventService eventService;
-  private final long SSE_TIMEOUT_MILLI_SECOND = 120 * 1000L;
+  private final long SSE_TIMEOUT_MILLI_SECOND = 85_000L;
 
   @Operation(summary = "SSE 이벤트 수신을 위한 연결")
   @ApiResponses(
@@ -46,7 +50,10 @@ public class SseEventController {
         @ApiResponse(responseCode = "500", description = "연결 실패 또는 시간초과")
       })
   @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public SseEmitter connect(@AuthenticationPrincipal TodakUser principal) {
-    return eventService.connect(principal.getId(), SSE_TIMEOUT_MILLI_SECOND);
+  public SseEmitter connect(@TodakUserId Long memberId) {
+    logger.info("{}와의 SSE 연결을 시작합니다.", memberId);
+    SseEmitter emitter = sseManager.connect(memberId, SSE_TIMEOUT_MILLI_SECOND);
+    eventService.sendPastEvent(emitter, memberId);
+    return emitter;
   }
 }
