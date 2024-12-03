@@ -23,7 +23,7 @@ final class SseEmitterRepositoryTest {
   @DisplayName("연결 관리를 위한 Emitter 저장 성공")
   void saveTest() {
     // when
-    SseEmitter savedEmitter = emitterRepository.save(sseEmitter, MEMBER_ID);
+    SseEmitter savedEmitter = emitterRepository.put(MEMBER_ID, sseEmitter);
 
     // then
     assertThat(savedEmitter).isEqualTo(sseEmitter);
@@ -33,7 +33,7 @@ final class SseEmitterRepositoryTest {
   @DisplayName("연결 종료로 인한 Emitter 삭제 성공")
   void deleteTest() {
     // given
-    emitterRepository.save(sseEmitter, MEMBER_ID);
+    emitterRepository.put(MEMBER_ID, sseEmitter);
 
     // when
     emitterRepository.delete(MEMBER_ID);
@@ -47,7 +47,7 @@ final class SseEmitterRepositoryTest {
   @DisplayName("연결된 회원의 Emitter 조회")
   void get_existedMember() {
     // given
-    emitterRepository.save(sseEmitter, MEMBER_ID);
+    emitterRepository.put(MEMBER_ID, sseEmitter);
 
     // when
     Optional<SseEmitter> result = emitterRepository.get(MEMBER_ID);
