@@ -9,7 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 @Schema(description = "공개 일기 조회 프로젝션")
-public class PublicDiaryContentOnlyProjection {
+public class PublicDiaryContentProjection {
 
   @Schema(description = "공개 일기 ID", example = "1")
   private final Long publicDiaryId;
@@ -38,7 +38,7 @@ public class PublicDiaryContentOnlyProjection {
   @DateTimeFormat(pattern = TIME_FORMAT.ISO_DATETIME_WITH_MILLISECONDS)
   private final Instant date;
 
-  public PublicDiaryContentOnlyProjection(
+  public PublicDiaryContentProjection(
       Long publicDiaryId,
       Long diaryId,
       String characterImageUrls,

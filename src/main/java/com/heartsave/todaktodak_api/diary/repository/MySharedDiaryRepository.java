@@ -1,7 +1,9 @@
 package com.heartsave.todaktodak_api.diary.repository;
 
+import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
-import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentOnlyProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryPageIndexProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection;
 import java.time.LocalDate;
 import java.util.List;
@@ -13,14 +15,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface MySharedDiaryRepository extends JpaRepository<PublicDiaryEntity, Long> {
 
-  @Query(
-      value =
-          """
-            SELECT MAX(pd.id)
-            FROM PublicDiaryEntity pd
-            WHERE pd.memberEntity.id = :memberId
-""")
-  Optional<Long> findLatestId(@Param("memberId") Long memberId);
+  Optional<DiaryPageIndexProjection> findFirstByMemberEntity_IdOrderByCreatedTimeDescIdDesc(
+      @Param("memberId") Long memberId);
 
   @Query(
       value =
@@ -32,17 +28,15 @@ public interface MySharedDiaryRepository extends JpaRepository<PublicDiaryEntity
                        pd.createdTime
                        )
                       FROM PublicDiaryEntity pd JOIN pd.diaryEntity d
-                      WHERE pd.memberEntity.id = :memberId AND pd.id < :publicDiaryId
+                      WHERE pd.memberEntity.id = :memberId AND pd.createdTime <= :#{#index.createdTime} AND pd.id < :#{#index.publicDiaryId}
                       ORDER BY pd.createdTime DESC, pd.id DESC
           """)
   List<MySharedDiaryPreviewProjection> findNextPreviews(
-      @Param("memberId") Long memberId,
-      @Param("publicDiaryId") Long publicDiaryId,
-      Pageable pageable);
+      @Param("memberId") Long memberId, @Param("index") DiaryPageIndex index, Pageable pageable);
 
   @Query(
       """
-            SELECT new com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentOnlyProjection(
+            SELECT new com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentProjection(
                 pd.id,
                 d.id,
                 pd.publicContent,
@@ -54,6 +48,6 @@ public interface MySharedDiaryRepository extends JpaRepository<PublicDiaryEntity
             JOIN pd.diaryEntity d
             WHERE  pd.memberEntity.id = :memberId AND CAST(d.diaryCreatedTime AS LocalDate) = :publicDiaryDate
             """)
-  Optional<MySharedDiaryContentOnlyProjection> findContentOnly(
+  Optional<MySharedDiaryContentProjection> findContent(
       @Param("memberId") Long memberId, @Param("publicDiaryDate") LocalDate publicDiaryDate);
 }

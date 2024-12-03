@@ -197,7 +197,7 @@ public class DiaryRepositoryTest {
 
   @EnableJpaAuditing
   @TestConfiguration
-  static class TestJpaConfig {
+  static class TestAuditConfig {
     @Bean
     AuditorAware<Long> auditorAware() {
       return () -> Optional.of(7L);
