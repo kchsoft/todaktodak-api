@@ -14,7 +14,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class SseEventService implements EventService {
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final EventRepository eventRepository;
@@ -28,25 +27,21 @@ public class SseEventService implements EventService {
 
   // 연결되어 있으면 이벤트를 전송하고,
   // 그렇지 않으면 이벤트를 저장한다.
+  @Transactional
   @Override
   public void send(EventEntity event) {
-    emitterRepository
-        .get(event.getMemberEntity().getId())
-        .ifPresentOrElse(
-            emitter -> sendEvent(emitter, event),
-            () -> {
-              save(event);
-              logEmitterNotFound(event.getMemberEntity().getId());
-            });
+    SseEmitter emitter = emitterRepository.get(event.getMemberEntity().getId()).orElse(null);
+    sendOrSave(emitter, event);
   }
 
+  @Transactional
   public void sendPastEvent(SseEmitter emitter, Long memberId) {
     try {
       // 수신 후 이벤트 제거
       List<EventEntity> pastEvents = eventRepository.findAllEventsByMemberId(memberId);
       pastEvents.forEach(
           event -> {
-            sendEvent(emitter, event);
+            sendOrSave(emitter, event);
             eventRepository.delete(event);
           });
       logger.info("{}가 수신하지 않은 메시지를 전부 전송했습니다.", memberId);
@@ -55,7 +50,13 @@ public class SseEventService implements EventService {
     }
   }
 
-  private void sendEvent(SseEmitter emitter, EventEntity event) {
+  private void sendOrSave(SseEmitter emitter, EventEntity event) {
+    if (emitter == null) {
+      save(event);
+      logEmitterNotFound(event.getMemberEntity().getId());
+      return;
+    }
+
     try {
       emitter.send(createEvent(event));
       logEventSuccess(event);
