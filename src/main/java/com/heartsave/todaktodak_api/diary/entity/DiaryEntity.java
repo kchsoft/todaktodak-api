@@ -17,6 +17,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
@@ -42,7 +43,13 @@ import org.hibernate.annotations.OnDeleteAction;
     sequenceName = "DIARY_SEQ", // DB name
     initialValue = 1,
     allocationSize = 50)
-@Table(name = "diary")
+@Table(
+    name = "diary",
+    indexes = {
+      @Index(
+          name = "idx_diary_id_diary_created_time",
+          columnList = "id DESC,diary_created_time DESC")
+    })
 public class DiaryEntity extends BaseEntity {
 
   @Id
