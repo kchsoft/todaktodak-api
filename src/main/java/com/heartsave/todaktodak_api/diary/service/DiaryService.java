@@ -39,7 +39,7 @@ public class DiaryService {
   public DiaryWriteResponse write(Long memberId, DiaryWriteRequest request, String zoneName) {
 
     DiaryEntity diary = createDiaryEntity(memberId, request);
-    validateDailyDiaryLimit(memberId, diary, zoneName);
+    validateDailyDiaryLimit(memberId, request, zoneName);
 
     log.info("AI 컨텐츠 생성 요청을 시작합니다.");
     AiDiaryContentResponse response = aiClientService.callDiaryContent(diary);
@@ -52,8 +52,8 @@ public class DiaryService {
     return DiaryWriteResponse.builder().aiComment(response.getAiComment()).build();
   }
 
-  private void validateDailyDiaryLimit(Long memberId, DiaryEntity diary, String zoneName) {
-    Instant diaryCreatedTime = diary.getDiaryCreatedTime();
+  private void validateDailyDiaryLimit(Long memberId, DiaryWriteRequest request, String zoneName) {
+    Instant diaryCreatedTime = request.getCreatedTime();
     if (diaryRepository.existsByMemberEntity_IdAndDiaryCreatedTimeBetween(
         memberId,
         InstantUtils.toDayStartAtZone(diaryCreatedTime, zoneName),

@@ -3,7 +3,6 @@ package com.heartsave.todaktodak_api.diary.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.heartsave.todaktodak_api.common.BaseTestObject;
-import com.heartsave.todaktodak_api.common.converter.InstantUtils;
 import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
@@ -14,7 +13,6 @@ import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreview
 import com.heartsave.todaktodak_api.diary.factory.DiaryPageIndexFactory;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -190,8 +188,7 @@ class MySharedDiaryRepositoryTest {
     PublicDiaryEntity expected = publicDiaries.get(3);
     Long memberId = expected.getMemberEntity().getId();
     DiaryEntity diaryEntity = expected.getDiaryEntity();
-    LocalDate requestDate =
-        InstantUtils.toLocalDate(expected.getDiaryEntity().getDiaryCreatedTime());
+    Instant requestDate = expected.getDiaryEntity().getDiaryCreatedTime();
 
     Optional<MySharedDiaryContentProjection> Optional_actual =
         mySharedDiaryRepository.findContent(memberId, requestDate);
@@ -224,14 +221,15 @@ class MySharedDiaryRepositoryTest {
   @Test
   @DisplayName("존재하지 않는 날짜의 공유된 일기를 조회하면 빈 Optional을 반환한다")
   void findContentOnly_ReturnEmpty_WhenNotFound() {
-    LocalDate nonExistentDate = LocalDate.of(3024, 1, 1);
+    Instant nonExistentDate = Instant.now().plus(10L, ChronoUnit.DAYS);
     Long memberId = member.getId();
 
     Optional<MySharedDiaryContentProjection> result =
         mySharedDiaryRepository.findContent(memberId, nonExistentDate);
     assertThat(result).as("존재하지 않는 날짜로 일기 조회 시 빈 Optional이 반환되어야 합니다").isEmpty();
 
-    result = mySharedDiaryRepository.findContent(1000L, LocalDate.now());
+    result =
+        mySharedDiaryRepository.findContent(1000L, Instant.now().truncatedTo(ChronoUnit.MILLIS));
     assertThat(result).as("존재하지 않는 memberId로 일기 조회 시 빈 Optional이 반환되어야 합니다").isEmpty();
   }
 

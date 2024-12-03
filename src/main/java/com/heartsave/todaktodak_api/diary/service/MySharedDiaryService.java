@@ -1,6 +1,5 @@
 package com.heartsave.todaktodak_api.diary.service;
 
-import com.heartsave.todaktodak_api.common.converter.InstantUtils;
 import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
@@ -84,7 +83,7 @@ public class MySharedDiaryService {
     log.info("나의 공개된 일기 content only 를 요청합니다.");
     MySharedDiaryContentProjection contentProjection =
         mySharedDiaryRepository
-            .findContent(memberId, InstantUtils.toLocalDate(requestDateTime))
+            .findContent(memberId, requestDateTime)
             .orElseThrow(
                 () ->
                     new PublicDiaryNotFoundException(

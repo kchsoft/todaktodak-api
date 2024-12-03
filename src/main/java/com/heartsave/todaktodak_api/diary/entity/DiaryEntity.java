@@ -97,7 +97,7 @@ public class DiaryEntity extends BaseEntity {
     this.memberEntity = member;
     this.emotion = request.getEmotion();
     this.content = request.getContent();
-    this.diaryCreatedTime = request.getDateTime();
+    this.diaryCreatedTime = request.getCreatedTime();
     this.webtoonImageUrl = DEFAULT_URL;
     this.bgmUrl = DEFAULT_URL;
   }
