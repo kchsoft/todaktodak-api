@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -37,7 +38,13 @@ import org.hibernate.annotations.OnDeleteAction;
     sequenceName = "PUBLIC_DIARY_SEQ",
     initialValue = 1,
     allocationSize = 50)
-@Table(name = "public_diary")
+@Table(
+    name = "public_diary",
+    indexes = {
+      @Index(name = "idx_created_time_public_diary_id", columnList = "created_time DESC, id DESC"),
+      @Index(name = "idx_member_id_public_diary_id", columnList = "member_id DESC, id DESC"),
+      @Index(name = "idx_member_id_created_time", columnList = "member_id DESC, created_time DESC")
+    })
 public class PublicDiaryEntity extends BaseEntity {
 
   @Id

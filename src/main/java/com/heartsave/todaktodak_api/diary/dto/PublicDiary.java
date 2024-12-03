@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.heartsave.todaktodak_api.common.constant.CoreConstant.TIME_FORMAT;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentOnlyProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.List;
@@ -49,14 +49,14 @@ public class PublicDiary {
   private final List<DiaryReactionType> myReaction;
 
   public static PublicDiary of(
-      PublicDiaryContentOnlyProjection content,
+      PublicDiaryContentProjection content,
       DiaryReactionCountProjection reactionCount,
       List<DiaryReactionType> memberReaction) {
     return new PublicDiary(content, reactionCount, memberReaction);
   }
 
   private PublicDiary(
-      PublicDiaryContentOnlyProjection content,
+      PublicDiaryContentProjection content,
       DiaryReactionCountProjection reactionCount,
       List<DiaryReactionType> memberReaction) {
     this.publicDiaryId = content.getPublicDiaryId();

@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.common.constant;
 
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -17,5 +18,10 @@ public final class CoreConstant {
   public static class HEADER {
     public static final String TIME_ZONE_KEY = "Todak-Time-Zone";
     public static final String DEFAULT_TIME_ZONE = "Asia/Seoul";
+  }
+
+  public static class DIARY {
+    public static final Long PAGE_DEFAULT_ID = 0L;
+    public static final Instant PAGE_DEFAULT_TIME = Instant.EPOCH;
   }
 }

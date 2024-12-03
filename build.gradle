@@ -60,6 +60,8 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    // timezone 설정
+    systemProperty 'user.timezone', 'UTC'
 }
 
 

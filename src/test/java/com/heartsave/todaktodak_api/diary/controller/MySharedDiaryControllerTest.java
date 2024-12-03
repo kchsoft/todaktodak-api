@@ -15,6 +15,7 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorS
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
+import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryResponse;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
@@ -73,7 +74,7 @@ public class MySharedDiaryControllerTest {
   @WithMockTodakUser
   @DisplayName("공개된 일기 목록 조회 성공")
   void getMySharedDiaryPreviews_Success() throws Exception {
-    when(mockMySharedDiaryService.getPagination(anyLong(), anyLong()))
+    when(mockMySharedDiaryService.getPage(anyLong(), any(DiaryPageRequest.class)))
         .thenReturn(paginationResponse);
     MvcResult mvcResult =
         mockMvc
@@ -85,7 +86,7 @@ public class MySharedDiaryControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.sharedDiaries").exists())
             .andReturn();
-    verify(mockMySharedDiaryService, times(1)).getPagination(anyLong(), anyLong());
+    verify(mockMySharedDiaryService, times(1)).getPage(anyLong(), any(DiaryPageRequest.class));
   }
 
   @Test
@@ -105,7 +106,7 @@ public class MySharedDiaryControllerTest {
   @WithMockTodakUser
   @DisplayName("빈 목록 조회 성공")
   void getMySharedDiaryPreviews_EmptyList_Success() throws Exception {
-    when(mockMySharedDiaryService.getPagination(anyLong(), anyLong()))
+    when(mockMySharedDiaryService.getPage(anyLong(), any(DiaryPageRequest.class)))
         .thenReturn(MySharedDiaryPaginationResponse.of(List.of()));
 
     mockMvc
@@ -116,15 +117,14 @@ public class MySharedDiaryControllerTest {
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.sharedDiaries").isArray())
-        .andExpect(jsonPath("$.sharedDiaries").isEmpty())
-        .andExpect(jsonPath("$.after").value(1));
+        .andExpect(jsonPath("$.sharedDiaries").isEmpty());
   }
 
   @Test
   @WithMockTodakUser
   @DisplayName("after 파라미터 없이 요청시 기본값 0으로 성공")
   void getMySharedDiaryPreviews_WithoutAfterParam_Success() throws Exception {
-    when(mockMySharedDiaryService.getPagination(anyLong(), anyLong()))
+    when(mockMySharedDiaryService.getPage(anyLong(), any(DiaryPageRequest.class)))
         .thenReturn(paginationResponse);
 
     mockMvc

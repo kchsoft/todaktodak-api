@@ -11,18 +11,24 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.converter.InstantUtils;
-import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
+import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
+import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryResponse;
+import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentOnlyProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection;
 import com.heartsave.todaktodak_api.diary.exception.PublicDiaryNotFoundException;
+import com.heartsave.todaktodak_api.diary.factory.DiaryPageIndexFactory;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.MySharedDiaryRepository;
+import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,20 +53,23 @@ public class MySharedDiaryServiceTest {
   @Mock private DiaryReactionRepository reactionRepository;
   @Mock private S3FileStorageManager s3FileStorageManager;
 
-  @Mock private TodakUser mockUser;
-
   @Mock private MySharedDiaryPreviewProjection mockProjection;
+  @Mock private DiaryPageIndexFactory mockIndexFactory;
 
-  private final Long memberId = 1L;
-  private final Long publicDiaryId = 1L;
+  private MemberEntity member;
+  private DiaryEntity diary;
+  private PublicDiaryEntity mockPublicDiary;
   private final String webtoonUrl = "webtoonUrl";
   private final String preSigned_webtoonUrl = "preSigned_webtoonUrl";
   private final String bgmUrl = "bgmUrl";
   private final String preSigned_bgmUrl = "preSigned_bgmUrl";
+  private final Instant createdTime = Instant.now();
 
   @BeforeEach
   void setUp() {
-    when(mockUser.getId()).thenReturn(memberId);
+    member = BaseTestObject.createMember();
+    diary = BaseTestObject.createDiary();
+    mockPublicDiary = mock(PublicDiaryEntity.class);
   }
 
   @Test
@@ -72,11 +81,16 @@ public class MySharedDiaryServiceTest {
     when(mockProjection.getWebtoonImageUrl()).thenReturn(webtoonUrl);
     when(s3FileStorageManager.preSignedFirstWebtoonUrlFrom(anyString()))
         .thenReturn(preSigned_webtoonUrl);
-    when(mySharedDiaryRepository.findNextPreviews(anyLong(), anyLong(), any(PageRequest.class)))
+    when(mySharedDiaryRepository.findNextPreviews(
+            anyLong(), any(DiaryPageIndex.class), any(PageRequest.class)))
         .thenReturn(previews);
+    DiaryPageRequest request =
+        new DiaryPageRequest(mockPublicDiary.getId(), mockPublicDiary.getCreatedTime());
+    when(mockIndexFactory.createFrom(request, member.getId()))
+        .thenReturn(mock(DiaryPageIndex.class));
 
     MySharedDiaryPaginationResponse response =
-        mySharedDiaryService.getPagination(mockUser.getId(), publicDiaryId);
+        mySharedDiaryService.getPage(member.getId(), request);
 
     assertThat(response).as("페이지네이션 응답이 null이 아니어야 합니다").isNotNull();
     assertThat(response.sharedDiaries()).as("페이지네이션 응답의 미리보기 목록은 1개의 항목을 포함해야 합니다").hasSize(1);
@@ -88,18 +102,21 @@ public class MySharedDiaryServiceTest {
   @Test
   @DisplayName("페이지네이션의 publicDiaryId가 0일 때 최신 ID를 조회한다")
   void getPagination_WithZeroPublicDiaryId() {
-    Long diaryId = 5L;
-    when(mySharedDiaryRepository.findLatestId(memberId)).thenReturn(Optional.of(5L));
+
     List<MySharedDiaryPreviewProjection> previews = new ArrayList<>();
     previews.add(mockProjection);
 
     when(mockProjection.getWebtoonImageUrl()).thenReturn(webtoonUrl);
     when(mySharedDiaryRepository.findNextPreviews(
-            eq(memberId), eq(diaryId + 1), any(PageRequest.class)))
+            eq(member.getId()), any(DiaryPageIndex.class), any(PageRequest.class)))
         .thenReturn(previews);
+    DiaryPageRequest request =
+        new DiaryPageRequest(mockPublicDiary.getId(), mockPublicDiary.getCreatedTime());
+    when(mockIndexFactory.createFrom(request, member.getId()))
+        .thenReturn(mock(DiaryPageIndex.class));
 
     MySharedDiaryPaginationResponse response =
-        mySharedDiaryService.getPagination(mockUser.getId(), 0L);
+        mySharedDiaryService.getPage(member.getId(), request);
 
     assertThat(response).as("publicDiaryId가 0일 때의 페이지네이션 응답이 null이 아니어야 합니다").isNotNull();
     assertThat(response.sharedDiaries())
@@ -111,13 +128,14 @@ public class MySharedDiaryServiceTest {
   @Test
   @DisplayName("페이지네이션 요청시 더 이상 공개된 일기가 없을 때 빈 객체 반환")
   void getPagination_ThrowsException_WhenNoDiaryFound() {
-    when(mySharedDiaryRepository.findLatestId(memberId)).thenReturn(Optional.empty());
+    DiaryPageRequest request =
+        new DiaryPageRequest(mockPublicDiary.getId(), mockPublicDiary.getCreatedTime());
     MySharedDiaryPaginationResponse response =
-        mySharedDiaryService.getPagination(mockUser.getId(), 0L);
+        mySharedDiaryService.getPage(member.getId(), request);
     assertThat(response.sharedDiaries().size()).as("공개된 일기가 없을 때 빈 객체가 반환 되어야 합니다.").isEqualTo(0);
     assertThat(response.isEnd()).as("공개된 일기가 없을 때 isEnd 조건이 true이어야합니다.").isTrue();
 
-    response = mySharedDiaryService.getPagination(mockUser.getId(), 999999L);
+    response = mySharedDiaryService.getPage(member.getId(), request);
     assertThat(response.sharedDiaries().size()).as("공개된 일기가 없을 때 빈 객체가 반환 되어야 합니다.").isEqualTo(0);
     assertThat(response.isEnd()).as("공개된 일기가 없을 때 isEnd 조건이 true이어야합니다.").isTrue();
 
@@ -128,7 +146,7 @@ public class MySharedDiaryServiceTest {
   @DisplayName("나의 공개 일기 상세를 성공적으로 조회한다")
   void getDiary_Success() {
     Instant requestDate = Instant.now();
-    MySharedDiaryContentOnlyProjection contentOnly = mock(MySharedDiaryContentOnlyProjection.class);
+    MySharedDiaryContentProjection contentOnly = mock(MySharedDiaryContentProjection.class);
     DiaryReactionCountProjection reactionCount = mock(DiaryReactionCountProjection.class);
     List<DiaryReactionType> memberReactions =
         List.of(DiaryReactionType.LIKE, DiaryReactionType.EMPATHIZE);
@@ -138,16 +156,17 @@ public class MySharedDiaryServiceTest {
     when(contentOnly.getWebtoonImageUrls()).thenReturn(List.of(webtoonUrl));
     when(contentOnly.getBgmUrl()).thenReturn(bgmUrl);
 
-    when(mySharedDiaryRepository.findContentOnly(memberId, InstantUtils.toLocalDate(requestDate)))
+    when(mySharedDiaryRepository.findContent(member.getId(), InstantUtils.toLocalDate(requestDate)))
         .thenReturn(Optional.of(contentOnly));
     when(reactionRepository.countEachByDiaryId(diaryId)).thenReturn(reactionCount);
-    when(reactionRepository.findMemberReaction(memberId, diaryId)).thenReturn(memberReactions);
+    when(reactionRepository.findMemberReaction(member.getId(), diaryId))
+        .thenReturn(memberReactions);
 
     when(s3FileStorageManager.preSignedWebtoonUrlFrom(any()))
         .thenReturn(List.of(preSigned_webtoonUrl));
     when(s3FileStorageManager.preSignedBgmUrlFrom(anyString())).thenReturn(preSigned_bgmUrl);
 
-    MySharedDiaryResponse response = mySharedDiaryService.getDiary(mockUser.getId(), requestDate);
+    MySharedDiaryResponse response = mySharedDiaryService.getDiary(member.getId(), requestDate);
 
     assertThat(response).as("조회된 응답이 null이 아니어야 합니다").isNotNull();
 
@@ -166,11 +185,11 @@ public class MySharedDiaryServiceTest {
   void getDiary_ThrowsException_WhenDiaryNotFound() {
     // Given
     Instant requestDate = Instant.now();
-    when(mySharedDiaryRepository.findContentOnly(memberId, InstantUtils.toLocalDate(requestDate)))
+    when(mySharedDiaryRepository.findContent(member.getId(), InstantUtils.toLocalDate(requestDate)))
         .thenReturn(Optional.empty());
 
     // When & Then
-    assertThatThrownBy(() -> mySharedDiaryService.getDiary(mockUser.getId(), requestDate))
+    assertThatThrownBy(() -> mySharedDiaryService.getDiary(member.getId(), requestDate))
         .as("존재하지 않는 날짜의 일기 조회시 PublicDiaryNotFoundException이 발생해야 합니다")
         .isInstanceOf(PublicDiaryNotFoundException.class);
   }
