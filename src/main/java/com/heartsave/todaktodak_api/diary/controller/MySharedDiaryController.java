@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.PastOrPresent;
 import java.time.Instant;
@@ -74,7 +73,6 @@ public class MySharedDiaryController {
               description = "조회할 일기 날짜",
               example = "2024-11-04",
               schema = @Schema(type = "string", format = "Instant"))
-          @Valid
           @PastOrPresent
           @RequestParam("date")
           Instant requestDateTime) {

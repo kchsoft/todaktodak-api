@@ -111,9 +111,8 @@ public class DiaryRepositoryTest {
         InstantUtils.toMonthEndAtZone(diary1.getDiaryCreatedTime(), DEFAULT_TIME_ZONE);
 
     List<DiaryYearMonthProjection> resultIndex =
-        diaryRepository
-            .findYearMonthsByMemberIdAndInstants(member.getId(), testStart, testEnd)
-            .orElseGet(List::of);
+        diaryRepository.findByMemberEntity_IdAndDiaryCreatedTimeBetweenOrderByDiaryCreatedTimeDesc(
+            member.getId(), testStart, testEnd);
     assertThat(resultIndex).as("메서드 응답이 null 입니다.").isNotNull();
 
     DiaryYearMonthProjection first = resultIndex.get(0);
@@ -154,9 +153,8 @@ public class DiaryRepositoryTest {
             .toInstant(ZoneOffset.UTC);
 
     List<DiaryYearMonthProjection> resultIndex =
-        diaryRepository
-            .findYearMonthsByMemberIdAndInstants(member.getId(), testStart, testEnd)
-            .orElseGet(List::of);
+        diaryRepository.findByMemberEntity_IdAndDiaryCreatedTimeBetweenOrderByDiaryCreatedTimeDesc(
+            member.getId(), testStart, testEnd);
     assertThat(resultIndex).as("메서드 응답이 null 입니다.").isNotNull();
 
     assertThat(resultIndex.isEmpty()).as("메서드 응답 내부가 비어있지 않습니다.").isTrue();

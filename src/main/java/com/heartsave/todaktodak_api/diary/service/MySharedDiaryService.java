@@ -61,7 +61,7 @@ public class MySharedDiaryService {
   @Transactional(readOnly = true)
   public MySharedDiaryResponse getDiary(Long memberId, Instant requestInstant) {
     log.info("나의 공개된 일기 상세 정보를 요청합니다.");
-    MySharedDiaryContentProjection contentOnly = fetchContentOnly(requestInstant, memberId);
+    MySharedDiaryContentProjection contentOnly = fetchContent(requestInstant, memberId);
     replaceWithPreSignedUrls(contentOnly);
 
     DiaryReactionCountProjection reactionCount =
@@ -80,7 +80,7 @@ public class MySharedDiaryService {
         s3FileStorageManager.preSignedBgmUrlFrom(contentProjection.getBgmUrl()));
   }
 
-  private MySharedDiaryContentProjection fetchContentOnly(Instant requestDateTime, Long memberId) {
+  private MySharedDiaryContentProjection fetchContent(Instant requestDateTime, Long memberId) {
     log.info("나의 공개된 일기 content only 를 요청합니다.");
     MySharedDiaryContentProjection contentProjection =
         mySharedDiaryRepository

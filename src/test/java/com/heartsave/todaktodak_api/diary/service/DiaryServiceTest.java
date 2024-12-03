@@ -176,9 +176,10 @@ public class DiaryServiceTest {
     Instant requestYearMonth =
         LocalDate.of(testYear, testMonth, 1).atStartOfDay(ZoneId.of(DEFAULT_TIME_ZONE)).toInstant();
 
-    when(mockDiaryRepository.findYearMonthsByMemberIdAndInstants(
-            member.getId(), testStart, testEnd))
-        .thenReturn(Optional.of(testProjection));
+    when(mockDiaryRepository
+            .findByMemberEntity_IdAndDiaryCreatedTimeBetweenOrderByDiaryCreatedTimeDesc(
+                member.getId(), testStart, testEnd))
+        .thenReturn(testProjection);
     DiaryYearMonthResponse response =
         diaryService.getYearMonth(member.getId(), requestYearMonth, DEFAULT_TIME_ZONE);
 
@@ -221,9 +222,10 @@ public class DiaryServiceTest {
             .toInstant();
     Instant requestYearMonth =
         LocalDate.of(testYear, testMonth, 1).atStartOfDay(ZoneId.of(DEFAULT_TIME_ZONE)).toInstant();
-    when(mockDiaryRepository.findYearMonthsByMemberIdAndInstants(
-            member.getId(), testStart, testEnd))
-        .thenReturn(Optional.empty());
+    when(mockDiaryRepository
+            .findByMemberEntity_IdAndDiaryCreatedTimeBetweenOrderByDiaryCreatedTimeDesc(
+                member.getId(), testStart, testEnd))
+        .thenReturn(List.of());
 
     DiaryYearMonthResponse yearMonths =
         diaryService.getYearMonth(member.getId(), requestYearMonth, DEFAULT_TIME_ZONE);

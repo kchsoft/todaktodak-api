@@ -21,18 +21,9 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
       value = "DELETE FROM DiaryEntity d WHERE :diaryId = d.id and :memberId = d.memberEntity.id")
   int deleteByIds(@Param("memberId") Long memberId, @Param("diaryId") Long diaryId);
 
-  @Query(
-      value =
-          """
-            SELECT d.id as id, d.diaryCreatedTime as diaryCreatedTime
-            FROM DiaryEntity d
-            WHERE d.memberEntity.id = :memberId AND d.diaryCreatedTime BETWEEN :startTime AND :endTime
-            ORDER BY d.diaryCreatedTime ASC
-          """)
-  Optional<List<DiaryYearMonthProjection>> findYearMonthsByMemberIdAndInstants(
-      @Param("memberId") Long memberId,
-      @Param("startTime") Instant startTime,
-      @Param("endTime") Instant endTime);
+  List<DiaryYearMonthProjection>
+      findByMemberEntity_IdAndDiaryCreatedTimeBetweenOrderByDiaryCreatedTimeDesc(
+          Long memberId, Instant startTime, Instant endTime);
 
   Optional<DiaryEntity> findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
       Long memberId, Instant diaryCreatedTime);

@@ -83,9 +83,8 @@ public class DiaryService {
     Instant endTime = InstantUtils.toMonthEndAtZone(request, zoneName);
     log.info("해당 연월에 작성한 일기를 정보를 요청합니다.");
     List<DiaryYearMonthProjection> yearMonthProjection =
-        diaryRepository
-            .findYearMonthsByMemberIdAndInstants(memberId, startTime, endTime)
-            .orElseGet(List::of);
+        diaryRepository.findByMemberEntity_IdAndDiaryCreatedTimeBetweenOrderByDiaryCreatedTimeDesc(
+            memberId, startTime, endTime);
 
     log.info("해당 연월에 작성한 일기를 정보를 성공적으로 가져왔습니다.");
     return DiaryYearMonthResponse.builder().diaryYearMonths(yearMonthProjection).build();
