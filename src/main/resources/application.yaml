@@ -38,12 +38,17 @@ aws:
 client:
   server:
     origin: ${CLIENT_SERVER_ORIGIN:http://localhost:1234}
-logging:
-  level:
-    org.springframework.security: trace
+#logging:
+#  level:
+#    com:
+#      zaxxer.hikari.HikariConfig: DEBUG
+#      zaxxer.hikari: DEBUG
+#    org.springframework.security: trace
 ---
 spring:
   datasource:
+    hikari:
+      maximum-pool-size: 20
     driver-class-name: org.postgresql.Driver
     url: ${POSTGRESQL_URL}
     username: ${POSTGRESQL_USER}
