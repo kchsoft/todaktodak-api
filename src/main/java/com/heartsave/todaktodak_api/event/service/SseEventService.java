@@ -74,7 +74,7 @@ public class SseEventService implements EventService {
   }
 
   private void debugLog(Exception e) {
-    logger.error("뭔가 잘못됐음. 예외 타입={}, 예외 메시지={}", e.getCause(), e.getMessage());
+    logger.error("이벤트 전송 중 예외 발생={}, 예외 메시지={}", e.getCause(), e.getMessage());
   }
 
   private void handleEmitterError(Long memberId, Exception e) {

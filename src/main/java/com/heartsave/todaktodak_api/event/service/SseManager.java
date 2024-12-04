@@ -41,14 +41,7 @@ public class SseManager {
   }
 
   private void setEmitterCallbacks(SseEmitter emitter, Long memberId) {
-    emitter.onTimeout(
-        () -> {
-          try {
-            handleEmitterComplete(emitter, memberId, TIMEOUT_MESSAGE);
-          } catch (Exception e) {
-            logger.error("시큐리티 에러가 감지되나요?={}, {}", e.getClass(), e.getMessage());
-          }
-        });
+    emitter.onTimeout(() -> handleEmitterComplete(emitter, memberId, TIMEOUT_MESSAGE));
     emitter.onCompletion(() -> handleEmitterComplete(emitter, memberId, COMPLETION_MESSAGE));
     emitter.onError(
         e -> {
