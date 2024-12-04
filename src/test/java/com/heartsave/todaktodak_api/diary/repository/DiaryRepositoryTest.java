@@ -1,20 +1,23 @@
 package com.heartsave.todaktodak_api.diary.repository;
 
+import static com.heartsave.todaktodak_api.common.constant.CoreConstant.HEADER.DEFAULT_TIME_ZONE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.heartsave.todaktodak_api.common.BaseTestObject;
-import com.heartsave.todaktodak_api.common.converter.InstantConverter;
+import com.heartsave.todaktodak_api.common.converter.InstantUtils;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIdsProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryYearMonthProjection;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.time.Instant;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -51,17 +54,25 @@ public class DiaryRepositoryTest {
   @Test
   @DisplayName("특정 날짜에 해당되는 사용자 일기 없음.")
   void notExistDiaryByDateAndMember() {
-    LocalDate testTime = LocalDate.of(2025, 10, 2);
-    boolean exist = diaryRepository.existsByDate(member.getId(), testTime);
+    Instant testTime =
+        LocalDateTime.now().plusDays(99L).atZone(ZoneId.of(DEFAULT_TIME_ZONE)).toInstant();
+    Instant testStart = InstantUtils.toDayStartAtZone(testTime, DEFAULT_TIME_ZONE);
+    Instant testEnd = InstantUtils.toDayEndAtZone(testTime, DEFAULT_TIME_ZONE);
+    boolean exist =
+        diaryRepository.existsByMemberEntity_IdAndDiaryCreatedTimeBetween(
+            member.getId(), testStart, testEnd);
     assertThat(exist).as("memberID와 날짜에 해당하는 일기가 있습니다.").isFalse();
   }
 
   @Test
   @DisplayName("특정 날짜에 해당되는 사용자 일기가 있음.")
   void existDiaryByDateAndMember() {
+    Instant startTime =
+        InstantUtils.toDayStartAtZone(diary.getDiaryCreatedTime(), DEFAULT_TIME_ZONE);
+    Instant endTime = InstantUtils.toDayEndAtZone(diary.getDiaryCreatedTime(), DEFAULT_TIME_ZONE);
     boolean exist =
-        diaryRepository.existsByDate(
-            member.getId(), InstantConverter.toLocalDate(diary.getDiaryCreatedTime()));
+        diaryRepository.existsByMemberEntity_IdAndDiaryCreatedTimeBetween(
+            member.getId(), startTime, endTime);
     assertThat(exist).as("memberID와 날짜에 해당하는 일기가 없습니다.").isTrue();
   }
 
@@ -94,18 +105,19 @@ public class DiaryRepositoryTest {
     diaryRepository.save(diary1);
     diaryRepository.save(diary2);
 
-    Instant testStart = InstantConverter.toMonthStartDateTime(diary1.getDiaryCreatedTime());
-    Instant testEnd = InstantConverter.toMonthEndDateTime(diary1.getDiaryCreatedTime());
+    Instant testStart =
+        InstantUtils.toMonthStartAtZone(diary1.getDiaryCreatedTime(), DEFAULT_TIME_ZONE);
+    Instant testEnd =
+        InstantUtils.toMonthEndAtZone(diary1.getDiaryCreatedTime(), DEFAULT_TIME_ZONE);
 
-    List<DiaryIndexProjection> resultIndex =
-        diaryRepository
-            .findIndexesByMemberIdAndDateTimes(member.getId(), testStart, testEnd)
-            .orElseGet(List::of);
+    List<DiaryYearMonthProjection> resultIndex =
+        diaryRepository.findByMemberEntity_IdAndDiaryCreatedTimeBetweenOrderByDiaryCreatedTimeDesc(
+            member.getId(), testStart, testEnd);
     assertThat(resultIndex).as("메서드 응답이 null 입니다.").isNotNull();
 
-    DiaryIndexProjection first = resultIndex.get(0);
+    DiaryYearMonthProjection first = resultIndex.get(0);
     assertThat(first).as("first 인덱스 결과가 null 입니다.").isNotNull();
-    DiaryIndexProjection second = resultIndex.get(1);
+    DiaryYearMonthProjection second = resultIndex.get(1);
     assertThat(second).as("second 인덱스 결과가 null 입니다.").isNotNull();
 
     assertThat(first.getId()).as("Diary1 ID와 응답 Diary ID가 서로 다릅니다.").isEqualTo(diary1.getId());
@@ -140,10 +152,9 @@ public class DiaryRepositoryTest {
             .atTime(LocalTime.MAX)
             .toInstant(ZoneOffset.UTC);
 
-    List<DiaryIndexProjection> resultIndex =
-        diaryRepository
-            .findIndexesByMemberIdAndDateTimes(member.getId(), testStart, testEnd)
-            .orElseGet(List::of);
+    List<DiaryYearMonthProjection> resultIndex =
+        diaryRepository.findByMemberEntity_IdAndDiaryCreatedTimeBetweenOrderByDiaryCreatedTimeDesc(
+            member.getId(), testStart, testEnd);
     assertThat(resultIndex).as("메서드 응답이 null 입니다.").isNotNull();
 
     assertThat(resultIndex.isEmpty()).as("메서드 응답 내부가 비어있지 않습니다.").isTrue();
@@ -152,9 +163,11 @@ public class DiaryRepositoryTest {
   @Test
   @DisplayName("findByMemberIdAndDate - 일기를 성공적으로 조회")
   void findByMemberIdAndDateSuccess() {
-    LocalDate diaryDate = InstantConverter.toLocalDate(diary.getDiaryCreatedTime());
+    Instant diaryDate = diary.getDiaryCreatedTime();
 
-    Optional<DiaryEntity> result = diaryRepository.findByMemberIdAndDate(member.getId(), diaryDate);
+    Optional<DiaryEntity> result =
+        diaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
+            member.getId(), diaryDate);
 
     assertThat(result).as("해당 날짜(%s)에 작성된 일기를 찾을 수 없습니다.", diaryDate).isPresent();
     assertThat(result.get().getId())
@@ -177,11 +190,11 @@ public class DiaryRepositoryTest {
   @Test
   @DisplayName("findByMemberIdAndDate - 해당 날짜에 일기가 없는 경우")
   void findByMemberIdAndDateEmpty() {
-    LocalDate differentDate =
-        InstantConverter.toLocalDate(diary.getDiaryCreatedTime()).plusDays(-1);
+    Instant differentDate = diary.getDiaryCreatedTime().minus(1L, ChronoUnit.DAYS);
 
     Optional<DiaryEntity> result =
-        diaryRepository.findByMemberIdAndDate(member.getId(), differentDate);
+        diaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
+            member.getId(), differentDate);
 
     assertThat(result).as("존재하지 않아야 할 날짜(%s)에 일기가 조회되었습니다.", differentDate).isEmpty();
   }

@@ -5,7 +5,7 @@ import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryPageIndexProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
@@ -16,20 +16,20 @@ import org.springframework.data.repository.query.Param;
 public interface MySharedDiaryRepository extends JpaRepository<PublicDiaryEntity, Long> {
 
   Optional<DiaryPageIndexProjection> findFirstByMemberEntity_IdOrderByCreatedTimeDescIdDesc(
-      @Param("memberId") Long memberId);
+      Long memberId);
 
   @Query(
       value =
           """
-                      SELECT
-                       new com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection(
-                       pd.id,
-                       d.webtoonImageUrl,
-                       pd.createdTime
-                       )
-                      FROM PublicDiaryEntity pd JOIN pd.diaryEntity d
-                      WHERE pd.memberEntity.id = :memberId AND pd.createdTime <= :#{#index.createdTime} AND pd.id < :#{#index.publicDiaryId}
-                      ORDER BY pd.createdTime DESC, pd.id DESC
+              SELECT
+               new com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection(
+               pd.id,
+               d.webtoonImageUrl,
+               pd.createdTime
+               )
+              FROM PublicDiaryEntity pd JOIN pd.diaryEntity d
+              WHERE pd.memberEntity.id = :memberId AND pd.createdTime <= :#{#index.createdTime} AND pd.id < :#{#index.publicDiaryId}
+              ORDER BY pd.createdTime DESC, pd.id DESC
           """)
   List<MySharedDiaryPreviewProjection> findNextPreviews(
       @Param("memberId") Long memberId, @Param("index") DiaryPageIndex index, Pageable pageable);
@@ -46,8 +46,8 @@ public interface MySharedDiaryRepository extends JpaRepository<PublicDiaryEntity
             )
             FROM PublicDiaryEntity pd
             JOIN pd.diaryEntity d
-            WHERE  pd.memberEntity.id = :memberId AND CAST(d.diaryCreatedTime AS LocalDate) = :publicDiaryDate
+            WHERE  pd.memberEntity.id = :memberId AND d.diaryCreatedTime = :publicDiaryDate
             """)
   Optional<MySharedDiaryContentProjection> findContent(
-      @Param("memberId") Long memberId, @Param("publicDiaryDate") LocalDate publicDiaryDate);
+      @Param("memberId") Long memberId, @Param("publicDiaryDate") Instant publicDiaryDate);
 }

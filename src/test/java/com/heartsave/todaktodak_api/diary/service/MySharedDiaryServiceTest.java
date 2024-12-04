@@ -12,7 +12,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.heartsave.todaktodak_api.common.BaseTestObject;
-import com.heartsave.todaktodak_api.common.converter.InstantConverter;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
@@ -156,8 +155,7 @@ public class MySharedDiaryServiceTest {
     when(contentOnly.getWebtoonImageUrls()).thenReturn(List.of(webtoonUrl));
     when(contentOnly.getBgmUrl()).thenReturn(bgmUrl);
 
-    when(mySharedDiaryRepository.findContent(
-            member.getId(), InstantConverter.toLocalDate(requestDate)))
+    when(mySharedDiaryRepository.findContent(member.getId(), requestDate))
         .thenReturn(Optional.of(contentOnly));
     when(reactionRepository.countEachByDiaryId(diaryId)).thenReturn(reactionCount);
     when(reactionRepository.findMemberReaction(member.getId(), diaryId))
@@ -186,8 +184,7 @@ public class MySharedDiaryServiceTest {
   void getDiary_ThrowsException_WhenDiaryNotFound() {
     // Given
     Instant requestDate = Instant.now();
-    when(mySharedDiaryRepository.findContent(
-            member.getId(), InstantConverter.toLocalDate(requestDate)))
+    when(mySharedDiaryRepository.findContent(member.getId(), requestDate))
         .thenReturn(Optional.empty());
 
     // When & Then

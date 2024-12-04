@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.diary.dto.response;
 
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryYearMonthProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -13,7 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "연월 일기 작성 현황 API 응답 객체")
-public class DiaryIndexResponse {
+public class DiaryYearMonthResponse {
   @Schema(description = "일기 연월 작성 현황 목록")
-  private List<DiaryIndexProjection> diaryIndexes;
+  @JsonProperty("diaryIndexes")
+  private List<DiaryYearMonthProjection> diaryYearMonths;
 }

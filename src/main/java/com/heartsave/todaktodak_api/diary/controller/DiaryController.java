@@ -1,10 +1,13 @@
 package com.heartsave.todaktodak_api.diary.controller;
 
+import static com.heartsave.todaktodak_api.common.constant.CoreConstant.HEADER.DEFAULT_TIME_ZONE;
+import static com.heartsave.todaktodak_api.common.constant.CoreConstant.HEADER.TIME_ZONE_KEY;
+
 import com.heartsave.todaktodak_api.auth.annotation.TodakUserId;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
-import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryYearMonthResponse;
 import com.heartsave.todaktodak_api.diary.service.DiaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,9 +50,11 @@ public class DiaryController {
       })
   @PostMapping
   public ResponseEntity<DiaryWriteResponse> writeDiary(
-      @TodakUserId Long memberId, @Valid @RequestBody DiaryWriteRequest writeRequest) {
+      @TodakUserId Long memberId,
+      @Valid @RequestBody DiaryWriteRequest writeRequest,
+      @RequestHeader(name = TIME_ZONE_KEY, defaultValue = DEFAULT_TIME_ZONE) String zoneName) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(diaryService.write(memberId, writeRequest));
+        .body(diaryService.write(memberId, writeRequest, zoneName));
   }
 
   @Operation(summary = "일기 삭제")
@@ -76,7 +82,7 @@ public class DiaryController {
         @ApiResponse(responseCode = "400", description = "잘못된 요청")
       })
   @GetMapping
-  public ResponseEntity<DiaryIndexResponse> getDiaryIndex(
+  public ResponseEntity<DiaryYearMonthResponse> getDiaryYearMonthInfo(
       @TodakUserId Long memberId,
       @Parameter(
               name = "yearMonth",
@@ -85,8 +91,10 @@ public class DiaryController {
               required = true,
               schema = @Schema(type = "string"))
           @RequestParam("yearMonth")
-          Instant yearMonth) {
-    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getIndex(memberId, yearMonth));
+          Instant request,
+      @RequestHeader(name = TIME_ZONE_KEY, defaultValue = DEFAULT_TIME_ZONE) String zoneName) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(diaryService.getYearMonth(memberId, request, zoneName));
   }
 
   @Operation(summary = "일기 상세 조회")
@@ -108,7 +116,7 @@ public class DiaryController {
           @Valid
           @PastOrPresent(message = "현재 날짜 이전의 일기만 조회가 가능합니다.")
           @RequestParam("date")
-          Instant requestDate) {
-    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getDiary(memberId, requestDate));
+          Instant request) {
+    return ResponseEntity.status(HttpStatus.OK).body(diaryService.getDiary(memberId, request));
   }
 }

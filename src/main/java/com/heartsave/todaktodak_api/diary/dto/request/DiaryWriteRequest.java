@@ -27,7 +27,7 @@ public class DiaryWriteRequest {
   @PastOrPresent(message = "Diary Writing Date is Future")
   @NotNull
   @JsonProperty("date")
-  private Instant dateTime;
+  private Instant createdTime;
 
   @Schema(description = "일기에 기록된 감정", example = "happy", required = true)
   @NotNull(message = "DiaryEmotion is Null")

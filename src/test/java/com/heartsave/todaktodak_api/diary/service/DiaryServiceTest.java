@@ -1,5 +1,6 @@
 package com.heartsave.todaktodak_api.diary.service;
 
+import static com.heartsave.todaktodak_api.common.constant.CoreConstant.HEADER.DEFAULT_TIME_ZONE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,11 +22,11 @@ import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.common.TestDiaryObjectFactory;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
-import com.heartsave.todaktodak_api.diary.dto.response.DiaryIndexResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryWriteResponse;
+import com.heartsave.todaktodak_api.diary.dto.response.DiaryYearMonthResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIndexProjection;
+import com.heartsave.todaktodak_api.diary.entity.projection.DiaryYearMonthProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryDailyWritingLimitExceedException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryException;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
@@ -38,7 +39,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -78,11 +78,13 @@ public class DiaryServiceTest {
     String AI_COMMENT = "this is test ai comment";
 
     when(mockMemberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-    when(mockDiaryRepository.existsByDate(anyLong(), any(LocalDate.class))).thenReturn(false);
+    when(mockDiaryRepository.existsByMemberEntity_IdAndDiaryCreatedTimeBetween(
+            anyLong(), any(Instant.class), any(Instant.class)))
+        .thenReturn(false);
     when(mockAiClientService.callDiaryContent(any(DiaryEntity.class)))
         .thenReturn(AiDiaryContentResponse.builder().aiComment("this is test ai comment").build());
 
-    DiaryWriteResponse write = diaryService.write(member.getId(), request);
+    DiaryWriteResponse write = diaryService.write(member.getId(), request, DEFAULT_TIME_ZONE);
     assertThat(write.getAiComment()).as("AI 코멘트 결과에 문제가 발생했습니다.").isEqualTo(AI_COMMENT);
   }
 
@@ -92,12 +94,14 @@ public class DiaryServiceTest {
     DiaryWriteRequest request =
         new DiaryWriteRequest(NOW_DATE_TIME, DiaryEmotion.HAPPY, "test diary content");
     when(mockMemberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-    when(mockDiaryRepository.existsByDate(anyLong(), any(LocalDate.class))).thenReturn(true);
+    when(mockDiaryRepository.existsByMemberEntity_IdAndDiaryCreatedTimeBetween(
+            anyLong(), any(Instant.class), any(Instant.class)))
+        .thenReturn(true);
 
     DiaryException diaryException =
         assertThrows(
             DiaryDailyWritingLimitExceedException.class,
-            () -> diaryService.write(member.getId(), request));
+            () -> diaryService.write(member.getId(), request, DEFAULT_TIME_ZONE));
     assertThat(diaryException.getErrorSpec()).isEqualTo(DiaryErrorSpec.DAILY_WRITING_LIMIT_EXCEED);
     log.info(diaryException.getLogMessage());
   }
@@ -157,24 +161,31 @@ public class DiaryServiceTest {
     int testYear = 2024;
     int testMonth = 3;
     Instant testStart =
-        YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC);
+        YearMonth.of(testYear, testMonth)
+            .atDay(1)
+            .atStartOfDay(ZoneId.of(DEFAULT_TIME_ZONE))
+            .toInstant();
     Instant testEnd =
         YearMonth.of(testYear, testMonth)
             .atEndOfMonth()
             .atTime(LocalTime.MAX)
-            .toInstant(ZoneOffset.UTC);
-    List<DiaryIndexProjection> testProjection =
+            .atZone(ZoneId.of(DEFAULT_TIME_ZONE))
+            .toInstant();
+    List<DiaryYearMonthProjection> testProjection =
         TestDiaryObjectFactory.getTestDiaryIndexProjections_2024_03_Data_Of_2();
     Instant requestYearMonth =
-        LocalDate.of(testYear, testMonth, 1).atStartOfDay(ZoneId.of("UTC")).toInstant();
+        LocalDate.of(testYear, testMonth, 1).atStartOfDay(ZoneId.of(DEFAULT_TIME_ZONE)).toInstant();
 
-    when(mockDiaryRepository.findIndexesByMemberIdAndDateTimes(member.getId(), testStart, testEnd))
-        .thenReturn(Optional.of(testProjection));
-    DiaryIndexResponse indexes = diaryService.getIndex(member.getId(), requestYearMonth);
+    when(mockDiaryRepository
+            .findByMemberEntity_IdAndDiaryCreatedTimeBetweenOrderByDiaryCreatedTimeDesc(
+                member.getId(), testStart, testEnd))
+        .thenReturn(testProjection);
+    DiaryYearMonthResponse response =
+        diaryService.getYearMonth(member.getId(), requestYearMonth, DEFAULT_TIME_ZONE);
 
-    List<DiaryIndexProjection> responseIndexes = indexes.getDiaryIndexes();
-    DiaryIndexProjection first = responseIndexes.get(0);
-    DiaryIndexProjection second = responseIndexes.get(1);
+    List<DiaryYearMonthProjection> responseYearMonth = response.getDiaryYearMonths();
+    DiaryYearMonthProjection first = responseYearMonth.get(0);
+    DiaryYearMonthProjection second = responseYearMonth.get(1);
 
     assertThat(first.getId())
         .as("설정 Diary ID와 응답 DiaryID가 서로 다릅니다.")
@@ -199,23 +210,30 @@ public class DiaryServiceTest {
     int testYear = 2024;
     int testMonth = 2;
     Instant testStart =
-        YearMonth.of(testYear, testMonth).atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC);
+        YearMonth.of(testYear, testMonth)
+            .atDay(1)
+            .atStartOfDay(ZoneId.of(DEFAULT_TIME_ZONE))
+            .toInstant();
     Instant testEnd =
         YearMonth.of(testYear, testMonth)
             .atEndOfMonth()
             .atTime(LocalTime.MAX)
-            .toInstant(ZoneOffset.UTC);
+            .atZone(ZoneId.of(DEFAULT_TIME_ZONE))
+            .toInstant();
     Instant requestYearMonth =
-        LocalDate.of(testYear, testMonth, 1).atStartOfDay(ZoneId.of("UTC")).toInstant();
-    when(mockDiaryRepository.findIndexesByMemberIdAndDateTimes(member.getId(), testStart, testEnd))
-        .thenReturn(Optional.empty());
+        LocalDate.of(testYear, testMonth, 1).atStartOfDay(ZoneId.of(DEFAULT_TIME_ZONE)).toInstant();
+    when(mockDiaryRepository
+            .findByMemberEntity_IdAndDiaryCreatedTimeBetweenOrderByDiaryCreatedTimeDesc(
+                member.getId(), testStart, testEnd))
+        .thenReturn(List.of());
 
-    DiaryIndexResponse indexes = diaryService.getIndex(member.getId(), requestYearMonth);
+    DiaryYearMonthResponse yearMonths =
+        diaryService.getYearMonth(member.getId(), requestYearMonth, DEFAULT_TIME_ZONE);
 
-    List<DiaryIndexProjection> responseIndexes = indexes.getDiaryIndexes();
-    System.out.println("responseIndexes = " + responseIndexes);
-    assertThat(responseIndexes).as("응답이 null 입니다.").isNotNull();
-    assertThat(responseIndexes.size()).as("응답 내용의 크기가 0이 아닙니다.").isEqualTo(0);
+    List<DiaryYearMonthProjection> yearMonthProjection = yearMonths.getDiaryYearMonths();
+    System.out.println("yearMonthProjection = " + yearMonthProjection);
+    assertThat(yearMonthProjection).as("응답이 null 입니다.").isNotNull();
+    assertThat(yearMonthProjection.size()).as("응답 내용의 크기가 0이 아닙니다.").isEqualTo(0);
   }
 
   @Test
@@ -223,7 +241,8 @@ public class DiaryServiceTest {
   void getDiarySuccess() {
     // given
     Instant requestDate = NOW_DATE_TIME;
-    when(mockDiaryRepository.findByMemberIdAndDate(anyLong(), any(LocalDate.class)))
+    when(mockDiaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
+            anyLong(), any(Instant.class)))
         .thenReturn(Optional.of(diary));
     List<String> preSignedWebtoon = List.of("pre-sigend-webtoon");
     String preSignedBgm = "pre-sigend-bgm";
@@ -245,7 +264,8 @@ public class DiaryServiceTest {
               assertThat(r.getDateTime()).isEqualTo(diary.getDiaryCreatedTime());
             });
 
-    verify(mockDiaryRepository, times(1)).findByMemberIdAndDate(anyLong(), any(LocalDate.class));
+    verify(mockDiaryRepository, times(1))
+        .findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(anyLong(), any(Instant.class));
   }
 
   @Test
@@ -253,7 +273,8 @@ public class DiaryServiceTest {
   void getDiaryFail() {
     Instant requestDate = NOW_DATE_TIME;
 
-    when(mockDiaryRepository.findByMemberIdAndDate(anyLong(), any(LocalDate.class)))
+    when(mockDiaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
+            anyLong(), any(Instant.class)))
         .thenReturn(Optional.empty());
 
     DiaryException diaryException =
@@ -261,7 +282,8 @@ public class DiaryServiceTest {
             DiaryNotFoundException.class, () -> diaryService.getDiary(member.getId(), requestDate));
 
     assertThat(diaryException.getErrorSpec()).isEqualTo(DiaryErrorSpec.DIARY_NOT_FOUND);
-    verify(mockDiaryRepository, times(1)).findByMemberIdAndDate(anyLong(), any(LocalDate.class));
+    verify(mockDiaryRepository, times(1))
+        .findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(anyLong(), any(Instant.class));
     verify(mockDiaryReactionRepository, times(0)).countEachByDiaryId(anyLong());
   }
 }
