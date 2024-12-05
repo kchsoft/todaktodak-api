@@ -25,12 +25,13 @@ public interface PublicDiaryRepository extends JpaRepository<PublicDiaryEntity, 
             pd.publicContent,
             d.webtoonImageUrl,
             d.bgmUrl,
-            d.diaryCreatedTime
+            pd.createdTime
         )
         FROM PublicDiaryEntity pd
         JOIN pd.diaryEntity d
         JOIN pd.memberEntity m
-        WHERE pd.createdTime <= :#{#index.createdTime} AND pd.id < :#{#index.publicDiaryId}
+        WHERE (pd.createdTime = :#{#index.createdTime} AND pd.id < :#{#index.publicDiaryId})
+        OR (pd.createdTime < :#{#index.createdTime})
         ORDER BY pd.createdTime DESC, pd.id DESC
         """)
   List<PublicDiaryContentProjection> findNextContents(
