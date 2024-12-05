@@ -47,7 +47,7 @@ class MySharedDiaryRepositoryTest {
   private Long TEST_PUBLIC_DIARY_SIZE = 13L;
 
   @BeforeEach
-  void setUp() {
+  void setUp() throws InterruptedException {
     member = BaseTestObject.createMemberNoId();
     tem.persist(member);
 
@@ -56,7 +56,7 @@ class MySharedDiaryRepositoryTest {
     tem.clear();
   }
 
-  private List<PublicDiaryEntity> createTestPublicDiaries() {
+  private List<PublicDiaryEntity> createTestPublicDiaries() throws InterruptedException {
     for (int i = 0; i < TEST_PUBLIC_DIARY_SIZE; i++) {
       DiaryEntity diary =
           BaseTestObject.createDiaryNoIdWithMemberAndCreatedDateTime(
@@ -69,6 +69,7 @@ class MySharedDiaryRepositoryTest {
               .build();
       tem.persist(diary);
       tem.persist(publicDiary);
+      Thread.sleep(1L);
     }
     tem.flush();
     tem.clear();
@@ -188,7 +189,7 @@ class MySharedDiaryRepositoryTest {
     PublicDiaryEntity expected = publicDiaries.get(3);
     Long memberId = expected.getMemberEntity().getId();
     DiaryEntity diaryEntity = expected.getDiaryEntity();
-    Instant requestDate = expected.getDiaryEntity().getDiaryCreatedTime();
+    Instant requestDate = expected.getCreatedTime();
 
     Optional<MySharedDiaryContentProjection> Optional_actual =
         mySharedDiaryRepository.findContent(memberId, requestDate);
