@@ -104,6 +104,7 @@ public class DiaryRepositoryTest {
     DiaryEntity diary2 = BaseTestObject.createDiaryNoIdWithMember(member);
     diaryRepository.save(diary1);
     diaryRepository.save(diary2);
+    System.out.println("diary1.getDiaryCreatedTime() = " + diary1.getDiaryCreatedTime());
 
     Instant testStart =
         InstantUtils.toMonthStartAtZone(diary1.getDiaryCreatedTime(), DEFAULT_TIME_ZONE);
@@ -166,8 +167,10 @@ public class DiaryRepositoryTest {
     Instant diaryDate = diary.getDiaryCreatedTime();
 
     Optional<DiaryEntity> result =
-        diaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
-            member.getId(), diaryDate);
+        diaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTimeBetween(
+            member.getId(),
+            InstantUtils.toDayStartAtZone(diaryDate, DEFAULT_TIME_ZONE),
+            InstantUtils.toDayEndAtZone(diaryDate, DEFAULT_TIME_ZONE));
 
     assertThat(result).as("해당 날짜(%s)에 작성된 일기를 찾을 수 없습니다.", diaryDate).isPresent();
     assertThat(result.get().getId())
@@ -193,8 +196,10 @@ public class DiaryRepositoryTest {
     Instant differentDate = diary.getDiaryCreatedTime().minus(1L, ChronoUnit.DAYS);
 
     Optional<DiaryEntity> result =
-        diaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
-            member.getId(), differentDate);
+        diaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTimeBetween(
+            member.getId(),
+            InstantUtils.toDayStartAtZone(differentDate, DEFAULT_TIME_ZONE),
+            InstantUtils.toDayEndAtZone(differentDate, DEFAULT_TIME_ZONE));
 
     assertThat(result).as("존재하지 않아야 할 날짜(%s)에 일기가 조회되었습니다.", differentDate).isEmpty();
   }

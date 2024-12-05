@@ -25,8 +25,8 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
       findByMemberEntity_IdAndDiaryCreatedTimeBetweenOrderByDiaryCreatedTimeDesc(
           Long memberId, Instant startTime, Instant endTime);
 
-  Optional<DiaryEntity> findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
-      Long memberId, Instant diaryCreatedTime);
+  Optional<DiaryEntity> findDiaryEntityByMemberEntity_IdAndDiaryCreatedTimeBetween(
+      Long memberId, Instant startTime, Instant endTime);
 
   @Query(
       value =

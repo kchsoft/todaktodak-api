@@ -178,11 +178,12 @@ public class DiaryControllerTest {
         DiaryResponse.builder()
             .content("테스트 일기 내용")
             .emotion(DiaryEmotion.HAPPY)
-            .dateTime(validDate)
+            .date(validDate)
             .build();
 
     // when
-    when(diaryService.getDiary(anyLong(), any(Instant.class))).thenReturn(mockResponse);
+    when(diaryService.getDiary(anyLong(), any(Instant.class), any(String.class)))
+        .thenReturn(mockResponse);
 
     // then
     MvcResult mvcResult =

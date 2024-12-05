@@ -241,8 +241,8 @@ public class DiaryServiceTest {
   void getDiarySuccess() {
     // given
     Instant requestDate = NOW_DATE_TIME;
-    when(mockDiaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
-            anyLong(), any(Instant.class)))
+    when(mockDiaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTimeBetween(
+            anyLong(), any(Instant.class), any(Instant.class)))
         .thenReturn(Optional.of(diary));
     List<String> preSignedWebtoon = List.of("pre-sigend-webtoon");
     String preSignedBgm = "pre-sigend-bgm";
@@ -250,7 +250,7 @@ public class DiaryServiceTest {
     when(mockS3Manager.preSignedWebtoonUrlFrom(anyList())).thenReturn(preSignedWebtoon);
     when(mockS3Manager.preSignedBgmUrlFrom(anyString())).thenReturn(preSignedBgm);
 
-    DiaryResponse response = diaryService.getDiary(member.getId(), requestDate);
+    DiaryResponse response = diaryService.getDiary(member.getId(), requestDate, DEFAULT_TIME_ZONE);
 
     assertThat(response)
         .satisfies(
@@ -261,11 +261,12 @@ public class DiaryServiceTest {
               assertThat(r.getWebtoonImageUrls()).isEqualTo(preSignedWebtoon);
               assertThat(r.getBgmUrl()).isEqualTo(preSignedBgm);
               assertThat(r.getAiComment()).isEqualTo(diary.getAiComment());
-              assertThat(r.getDateTime()).isEqualTo(diary.getDiaryCreatedTime());
+              assertThat(r.getDate()).isEqualTo(diary.getDiaryCreatedTime());
             });
 
     verify(mockDiaryRepository, times(1))
-        .findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(anyLong(), any(Instant.class));
+        .findDiaryEntityByMemberEntity_IdAndDiaryCreatedTimeBetween(
+            anyLong(), any(Instant.class), any(Instant.class));
   }
 
   @Test
@@ -273,17 +274,19 @@ public class DiaryServiceTest {
   void getDiaryFail() {
     Instant requestDate = NOW_DATE_TIME;
 
-    when(mockDiaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(
-            anyLong(), any(Instant.class)))
+    when(mockDiaryRepository.findDiaryEntityByMemberEntity_IdAndDiaryCreatedTimeBetween(
+            anyLong(), any(Instant.class), any(Instant.class)))
         .thenReturn(Optional.empty());
 
     DiaryException diaryException =
         assertThrows(
-            DiaryNotFoundException.class, () -> diaryService.getDiary(member.getId(), requestDate));
+            DiaryNotFoundException.class,
+            () -> diaryService.getDiary(member.getId(), requestDate, DEFAULT_TIME_ZONE));
 
     assertThat(diaryException.getErrorSpec()).isEqualTo(DiaryErrorSpec.DIARY_NOT_FOUND);
     verify(mockDiaryRepository, times(1))
-        .findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(anyLong(), any(Instant.class));
+        .findDiaryEntityByMemberEntity_IdAndDiaryCreatedTimeBetween(
+            anyLong(), any(Instant.class), any(Instant.class));
     verify(mockDiaryReactionRepository, times(0)).countEachByDiaryId(anyLong());
   }
 }
