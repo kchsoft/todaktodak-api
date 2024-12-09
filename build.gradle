@@ -43,6 +43,7 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.6'
     implementation group: 'me.paulschwarz', name: 'spring-dotenv', version: '4.0.0'
 
+    implementation 'com.github.codemonstur:embedded-redis:1.4.3'
     implementation 'software.amazon.awssdk:s3:2.29.3'
 
     // test에서 lombok 사용
@@ -55,7 +56,6 @@ dependencies {
 
     testImplementation 'com.h2database:h2:2.3.232'
     testImplementation 'com.squareup.okhttp3:mockwebserver'
-//    testImplementation 'com.github.codemonstur:embedded-redis:1.4.3'
 }
 
 test {
