@@ -40,7 +40,8 @@ public class Oauth2FailureHandler implements AuthenticationFailureHandler {
 
   private void setResponseBody(HttpServletResponse response, OAuth2AuthenticationException e)
       throws IOException {
-    logger.error("Oauth2 인증이 실패되어서 로그인 페이지로 리다이렉트합니다..{}", CLIENT_SERVER_ORIGIN);
+    logger.error(
+        "Oauth2 인증이 실패되어서 로그인 페이지로 리다이렉트합니다..{}, Error={}", CLIENT_SERVER_ORIGIN, e.getMessage());
     // 중복 이메일로 회원가입
     if (DUPLICATED_EMAIL_ERROR.getErrorCode().equals(e.getError().getErrorCode())) {
       response
