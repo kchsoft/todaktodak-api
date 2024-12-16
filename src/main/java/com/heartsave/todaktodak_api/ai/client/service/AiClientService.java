@@ -94,8 +94,8 @@ public class AiClientService {
     MultipartBodyBuilder builder = new MultipartBodyBuilder();
 
     // 요청 json
-    builder.part("memberId", request.memberId());
-    builder.part("characterStyle", request.characterStyle());
+    builder.part("memberId", request.getMemberId());
+    builder.part("characterStyle", request.getCharacterStyle());
 
     // 이미지
     try {
