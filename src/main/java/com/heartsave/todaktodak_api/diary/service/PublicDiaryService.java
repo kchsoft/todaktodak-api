@@ -15,6 +15,7 @@ import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountPr
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.exception.PublicDiaryExistException;
+import com.heartsave.todaktodak_api.diary.exception.PublicDiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.factory.DiaryPageIndexFactory;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
@@ -22,6 +23,7 @@ import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -112,5 +114,21 @@ public class PublicDiaryService {
             .publicContent(publicContent)
             .build();
     publicDiaryRepository.save(publicDiary);
+  }
+
+  public void delete(Long memberId, Long publicDiaryId) {
+    PublicDiaryEntity publicDiary =
+        publicDiaryRepository
+            .findById(publicDiaryId)
+            .orElseThrow(
+                () ->
+                    new PublicDiaryNotFoundException(
+                        PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, publicDiaryId));
+
+    if (!Objects.equals(memberId, publicDiary.getMemberEntity().getId())) {
+      throw new PublicDiaryNotFoundException(
+          PublicDiaryErrorSpec.PUBLIC_DIARY_DELETE_NOT_FOUND, publicDiaryId);
+    }
+    publicDiaryRepository.delete(publicDiary);
   }
 }

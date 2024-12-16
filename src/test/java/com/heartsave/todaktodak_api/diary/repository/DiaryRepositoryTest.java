@@ -77,13 +77,38 @@ public class DiaryRepositoryTest {
   }
 
   @Test
-  @DisplayName(" 요청한 멤버 ID 및 일기장 ID에 해당하는 일기장 삭제 성공")
+  @DisplayName("요청한 멤버 ID 및 일기장 ID에 해당하는 일기장 삭제 성공")
   void deleteDiaryByIdsSuccess() {
     System.out.println("member.getId() = " + member.getId());
     System.out.println("diary.getId() = " + diary.getId());
     assertThat(diaryRepository.deleteByIds(member.getId(), diary.getId()))
         .as("memberId와 diaryId가 일치하는 diary가 없습니다.")
         .isEqualTo(1);
+  }
+
+  @Test
+  @DisplayName("일기 삭제시, 공개 일기 cascade 삭제 성공")
+  void deleteDiaryAndCascadePublicDiary() {
+    PublicDiaryEntity publicDiary =
+        PublicDiaryEntity.builder()
+            .publicContent("public-content")
+            .diaryEntity(diary)
+            .memberEntity(member)
+            .reactions(List.of())
+            .build();
+
+    tem.persist(publicDiary);
+    diaryRepository.delete(diary);
+    System.out.println("diary.getId() = " + diary.getId());
+    System.out.println(
+        "publicDiary.getDiaryEntity().getId() = " + publicDiary.getDiaryEntity().getId());
+    boolean existDiary = diaryRepository.existsById(diary.getId());
+    tem.flush();
+    tem.clear();
+    publicDiary = tem.find(PublicDiaryEntity.class, publicDiary.getId());
+
+    assertThat(existDiary).as("memberId와 diaryId가 일치하는 diary가 없습니다.").isFalse();
+    assertThat(publicDiary).as("공개 일기가 cascade에 의해 삭제되지 않았습니다.").isNull();
   }
 
   @Test
