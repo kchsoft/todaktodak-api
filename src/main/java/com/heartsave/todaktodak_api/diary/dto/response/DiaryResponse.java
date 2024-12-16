@@ -37,5 +37,5 @@ public class DiaryResponse {
 
   @Schema(description = "일기 작성 날짜", example = "2024-10-26", type = "string", format = "date")
   @JsonFormat(pattern = TIME_FORMAT.ISO_DATETIME_WITH_MILLISECONDS, timezone = "UTC")
-  private Instant dateTime;
+  private Instant date;
 }

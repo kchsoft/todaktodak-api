@@ -91,14 +91,19 @@ public class DiaryService {
   }
 
   @Transactional(readOnly = true)
-  public DiaryResponse getDiary(Long memberId, Instant request) {
+  public DiaryResponse getDiary(Long memberId, Instant request, String zoneName) {
     log.info("사용자의 나의 일기 정보를 요청합니다.");
+
     DiaryEntity diary =
         diaryRepository
-            .findDiaryEntityByMemberEntity_IdAndDiaryCreatedTime(memberId, request)
+            .findDiaryEntityByMemberEntity_IdAndDiaryCreatedTimeBetween(
+                memberId,
+                InstantUtils.toDayStartAtZone(request, zoneName),
+                InstantUtils.toDayEndAtZone(request, zoneName))
             .orElseThrow(
                 () ->
                     new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, request));
+
     log.info("사용자의 나의 일기 정보를 성공적으로 가져왔습니다.");
 
     return DiaryResponse.builder()
@@ -109,7 +114,7 @@ public class DiaryService {
             s3FileStorageManager.preSignedWebtoonUrlFrom(List.of(diary.getWebtoonImageUrl())))
         .bgmUrl(s3FileStorageManager.preSignedBgmUrlFrom(diary.getBgmUrl()))
         .aiComment(diary.getAiComment())
-        .dateTime(diary.getDiaryCreatedTime())
+        .date(diary.getDiaryCreatedTime())
         .build();
   }
 

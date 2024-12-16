@@ -28,7 +28,9 @@ public interface MySharedDiaryRepository extends JpaRepository<PublicDiaryEntity
                pd.createdTime
                )
               FROM PublicDiaryEntity pd JOIN pd.diaryEntity d
-              WHERE pd.memberEntity.id = :memberId AND pd.createdTime <= :#{#index.createdTime} AND pd.id < :#{#index.publicDiaryId}
+              WHERE pd.memberEntity.id = :memberId AND
+                ((pd.createdTime = :#{#index.createdTime} AND pd.id < :#{#index.publicDiaryId})
+                OR (pd.createdTime < :#{#index.createdTime}))
               ORDER BY pd.createdTime DESC, pd.id DESC
           """)
   List<MySharedDiaryPreviewProjection> findNextPreviews(
@@ -46,7 +48,7 @@ public interface MySharedDiaryRepository extends JpaRepository<PublicDiaryEntity
             )
             FROM PublicDiaryEntity pd
             JOIN pd.diaryEntity d
-            WHERE  pd.memberEntity.id = :memberId AND d.diaryCreatedTime = :publicDiaryDate
+            WHERE  pd.memberEntity.id = :memberId AND pd.createdTime = :publicDiaryDate
             """)
   Optional<MySharedDiaryContentProjection> findContent(
       @Param("memberId") Long memberId, @Param("publicDiaryDate") Instant publicDiaryDate);
