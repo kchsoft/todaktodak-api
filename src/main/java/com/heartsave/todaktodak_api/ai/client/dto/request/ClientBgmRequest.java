@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import lombok.Getter;
 
 @Getter
-public class ClientBgmRequest {
+public class ClientBgmRequest extends ClientIPInfo {
   private final Long memberId;
 
   @JsonFormat(pattern = "yyyy-MM-dd")

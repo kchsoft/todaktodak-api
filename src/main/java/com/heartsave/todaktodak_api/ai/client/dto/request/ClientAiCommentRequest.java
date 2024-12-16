@@ -4,7 +4,7 @@ import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import lombok.Getter;
 
 @Getter
-public class ClientAiCommentRequest {
+public class ClientAiCommentRequest extends ClientIPInfo {
   private final String content;
 
   private ClientAiCommentRequest(DiaryEntity diary) {
