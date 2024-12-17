@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PastOrPresent;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +44,8 @@ public class PublicDiaryController {
   public ResponseEntity<PublicDiaryPageResponse> getPagination(
       @TodakUserId Long memberId,
       @Min(0L) @RequestParam(name = "after", defaultValue = "0") Long publicDiaryId,
-      @RequestParam(name = "date", defaultValue = "1970-01-01T00:00:00Z") Instant createdTime) {
+      @PastOrPresent @RequestParam(name = "date", defaultValue = "1970-01-01T00:00:00Z")
+          Instant createdTime) {
     DiaryPageRequest request = new DiaryPageRequest(publicDiaryId, createdTime);
     log.info("공개 일기를 조회를 요청합니다. after = {}", request.publicDiaryId());
     PublicDiaryPageResponse response = publicDiaryService.getPagination(memberId, request);
