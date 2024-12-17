@@ -1,13 +1,32 @@
 package com.heartsave.todaktodak_api.ai.client.util;
 
+import jakarta.annotation.PostConstruct;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-public class ClientIpUtil {
-  public static String getServerIp() {
+@Component
+public class ClientDomainUrlUtil {
+
+  @Value("${server.port}")
+  private Integer port;
+
+  private static String SERVER_DOMAIN_URL;
+
+  @PostConstruct
+  public void init() {
+    SERVER_DOMAIN_URL = getServerIp() + ":" + port;
+  }
+
+  public static String getServerDomainUrl() {
+    return SERVER_DOMAIN_URL;
+  }
+
+  private String getServerIp() {
     try {
       Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
       while (networkInterfaces.hasMoreElements()) {

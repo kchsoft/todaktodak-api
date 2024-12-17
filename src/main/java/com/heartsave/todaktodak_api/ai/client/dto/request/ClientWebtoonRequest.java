@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import lombok.Getter;
 
 @Getter
-public class ClientWebtoonRequest extends ClientIPInfo {
+public class ClientWebtoonRequest extends ClientDomainInfo {
   private final String memberId;
 
   @JsonFormat(pattern = "yyyy-MM-dd")
