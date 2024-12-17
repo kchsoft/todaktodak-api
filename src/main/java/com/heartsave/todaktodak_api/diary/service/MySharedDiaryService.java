@@ -7,6 +7,7 @@ import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryPaginationResponse;
 import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryResponse;
+import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryContentProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection;
@@ -16,6 +17,7 @@ import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.MySharedDiaryRepository;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -90,5 +92,21 @@ public class MySharedDiaryService {
                         PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, requestDateTime));
 
     return contentProjection;
+  }
+
+  public void delete(Long memberId, Long publicDiaryId) {
+    PublicDiaryEntity publicDiary =
+        mySharedDiaryRepository
+            .findById(publicDiaryId)
+            .orElseThrow(
+                () ->
+                    new PublicDiaryNotFoundException(
+                        PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, publicDiaryId));
+
+    if (!Objects.equals(memberId, publicDiary.getMemberEntity().getId())) {
+      throw new PublicDiaryNotFoundException(
+          PublicDiaryErrorSpec.PUBLIC_DIARY_DELETE_NOT_FOUND, publicDiaryId);
+    }
+    mySharedDiaryRepository.delete(publicDiary);
   }
 }

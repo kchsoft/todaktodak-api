@@ -87,14 +87,13 @@ public class S3FileStorageManager {
 
   public void deleteDiaryContent(String key) {
     if (DEFAULT_URL.equals(key) || !isObjectExist(key)) return;
-
-    log.info("S3에 일기 컨텐츠 삭제를 요청합니다.");
     deleteObject(key);
-    log.info("S3에서 일기 컨텐츠를 삭제했습니다.");
   }
 
   public void deleteDiaryContents(List<String> keys) {
+    log.info("S3에 일기 컨텐츠 삭제를 요청합니다.");
     keys.forEach(this::deleteDiaryContent);
+    log.info("S3에서 일기 컨텐츠를 삭제했습니다.");
   }
 
   // 객체 메타데이터 조회로 존재 확인

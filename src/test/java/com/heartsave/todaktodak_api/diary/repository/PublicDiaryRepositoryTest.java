@@ -215,4 +215,15 @@ public class PublicDiaryRepositoryTest {
     assertThat(contentOnly2.get(0).getPublicContent()).isEqualTo(publicDiary1.getPublicContent());
     assertThat(contentOnly2.get(1).getPublicContent()).isEqualTo(publicDiary.getPublicContent());
   }
+
+  @Test
+  @DisplayName("공개 일기 삭제 성공")
+  void deletePublicDiarySuccess() {
+    publicDiary2 = publicDiaryRepository.findById(publicDiary2.getId()).get();
+
+    publicDiaryRepository.delete(publicDiary2);
+
+    boolean existPD2 = publicDiaryRepository.existsById(publicDiary2.getId());
+    assertThat(existPD2).isFalse();
+  }
 }
