@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ClientCharacterRequest extends ClientIPInfo {
+public class ClientCharacterRequest extends ClientDomainInfo {
   private final Long memberId;
   private final String characterStyle;
 

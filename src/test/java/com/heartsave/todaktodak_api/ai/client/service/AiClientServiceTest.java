@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.heartsave.todaktodak_api.ai.client.config.properties.AiServerProperties;
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
+import com.heartsave.todaktodak_api.config.BaseSpringbootTest;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.io.IOException;
@@ -23,7 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
-class AiClientServiceTest {
+class AiClientServiceTest extends BaseSpringbootTest {
 
   private static MockWebServer mockWebServer;
   private static AiClientService aiClientService;

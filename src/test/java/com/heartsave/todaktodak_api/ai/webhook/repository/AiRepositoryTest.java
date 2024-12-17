@@ -11,6 +11,7 @@ import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookBgmCompletionR
 import com.heartsave.todaktodak_api.ai.webhook.dto.request.WebhookWebtoonCompletionRequest;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.converter.InstantUtils;
+import com.heartsave.todaktodak_api.diary.constant.DiaryBgmGenre;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
@@ -135,6 +136,7 @@ class AiRepositoryTest {
               .webtoonImageUrl("")
               .diaryCreatedTime(diary.getDiaryCreatedTime())
               .emotion(DiaryEmotion.HAPPY)
+              .bgmGenre(DiaryBgmGenre.POP)
               .build();
       tem.persist(diary2);
       tem.flush();
@@ -181,6 +183,7 @@ class AiRepositoryTest {
               .webtoonImageUrl("")
               .diaryCreatedTime(nowDateTime)
               .emotion(DiaryEmotion.HAPPY)
+              .bgmGenre(DiaryBgmGenre.CLASSICAL)
               .build();
 
       tem.persist(diaryWithBgm);
@@ -205,6 +208,7 @@ class AiRepositoryTest {
               .webtoonImageUrl(TEST_WEBTOON_KEY_URL)
               .diaryCreatedTime(nowDateTime)
               .emotion(DiaryEmotion.HAPPY)
+              .bgmGenre(DiaryBgmGenre.JAZZ)
               .build();
       tem.persist(diaryWithWebtoon);
       tem.flush();
@@ -228,6 +232,7 @@ class AiRepositoryTest {
               .diaryCreatedTime(
                   Instant.now().plus(1, ChronoUnit.DAYS)) // BeforeEach의 diary 날짜 다르게 하기 위해
               .emotion(DiaryEmotion.HAPPY)
+              .bgmGenre(DiaryBgmGenre.EDM)
               .build();
 
       tem.persist(completedDiary);
