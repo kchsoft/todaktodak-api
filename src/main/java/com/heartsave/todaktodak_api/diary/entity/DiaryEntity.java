@@ -80,6 +80,7 @@ public class DiaryEntity extends BaseEntity {
   @Column(name = "bgm_url", nullable = false, length = 255)
   private String bgmUrl;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "bgm_genre", nullable = false)
   private DiaryBgmGenre bgmGenre;
 
