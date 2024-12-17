@@ -20,6 +20,7 @@ import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.common.TestDiaryObjectFactory;
+import com.heartsave.todaktodak_api.diary.constant.DiaryBgmGenre;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
@@ -74,7 +75,8 @@ public class DiaryServiceTest {
   @DisplayName("일기 작성 성공")
   void diaryWritingSuccess() {
     DiaryWriteRequest request =
-        new DiaryWriteRequest(NOW_DATE_TIME, DiaryEmotion.HAPPY, "test diary content");
+        new DiaryWriteRequest(
+            NOW_DATE_TIME, DiaryEmotion.HAPPY, "test diary content", DiaryBgmGenre.ACOUSTIC);
     String AI_COMMENT = "this is test ai comment";
 
     when(mockMemberRepository.findById(anyLong())).thenReturn(Optional.of(member));
@@ -92,7 +94,8 @@ public class DiaryServiceTest {
   @DisplayName("하루 일기 작성 횟수 초과 에러 발생")
   void dailyDiaryWritingLimitException() {
     DiaryWriteRequest request =
-        new DiaryWriteRequest(NOW_DATE_TIME, DiaryEmotion.HAPPY, "test diary content");
+        new DiaryWriteRequest(
+            NOW_DATE_TIME, DiaryEmotion.HAPPY, "test diary content", DiaryBgmGenre.POP);
     when(mockMemberRepository.findById(anyLong())).thenReturn(Optional.of(member));
     when(mockDiaryRepository.existsByMemberEntity_IdAndDiaryCreatedTimeBetween(
             anyLong(), any(Instant.class), any(Instant.class)))

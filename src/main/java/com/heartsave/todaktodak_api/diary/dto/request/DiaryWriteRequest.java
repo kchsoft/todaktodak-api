@@ -4,6 +4,7 @@ import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraint
 import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraintConstant.DIARY_CONTENT_MIN_SIZE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.heartsave.todaktodak_api.diary.constant.DiaryBgmGenre;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -44,4 +45,7 @@ public class DiaryWriteRequest {
       message = "Diary Content Length Out Of Range")
   @NotBlank
   private String content;
+
+  @NotNull(message = "DiaryBgmGenre is Null")
+  private DiaryBgmGenre bgmGenre;
 }

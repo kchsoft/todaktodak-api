@@ -6,6 +6,7 @@ import static com.heartsave.todaktodak_api.diary.constant.DiaryContentConstraint
 
 import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.common.entity.BaseEntity;
+import com.heartsave.todaktodak_api.diary.constant.DiaryBgmGenre;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
@@ -79,6 +80,9 @@ public class DiaryEntity extends BaseEntity {
   @Column(name = "bgm_url", nullable = false, length = 255)
   private String bgmUrl;
 
+  @Column(name = "bgm_genre", nullable = false)
+  private DiaryBgmGenre bgmGenre;
+
   @Column(
       name = "diary_created_time",
       nullable = false,
@@ -100,6 +104,7 @@ public class DiaryEntity extends BaseEntity {
     this.diaryCreatedTime = request.getCreatedTime();
     this.webtoonImageUrl = DEFAULT_URL;
     this.bgmUrl = DEFAULT_URL;
+    this.bgmGenre = request.getBgmGenre();
   }
 
   public static DiaryEntity createDefault(DiaryWriteRequest request, MemberEntity member) {

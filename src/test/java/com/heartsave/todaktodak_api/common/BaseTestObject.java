@@ -1,6 +1,7 @@
 package com.heartsave.todaktodak_api.common;
 
 import com.heartsave.todaktodak_api.common.security.domain.AuthType;
+import com.heartsave.todaktodak_api.diary.constant.DiaryBgmGenre;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.domain.TodakRole;
@@ -79,6 +80,7 @@ public class BaseTestObject {
         .memberEntity(createMember())
         .webtoonImageUrl(TEST_DEFAULT_WEBTOON_URL)
         .bgmUrl(TEST_DEFAULT_BGM_URL)
+        .bgmGenre(DiaryBgmGenre.JAZZ)
         .aiComment(TEST_COMMENT)
         .build();
   }
@@ -92,6 +94,7 @@ public class BaseTestObject {
         .memberEntity(member)
         .webtoonImageUrl(TEST_DEFAULT_WEBTOON_URL)
         .bgmUrl(TEST_DEFAULT_BGM_URL)
+        .bgmGenre(DiaryBgmGenre.ACOUSTIC)
         .aiComment(TEST_COMMENT)
         .build();
   }
@@ -104,6 +107,7 @@ public class BaseTestObject {
         .memberEntity(member)
         .webtoonImageUrl(TEST_DEFAULT_WEBTOON_URL)
         .bgmUrl(TEST_DEFAULT_BGM_URL)
+        .bgmGenre(DiaryBgmGenre.POP)
         .aiComment(TEST_COMMENT)
         .build();
   }
@@ -117,6 +121,7 @@ public class BaseTestObject {
         .memberEntity(member)
         .webtoonImageUrl(TEST_DEFAULT_WEBTOON_URL)
         .bgmUrl(TEST_DEFAULT_BGM_URL)
+        .bgmGenre(DiaryBgmGenre.CLASSICAL)
         .aiComment(TEST_COMMENT)
         .build();
   }

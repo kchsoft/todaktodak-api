@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
 import com.heartsave.todaktodak_api.diary.common.TestDiaryObjectFactory;
+import com.heartsave.todaktodak_api.diary.constant.DiaryBgmGenre;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.DiaryResponse;
@@ -57,7 +58,10 @@ public class DiaryControllerTest {
   void writeDiarySuccess() throws Exception {
     DiaryWriteRequest request =
         new DiaryWriteRequest(
-            Instant.now(), DiaryEmotion.HAPPY, BaseTestObject.DUMMY_STRING_CONTENT);
+            Instant.now(),
+            DiaryEmotion.HAPPY,
+            BaseTestObject.DUMMY_STRING_CONTENT,
+            DiaryBgmGenre.JAZZ);
 
     final String AI_COMMENT = "this is test ai comment";
 
