@@ -11,7 +11,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PublicDiaryContentCacheRepository {
+public class PublicDiaryContentCacheRepository
+    implements CacheRepository<List<PublicDiaryContentProjection>> {
   private final String PUBLIC_DIARY_CACHE_KEY = "public:diary:cache";
   private final RedisTemplate<String, String> redisTemplate;
   private final ObjectMapper objectMapper;
@@ -42,7 +43,8 @@ public class PublicDiaryContentCacheRepository {
     return pageIndex.getCreatedTime().toEpochMilli() + ":" + pageIndex.getPublicDiaryId();
   }
 
-  private String serialize(List<PublicDiaryContentProjection> contents) {
+  @Override
+  public String serialize(List<PublicDiaryContentProjection> contents) {
     try {
       return objectMapper.writeValueAsString(contents);
     } catch (JsonProcessingException e) {
@@ -50,7 +52,8 @@ public class PublicDiaryContentCacheRepository {
     }
   }
 
-  private List<PublicDiaryContentProjection> deserialize(String jsonValue) {
+  @Override
+  public List<PublicDiaryContentProjection> deserialize(String jsonValue) {
     try {
       return objectMapper.readValue(
           jsonValue,
