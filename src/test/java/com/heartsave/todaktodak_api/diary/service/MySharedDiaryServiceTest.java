@@ -157,7 +157,7 @@ public class MySharedDiaryServiceTest {
 
     when(mySharedDiaryRepository.findContent(member.getId(), requestDate))
         .thenReturn(Optional.of(contentOnly));
-    when(reactionRepository.countEachByDiaryId(diaryId)).thenReturn(reactionCount);
+    when(reactionRepository.countEachByPublicDiaryId(diaryId)).thenReturn(reactionCount);
     when(reactionRepository.findMemberReaction(member.getId(), diaryId))
         .thenReturn(memberReactions);
 

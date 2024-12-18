@@ -12,7 +12,6 @@ import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPageResponse;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIdsProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentProjection;
 import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.diary.exception.PublicDiaryExistException;
@@ -23,6 +22,7 @@ import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -52,18 +52,16 @@ public class PublicDiaryService {
 
   private List<PublicDiaryContentProjection> fetchContents(DiaryPageIndex pageIndex) {
     log.info("공개 일기 content 정보를 조회합니다.");
-
-    List<PublicDiaryContentProjection> content = publicDiaryCacheService.getContent(pageIndex);
-    if (!content.isEmpty()) {
-      return content;
-    }
-
-    log.info("공개 일기 content Cache Miss");
-    content =
-        publicDiaryRepository.findNextContents(
-            pageIndex, PageRequest.of(0, 5)); // 현재 ID 제외, 다음 ID 포함 5개 조회
-    publicDiaryCacheService.saveContent(pageIndex, content);
-    return content;
+    return Optional.ofNullable(publicDiaryCacheService.getContents(pageIndex))
+        .filter(contents -> !contents.isEmpty())
+        .orElseGet(
+            () -> {
+              log.info("공개 일기 Cache Miss");
+              List<PublicDiaryContentProjection> dbContents =
+                  publicDiaryRepository.findNextContents(pageIndex, PageRequest.of(0, 5));
+              publicDiaryCacheService.saveContents(pageIndex, dbContents);
+              return dbContents;
+            });
   }
 
   private void replaceWithPreSignedUrls(List<PublicDiaryContentProjection> contentProjections) {
@@ -84,19 +82,26 @@ public class PublicDiaryService {
     contentProjection.stream()
         .map(
             content -> {
-              DiaryReactionCount reactionCount = fetchReactionCount(content.getDiaryId());
+              DiaryReactionCount reactionCount = fetchReactionCount(content.getPublicDiaryId());
               List<DiaryReactionType> memberReactions =
-                  fetchMemberReactions(memberId, content.getDiaryId());
+                  fetchMemberReactions(memberId, content.getPublicDiaryId());
               return PublicDiary.of(content, reactionCount, memberReactions);
             })
         .forEach(response::addPublicDiary);
     return response;
   }
 
-  private DiaryReactionCount fetchReactionCount(Long diaryId) {
-    //    diaryReactionCacheRepository;
-    DiaryReactionCountProjection projection = reactionRepository.countEachByDiaryId(diaryId);
-    return DiaryReactionCount.from(projection);
+  private DiaryReactionCount fetchReactionCount(Long publicDiaryId) {
+    return publicDiaryCacheService
+        .getReactionCount(publicDiaryId)
+        .orElseGet(
+            () -> {
+              DiaryReactionCount reactionCount =
+                  DiaryReactionCount.from(
+                      reactionRepository.countEachByPublicDiaryId(publicDiaryId));
+              publicDiaryCacheService.saveReactionCount(publicDiaryId, reactionCount);
+              return reactionCount;
+            });
   }
 
   private List<DiaryReactionType> fetchMemberReactions(Long memberId, Long diaryId) {

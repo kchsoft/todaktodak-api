@@ -20,7 +20,9 @@ public class PublicDiaryCache {
   public void save(
       String key, DiaryPageIndex pageIndex, List<PublicDiaryContentProjection> contents) {
     if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
+      redisTemplate.opsForHash().put(key, getHashKey(pageIndex), serializer.serialize(contents));
       redisTemplate.expire(key, Duration.ofMinutes(1));
+      return;
     }
     redisTemplate.opsForHash().put(key, getHashKey(pageIndex), serializer.serialize(contents));
   }

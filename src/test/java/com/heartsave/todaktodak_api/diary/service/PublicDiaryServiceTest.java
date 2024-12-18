@@ -165,7 +165,8 @@ class PublicDiaryServiceTest {
 
     // 반응 정보 mock
     DiaryReactionCountProjection reactionCount = mock(DiaryReactionCountProjection.class);
-    when(mockDiaryReactionRepository.countEachByDiaryId(diary.getId())).thenReturn(reactionCount);
+    when(mockDiaryReactionRepository.countEachByPublicDiaryId(diary.getId()))
+        .thenReturn(reactionCount);
     when(mockDiaryReactionRepository.findMemberReaction(memberId, diary.getId()))
         .thenReturn(List.of(DiaryReactionType.LIKE));
 
@@ -201,7 +202,7 @@ class PublicDiaryServiceTest {
     // 메서드 호출 검증
     verify(mockPublicDiaryRepository)
         .findNextContents(any(DiaryPageIndex.class), any(PageRequest.class));
-    verify(mockDiaryReactionRepository).countEachByDiaryId(diary.getId());
+    verify(mockDiaryReactionRepository).countEachByPublicDiaryId(diary.getId());
     verify(mockDiaryReactionRepository).findMemberReaction(memberId, diary.getId());
     verify(mocksS3FileStorageManager).preSignedWebtoonUrlFrom(any());
     verify(mocksS3FileStorageManager).preSignedCharacterImageUrlFrom(any());
@@ -222,7 +223,7 @@ class PublicDiaryServiceTest {
     when(mockPublicDiaryRepository.findNextContents(
             any(DiaryPageIndex.class), any(PageRequest.class)))
         .thenReturn(List.of(content));
-    when(mockDiaryReactionRepository.countEachByDiaryId(anyLong())).thenReturn(reactionCount);
+    when(mockDiaryReactionRepository.countEachByPublicDiaryId(anyLong())).thenReturn(reactionCount);
     when(mockDiaryReactionRepository.findMemberReaction(anyLong(), anyLong()))
         .thenReturn(reactionType);
     when(mockIndexFactory.createFrom(request)).thenReturn(mock(DiaryPageIndex.class));

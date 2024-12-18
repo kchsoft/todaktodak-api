@@ -3,7 +3,7 @@ package com.heartsave.todaktodak_api.diary.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.heartsave.todaktodak_api.common.constant.CoreConstant.TIME_FORMAT;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
+import com.heartsave.todaktodak_api.diary.domain.DiaryReactionCount;
 import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
@@ -43,21 +43,21 @@ public class PublicDiary {
   private final Instant createdDate;
 
   @Schema(description = "일기에 대한 반응 수 정보")
-  private final DiaryReactionCountProjection reactionCount;
+  private final DiaryReactionCount reactionCount;
 
   @Schema(description = "현재 사용자의 반응 목록")
   private final List<DiaryReactionType> myReaction;
 
   public static PublicDiary of(
       PublicDiaryContentProjection content,
-      DiaryReactionCountProjection reactionCount,
+      DiaryReactionCount reactionCount,
       List<DiaryReactionType> memberReaction) {
     return new PublicDiary(content, reactionCount, memberReaction);
   }
 
   private PublicDiary(
       PublicDiaryContentProjection content,
-      DiaryReactionCountProjection reactionCount,
+      DiaryReactionCount reactionCount,
       List<DiaryReactionType> memberReaction) {
     this.publicDiaryId = content.getPublicDiaryId();
     this.diaryId = content.getDiaryId();

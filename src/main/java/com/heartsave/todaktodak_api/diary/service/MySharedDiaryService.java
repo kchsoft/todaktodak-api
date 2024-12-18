@@ -66,7 +66,7 @@ public class MySharedDiaryService {
     replaceWithPreSignedUrls(contentOnly);
 
     DiaryReactionCountProjection reactionCount =
-        reactionRepository.countEachByDiaryId(contentOnly.getDiaryId());
+        reactionRepository.countEachByPublicDiaryId(contentOnly.getDiaryId());
     List<DiaryReactionType> memberReaction =
         reactionRepository.findMemberReaction(memberId, contentOnly.getDiaryId());
     log.info("나의 공개된 일기 상세 정보 요청을 성공적으로 마쳤습니다.");

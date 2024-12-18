@@ -290,6 +290,6 @@ public class DiaryServiceTest {
     verify(mockDiaryRepository, times(1))
         .findDiaryEntityByMemberEntity_IdAndDiaryCreatedTimeBetween(
             anyLong(), any(Instant.class), any(Instant.class));
-    verify(mockDiaryReactionRepository, times(0)).countEachByDiaryId(anyLong());
+    verify(mockDiaryReactionRepository, times(0)).countEachByPublicDiaryId(anyLong());
   }
 }

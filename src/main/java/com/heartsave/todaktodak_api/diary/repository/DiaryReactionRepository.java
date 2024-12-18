@@ -46,7 +46,7 @@ public interface DiaryReactionRepository extends JpaRepository<DiaryReactionEnti
             WHERE public_diary_id = :publicDiaryId
           """,
       nativeQuery = true)
-  DiaryReactionCountProjection countEachByDiaryId(Long publicDiaryId);
+  DiaryReactionCountProjection countEachByPublicDiaryId(Long publicDiaryId);
 
   @Modifying
   @Query(
