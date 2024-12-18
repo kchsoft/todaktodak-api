@@ -18,6 +18,7 @@ import com.heartsave.todaktodak_api.diary.exception.PublicDiaryExistException;
 import com.heartsave.todaktodak_api.diary.factory.DiaryPageIndexFactory;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
+import com.heartsave.todaktodak_api.diary.repository.PublicDiaryContentCacheRepository;
 import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
@@ -39,6 +40,7 @@ public class PublicDiaryService {
   private final DiaryReactionRepository reactionRepository;
   private final MemberRepository memberRepository;
   private final S3FileStorageManager s3FileStorageManager;
+  private final PublicDiaryContentCacheRepository publicDiaryContentCacheRepository;
 
   @Transactional(readOnly = true)
   public PublicDiaryPageResponse getPagination(Long memberId, DiaryPageRequest request) {
@@ -50,8 +52,18 @@ public class PublicDiaryService {
 
   private List<PublicDiaryContentProjection> fetchContents(DiaryPageIndex pageIndex) {
     log.info("공개 일기 content 정보를 조회합니다.");
-    return publicDiaryRepository.findNextContents(
-        pageIndex, PageRequest.of(0, 5)); // 현재 ID 제외, 다음 ID 포함 5개 조회
+
+    List<PublicDiaryContentProjection> content = publicDiaryContentCacheRepository.get(pageIndex);
+    if (!content.isEmpty()) {
+      return content;
+    }
+
+    log.info("공개 일기 content Cache Miss");
+    content =
+        publicDiaryRepository.findNextContents(
+            pageIndex, PageRequest.of(0, 5)); // 현재 ID 제외, 다음 ID 포함 5개 조회
+    publicDiaryContentCacheRepository.save(pageIndex, content);
+    return content;
   }
 
   private void replaceWithPreSignedUrls(List<PublicDiaryContentProjection> contentProjections) {
