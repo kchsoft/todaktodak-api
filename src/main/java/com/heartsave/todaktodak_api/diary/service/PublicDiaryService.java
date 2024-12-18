@@ -5,6 +5,7 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorS
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
+import com.heartsave.todaktodak_api.diary.domain.DiaryReactionCount;
 import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
 import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPageResponse;
@@ -18,7 +19,6 @@ import com.heartsave.todaktodak_api.diary.exception.PublicDiaryExistException;
 import com.heartsave.todaktodak_api.diary.factory.DiaryPageIndexFactory;
 import com.heartsave.todaktodak_api.diary.repository.DiaryReactionRepository;
 import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
-import com.heartsave.todaktodak_api.diary.repository.PublicDiaryContentCacheRepository;
 import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
@@ -40,7 +40,7 @@ public class PublicDiaryService {
   private final DiaryReactionRepository reactionRepository;
   private final MemberRepository memberRepository;
   private final S3FileStorageManager s3FileStorageManager;
-  private final PublicDiaryContentCacheRepository publicDiaryContentCacheRepository;
+  private final PublicDiaryCacheService publicDiaryCacheService;
 
   @Transactional(readOnly = true)
   public PublicDiaryPageResponse getPagination(Long memberId, DiaryPageRequest request) {
@@ -53,7 +53,7 @@ public class PublicDiaryService {
   private List<PublicDiaryContentProjection> fetchContents(DiaryPageIndex pageIndex) {
     log.info("공개 일기 content 정보를 조회합니다.");
 
-    List<PublicDiaryContentProjection> content = publicDiaryContentCacheRepository.get(pageIndex);
+    List<PublicDiaryContentProjection> content = publicDiaryCacheService.getContent(pageIndex);
     if (!content.isEmpty()) {
       return content;
     }
@@ -62,7 +62,7 @@ public class PublicDiaryService {
     content =
         publicDiaryRepository.findNextContents(
             pageIndex, PageRequest.of(0, 5)); // 현재 ID 제외, 다음 ID 포함 5개 조회
-    publicDiaryContentCacheRepository.save(pageIndex, content);
+    publicDiaryCacheService.saveContent(pageIndex, content);
     return content;
   }
 
@@ -84,7 +84,7 @@ public class PublicDiaryService {
     contentProjection.stream()
         .map(
             content -> {
-              DiaryReactionCountProjection reactionCount = fetchReactionCount(content.getDiaryId());
+              DiaryReactionCount reactionCount = fetchReactionCount(content.getDiaryId());
               List<DiaryReactionType> memberReactions =
                   fetchMemberReactions(memberId, content.getDiaryId());
               return PublicDiary.of(content, reactionCount, memberReactions);
@@ -93,8 +93,10 @@ public class PublicDiaryService {
     return response;
   }
 
-  private DiaryReactionCountProjection fetchReactionCount(Long diaryId) {
-    return reactionRepository.countEachByDiaryId(diaryId);
+  private DiaryReactionCount fetchReactionCount(Long diaryId) {
+    //    diaryReactionCacheRepository;
+    DiaryReactionCountProjection projection = reactionRepository.countEachByDiaryId(diaryId);
+    return DiaryReactionCount.from(projection);
   }
 
   private List<DiaryReactionType> fetchMemberReactions(Long memberId, Long diaryId) {
