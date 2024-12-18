@@ -167,7 +167,7 @@ class PublicDiaryServiceTest {
     DiaryReactionCountProjection reactionCount = mock(DiaryReactionCountProjection.class);
     when(mockDiaryReactionRepository.countEachByPublicDiaryId(diary.getId()))
         .thenReturn(reactionCount);
-    when(mockDiaryReactionRepository.findMemberReaction(memberId, diary.getId()))
+    when(mockDiaryReactionRepository.findMemberReactions(memberId, diary.getId()))
         .thenReturn(List.of(DiaryReactionType.LIKE));
 
     when(mockIndexFactory.createFrom(request)).thenReturn(mock(DiaryPageIndex.class));
@@ -203,7 +203,7 @@ class PublicDiaryServiceTest {
     verify(mockPublicDiaryRepository)
         .findNextContents(any(DiaryPageIndex.class), any(PageRequest.class));
     verify(mockDiaryReactionRepository).countEachByPublicDiaryId(diary.getId());
-    verify(mockDiaryReactionRepository).findMemberReaction(memberId, diary.getId());
+    verify(mockDiaryReactionRepository).findMemberReactions(memberId, diary.getId());
     verify(mocksS3FileStorageManager).preSignedWebtoonUrlFrom(any());
     verify(mocksS3FileStorageManager).preSignedCharacterImageUrlFrom(any());
     verify(mocksS3FileStorageManager).preSignedBgmUrlFrom(any());
@@ -224,7 +224,7 @@ class PublicDiaryServiceTest {
             any(DiaryPageIndex.class), any(PageRequest.class)))
         .thenReturn(List.of(content));
     when(mockDiaryReactionRepository.countEachByPublicDiaryId(anyLong())).thenReturn(reactionCount);
-    when(mockDiaryReactionRepository.findMemberReaction(anyLong(), anyLong()))
+    when(mockDiaryReactionRepository.findMemberReactions(anyLong(), anyLong()))
         .thenReturn(reactionType);
     when(mockIndexFactory.createFrom(request)).thenReturn(mock(DiaryPageIndex.class));
 

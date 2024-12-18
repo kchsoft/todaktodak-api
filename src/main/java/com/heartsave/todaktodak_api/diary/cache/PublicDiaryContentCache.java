@@ -12,8 +12,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @AllArgsConstructor
-public class PublicDiaryCache {
-
+public class PublicDiaryContentCache {
+  private final String TIMESTAMP_ID_KEY = "%d:%d";
   private final RedisTemplate<String, String> redisTemplate;
   private final PublicDiaryContentSerializer serializer;
 
@@ -21,7 +21,7 @@ public class PublicDiaryCache {
       String key, DiaryPageIndex pageIndex, List<PublicDiaryContentProjection> contents) {
     if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
       redisTemplate.opsForHash().put(key, getHashKey(pageIndex), serializer.serialize(contents));
-      redisTemplate.expire(key, Duration.ofMinutes(1));
+      redisTemplate.expire(key, Duration.ofMinutes(2));
       return;
     }
     redisTemplate.opsForHash().put(key, getHashKey(pageIndex), serializer.serialize(contents));
@@ -34,6 +34,7 @@ public class PublicDiaryCache {
   }
 
   private String getHashKey(DiaryPageIndex pageIndex) {
-    return pageIndex.getCreatedTime().toEpochMilli() + ":" + pageIndex.getPublicDiaryId();
+    return String.format(
+        TIMESTAMP_ID_KEY, pageIndex.getCreatedTime().toEpochMilli(), pageIndex.getPublicDiaryId());
   }
 }

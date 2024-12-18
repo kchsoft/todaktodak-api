@@ -158,7 +158,7 @@ public class MySharedDiaryServiceTest {
     when(mySharedDiaryRepository.findContent(member.getId(), requestDate))
         .thenReturn(Optional.of(contentOnly));
     when(reactionRepository.countEachByPublicDiaryId(diaryId)).thenReturn(reactionCount);
-    when(reactionRepository.findMemberReaction(member.getId(), diaryId))
+    when(reactionRepository.findMemberReactions(member.getId(), diaryId))
         .thenReturn(memberReactions);
 
     when(s3FileStorageManager.preSignedWebtoonUrlFrom(any()))

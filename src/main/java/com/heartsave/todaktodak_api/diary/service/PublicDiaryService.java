@@ -104,8 +104,15 @@ public class PublicDiaryService {
             });
   }
 
-  private List<DiaryReactionType> fetchMemberReactions(Long memberId, Long diaryId) {
-    return reactionRepository.findMemberReaction(memberId, diaryId);
+  private List<DiaryReactionType> fetchMemberReactions(Long memberId, Long publicDiaryId) {
+    return Optional.ofNullable(publicDiaryCacheService.getMemberReactions(memberId, publicDiaryId))
+        .orElseGet(
+            () -> {
+              List<DiaryReactionType> reactions =
+                  reactionRepository.findMemberReactions(memberId, publicDiaryId);
+              publicDiaryCacheService.saveMemberReactions(memberId, publicDiaryId, reactions);
+              return reactions;
+            });
   }
 
   public void write(Long memberId, Long diaryId, String publicContent) {

@@ -8,9 +8,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-public class DiaryReactionSerializer implements CacheSerializer<DiaryReactionCount> {
+public class DiaryReactionCountSerializer implements CacheSerializer<DiaryReactionCount> {
   private final ObjectMapper objectMapper;
 
+  @Override
   public String serialize(DiaryReactionCount count) {
     try {
       return objectMapper.writeValueAsString(count);

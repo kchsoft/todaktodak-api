@@ -20,6 +20,6 @@ public class DiaryReactionCount {
         projection.getLikes(),
         projection.getSurprised(),
         projection.getEmpathize(),
-        projection.getEmpathize());
+        projection.getCheering());
   }
 }
