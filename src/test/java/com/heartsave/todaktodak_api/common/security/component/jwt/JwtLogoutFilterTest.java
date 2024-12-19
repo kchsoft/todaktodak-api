@@ -3,6 +3,8 @@ package com.heartsave.todaktodak_api.common.security.component.jwt;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.heartsave.todaktodak_api.auth.repository.RefreshTokenCacheRepository;
+import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +23,9 @@ final class JwtLogoutFilterTest {
 
   @BeforeEach
   void setup() {
-    jwtLogoutFilter = new JwtLogoutFilter();
+    RefreshTokenCacheRepository refreshTokenCacheRepository =
+        mock(RefreshTokenCacheRepository.class);
+    jwtLogoutFilter = new JwtLogoutFilter(refreshTokenCacheRepository);
     request = new MockHttpServletRequest();
     response = new MockHttpServletResponse();
     filterChain = new MockFilterChain();
@@ -29,6 +33,7 @@ final class JwtLogoutFilterTest {
 
   @Test
   @DisplayName("로그아웃 성공")
+  @WithMockTodakUser
   void logoutSuccessTest() throws Exception {
     request.setMethod("POST");
     request.setRequestURI("/api/v1/auth/logout");
