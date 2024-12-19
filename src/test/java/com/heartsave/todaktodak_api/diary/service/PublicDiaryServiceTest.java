@@ -144,7 +144,7 @@ class PublicDiaryServiceTest {
     PublicDiaryContentProjection content = mock(PublicDiaryContentProjection.class);
     when(content.getPublicDiaryId()).thenReturn(publicDiaryId);
     when(content.getDiaryId()).thenReturn(diary.getId());
-    when(content.getWebtoonImageUrls()).thenReturn(List.of("webtoon/image.jpg"));
+    when(content.getWebtoonImageUrl()).thenReturn(List.of("webtoon/image.jpg"));
     when(content.getCharacterImageUrl()).thenReturn("character/image.jpg");
     when(content.getBgmUrl()).thenReturn("bgm/music.mp3");
     when(content.getNickname()).thenReturn("nickname");

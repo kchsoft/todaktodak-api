@@ -1,46 +1,35 @@
 package com.heartsave.todaktodak_api.diary.service;
 
-import com.heartsave.todaktodak_api.diary.cache.DiaryReactionCache;
-import com.heartsave.todaktodak_api.diary.cache.PublicDiaryContentCache;
-import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
+import com.heartsave.todaktodak_api.diary.cache.ContentReactionCountCache;
+import com.heartsave.todaktodak_api.diary.cache.entity.ContentReactionCountEntity;
 import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
-import com.heartsave.todaktodak_api.diary.domain.DiaryReactionCount;
-import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentProjection;
-import io.jsonwebtoken.lang.Collections;
 import java.util.List;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @AllArgsConstructor
 public class PublicDiaryCacheService {
-  private final String PUBLIC_DIARY_KEY = "public_diary:cache";
-  private final PublicDiaryContentCache publicDiaryContentCache;
-  private final DiaryReactionCache diaryReactionCache;
+  private final ContentReactionCountCache contentReactionCountCache;
+  private final String ORDER_PIVOT_FORMAT = "%d:%19d";
 
-  public void saveContents(DiaryPageIndex pageIndex, List<PublicDiaryContentProjection> contents) {
-    publicDiaryContentCache.save(PUBLIC_DIARY_KEY, pageIndex, contents);
+  public void saveContentReactionCounts(
+      DiaryPageIndex pageIndex, List<ContentReactionCountEntity> contents) {
+    setOrderPivotPadding(pageIndex, contents);
+    contentReactionCountCache.save(contents);
   }
 
-  public List<PublicDiaryContentProjection> getContents(DiaryPageIndex pageIndex) {
-    return publicDiaryContentCache.get(PUBLIC_DIARY_KEY, pageIndex).orElse(Collections.emptyList());
+  private void setOrderPivotPadding(
+      DiaryPageIndex pageIndex, List<ContentReactionCountEntity> contents) {
+    contents.forEach(content -> content.setOrderPivot(joinOrderPivot(pageIndex)));
   }
 
-  public void saveReactionCount(Long publicDiaryId, DiaryReactionCount count) {
-    diaryReactionCache.saveCount(PUBLIC_DIARY_KEY, publicDiaryId, count);
+  private String joinOrderPivot(DiaryPageIndex pageIndex) {
+    return String.format(
+        ORDER_PIVOT_FORMAT, pageIndex.getMilsTimeStamp(), pageIndex.getPublicDiaryId());
   }
 
-  public Optional<DiaryReactionCount> getReactionCount(Long publicDiaryId) {
-    return diaryReactionCache.getCount(PUBLIC_DIARY_KEY, publicDiaryId);
-  }
-
-  public List<DiaryReactionType> getMemberReactions(Long memberId, Long publicDiaryId) {
-    return diaryReactionCache.getMemberReactions(PUBLIC_DIARY_KEY, memberId, publicDiaryId);
-  }
-
-  public void saveMemberReactions(
-      Long memberId, Long publicDiaryId, List<DiaryReactionType> types) {
-    diaryReactionCache.saveMemberReactions(PUBLIC_DIARY_KEY, memberId, publicDiaryId, types);
+  public List<ContentReactionCountEntity> getContentReactionCounts(DiaryPageIndex pageIndex) {
+    return contentReactionCountCache.get(joinOrderPivot(pageIndex));
   }
 }

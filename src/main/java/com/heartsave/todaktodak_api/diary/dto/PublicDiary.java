@@ -2,9 +2,9 @@ package com.heartsave.todaktodak_api.diary.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.heartsave.todaktodak_api.common.constant.CoreConstant.TIME_FORMAT;
+import com.heartsave.todaktodak_api.diary.cache.entity.ContentReactionCountEntity;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.domain.DiaryReactionCount;
-import com.heartsave.todaktodak_api.diary.entity.projection.PublicDiaryContentProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.List;
@@ -49,25 +49,21 @@ public class PublicDiary {
   private final List<DiaryReactionType> myReaction;
 
   public static PublicDiary of(
-      PublicDiaryContentProjection content,
-      DiaryReactionCount reactionCount,
-      List<DiaryReactionType> memberReaction) {
-    return new PublicDiary(content, reactionCount, memberReaction);
+      ContentReactionCountEntity contentReactionCount, List<DiaryReactionType> memberReaction) {
+    return new PublicDiary(contentReactionCount, memberReaction);
   }
 
   private PublicDiary(
-      PublicDiaryContentProjection content,
-      DiaryReactionCount reactionCount,
-      List<DiaryReactionType> memberReaction) {
-    this.publicDiaryId = content.getPublicDiaryId();
-    this.diaryId = content.getDiaryId();
-    this.characterImageUrl = content.getCharacterImageUrl();
-    this.nickname = content.getNickname();
-    this.publicContent = content.getPublicContent();
-    this.webtoonImageUrls = content.getWebtoonImageUrls();
-    this.bgmUrl = content.getBgmUrl();
-    this.createdDate = content.getDate();
-    this.reactionCount = reactionCount;
+      ContentReactionCountEntity contentReactionCount, List<DiaryReactionType> memberReaction) {
+    this.publicDiaryId = contentReactionCount.getPublicDiaryId();
+    this.diaryId = contentReactionCount.getDiaryId();
+    this.characterImageUrl = contentReactionCount.getCharacterImageUrl();
+    this.nickname = contentReactionCount.getNickname();
+    this.publicContent = contentReactionCount.getPublicContent();
+    this.webtoonImageUrls = contentReactionCount.getWebtoonImageUrls();
+    this.bgmUrl = contentReactionCount.getBgmUrl();
+    this.createdDate = contentReactionCount.getDate();
+    this.reactionCount = contentReactionCount.getReactionCount();
     this.myReaction = memberReaction;
   }
 }

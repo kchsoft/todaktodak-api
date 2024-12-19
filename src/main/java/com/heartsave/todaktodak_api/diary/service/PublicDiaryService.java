@@ -3,6 +3,7 @@ package com.heartsave.todaktodak_api.diary.service;
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
+import com.heartsave.todaktodak_api.diary.cache.entity.ContentReactionCountEntity;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.diary.domain.DiaryPageIndex;
 import com.heartsave.todaktodak_api.diary.domain.DiaryReactionCount;
@@ -22,7 +23,6 @@ import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -45,74 +45,52 @@ public class PublicDiaryService {
   @Transactional(readOnly = true)
   public PublicDiaryPageResponse getPagination(Long memberId, DiaryPageRequest request) {
     DiaryPageIndex pageIndex = pageIndexFactory.createFrom(request);
-    List<PublicDiaryContentProjection> contentProjections = fetchContents(pageIndex);
-    replaceWithPreSignedUrls(contentProjections);
-    return createPageResponse(contentProjections, memberId);
-  }
 
-  private List<PublicDiaryContentProjection> fetchContents(DiaryPageIndex pageIndex) {
-    log.info("공개 일기 content 정보를 조회합니다.");
-    return Optional.ofNullable(publicDiaryCacheService.getContents(pageIndex))
-        .filter(contents -> !contents.isEmpty())
-        .orElseGet(
-            () -> {
-              log.info("공개 일기 Cache Miss");
-              List<PublicDiaryContentProjection> dbContents =
-                  publicDiaryRepository.findNextContents(pageIndex, PageRequest.of(0, 5));
-              publicDiaryCacheService.saveContents(pageIndex, dbContents);
-              return dbContents;
-            });
-  }
+    List<ContentReactionCountEntity> contentReactionCounts =
+        publicDiaryCacheService.getContentReactionCounts(pageIndex);
+    if (contentReactionCounts.isEmpty()) {
+      List<PublicDiaryContentProjection> projections = fetchContents(pageIndex);
 
-  private void replaceWithPreSignedUrls(List<PublicDiaryContentProjection> contentProjections) {
-    log.info("공개 일기 content url을 pre-signed url로 변경합니다.");
-    for (PublicDiaryContentProjection content : contentProjections) {
-      content.replaceWebtoonImageUrls(
-          s3FileStorageManager.preSignedWebtoonUrlFrom(content.getWebtoonImageUrls()));
-      content.replaceCharacterImageUrl(
-          s3FileStorageManager.preSignedCharacterImageUrlFrom(content.getCharacterImageUrl()));
-      content.replaceBgmUrl(s3FileStorageManager.preSignedBgmUrlFrom(content.getBgmUrl()));
+      for (PublicDiaryContentProjection projection : projections) {
+        ContentReactionCountEntity entity = ContentReactionCountEntity.createFrom(projection);
+        entity.applyReactionCount(fetchReactionCount(projection.getPublicDiaryId()));
+        contentReactionCounts.add(entity);
+      }
+      publicDiaryCacheService.saveContentReactionCounts(pageIndex, contentReactionCounts);
     }
-  }
+    updateUrlsWithPreSigned(contentReactionCounts);
 
-  private PublicDiaryPageResponse createPageResponse(
-      List<PublicDiaryContentProjection> contentProjection, Long memberId) {
     PublicDiaryPageResponse response = new PublicDiaryPageResponse();
-    log.info("공개 일기 Reaction 정보를 조회합니다.");
-    contentProjection.stream()
-        .map(
-            content -> {
-              DiaryReactionCount reactionCount = fetchReactionCount(content.getPublicDiaryId());
-              List<DiaryReactionType> memberReactions =
-                  fetchMemberReactions(memberId, content.getPublicDiaryId());
-              return PublicDiary.of(content, reactionCount, memberReactions);
-            })
-        .forEach(response::addPublicDiary);
+    for (ContentReactionCountEntity contentReactionCount : contentReactionCounts) {
+      response.addPublicDiary(
+          PublicDiary.of(
+              contentReactionCount,
+              fetchMemberReactions(memberId, contentReactionCount.getPublicDiaryId())));
+    }
     return response;
   }
 
+  private List<PublicDiaryContentProjection> fetchContents(DiaryPageIndex pageIndex) {
+    return publicDiaryRepository.findNextContents(pageIndex, PageRequest.of(0, 5));
+  }
+
+  private void updateUrlsWithPreSigned(List<ContentReactionCountEntity> entitys) {
+    log.info("공개 일기 content url을 pre-signed url로 변경합니다.");
+    for (ContentReactionCountEntity content : entitys) {
+      content.updateWebtoonImageUrls(
+          s3FileStorageManager.preSignedWebtoonUrlFrom(content.getWebtoonImageUrls()));
+      content.updateCharacterImageUrl(
+          s3FileStorageManager.preSignedCharacterImageUrlFrom(content.getCharacterImageUrl()));
+      content.updateBgmUrl(s3FileStorageManager.preSignedBgmUrlFrom(content.getBgmUrl()));
+    }
+  }
+
   private DiaryReactionCount fetchReactionCount(Long publicDiaryId) {
-    return publicDiaryCacheService
-        .getReactionCount(publicDiaryId)
-        .orElseGet(
-            () -> {
-              DiaryReactionCount reactionCount =
-                  DiaryReactionCount.from(
-                      reactionRepository.countEachByPublicDiaryId(publicDiaryId));
-              publicDiaryCacheService.saveReactionCount(publicDiaryId, reactionCount);
-              return reactionCount;
-            });
+    return DiaryReactionCount.from(reactionRepository.countEachByPublicDiaryId(publicDiaryId));
   }
 
   private List<DiaryReactionType> fetchMemberReactions(Long memberId, Long publicDiaryId) {
-    return Optional.ofNullable(publicDiaryCacheService.getMemberReactions(memberId, publicDiaryId))
-        .orElseGet(
-            () -> {
-              List<DiaryReactionType> reactions =
-                  reactionRepository.findMemberReactions(memberId, publicDiaryId);
-              publicDiaryCacheService.saveMemberReactions(memberId, publicDiaryId, reactions);
-              return reactions;
-            });
+    return reactionRepository.findMemberReactions(memberId, publicDiaryId);
   }
 
   public void write(Long memberId, Long diaryId, String publicContent) {
