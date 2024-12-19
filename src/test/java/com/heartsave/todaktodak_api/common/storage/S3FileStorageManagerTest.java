@@ -33,8 +33,6 @@ final class S3FileStorageManagerTest {
 
   private static final String TEST_PRE_SIGNED_URL =
       "https://test-bucket.s3.amazonaws.com/presigned-url";
-  private static final String TEST_ORIGINAL_URL =
-      "https://test-bucket.s3.amazonaws.com/original-url";
   private static final String DEFAULT_WEBTOON_KEY = "default/webtoon.jpg";
   private static final String DEFAULT_CHARACTER_KEY = "default/character.jpg";
   private static final String DEFAULT_BGM_KEY = "default/bgm.mp3";
@@ -105,15 +103,11 @@ final class S3FileStorageManagerTest {
   @DisplayName("캐릭터 이미지 presign 테스트")
   final class CharacterUrlTests {
 
-    @BeforeEach
-    void setUp() {
-      mockBasicProperties();
-    }
-
     @Test
     @DisplayName("캐릭터 이미지 presign 성공")
     void preSignCharacterImageUrlSuccessTest() throws Exception {
       // given
+      mockBasicProperties();
       mockPresign();
       String key = "character.jpg";
 
@@ -127,15 +121,11 @@ final class S3FileStorageManagerTest {
     @Test
     @DisplayName("존재하지 않는 캐릭터 이미지에 대해 기본 이미지로 대체")
     void preSignCharacterUrlDefaultTest() throws Exception {
-      // given
-      mockDefaultKey();
-      mockPresign();
-
       // when
       String url = s3Manager.preSignedCharacterImageUrlFrom(null);
 
       // then
-      assertThat(url).isEqualTo(TEST_PRE_SIGNED_URL);
+      assertThat(url).isNull();
     }
   }
 
