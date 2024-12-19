@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @RequiredArgsConstructor
@@ -123,5 +125,11 @@ public class JwtValidationFilter extends OncePerRequestFilter {
         .username(extractUsername(token))
         .role(extractRole(token))
         .build();
+  }
+
+  @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) {
+    return Stream.of("auth/**", "webhook/ai/**")
+        .anyMatch(pattern -> new AntPathMatcher().match(pattern, request.getRequestURI()));
   }
 }
