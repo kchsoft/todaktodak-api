@@ -37,8 +37,10 @@ public class CharacterController {
       })
   @PostMapping
   public ResponseEntity<Void> createCharacterImage(
-      @RequestParam("uploadImage") MultipartFile file, @TodakUserId Long memberId) {
-    characterService.createCharacterImage(file, memberId);
+      @RequestParam("uploadImage") MultipartFile file,
+      @RequestParam("characterStyle") String characterStyle,
+      @TodakUserId Long memberId) {
+    characterService.createCharacterImage(file, characterStyle, memberId);
     return ResponseEntity.noContent().build();
   }
 
