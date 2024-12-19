@@ -28,4 +28,8 @@ public class RefreshTokenCacheRepository {
   public String get(String key) {
     return redisTemplate.opsForValue().get(REFRESH_TOKEN_KEY_PREFIX + key);
   }
+
+  public void delete(String key) {
+    redisTemplate.delete(REFRESH_TOKEN_KEY_PREFIX + key);
+  }
 }
