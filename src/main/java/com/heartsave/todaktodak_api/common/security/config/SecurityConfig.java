@@ -7,6 +7,7 @@ import com.heartsave.todaktodak_api.common.security.component.AuthenticationEntr
 import com.heartsave.todaktodak_api.common.security.component.jwt.JwtAuthFilter;
 import com.heartsave.todaktodak_api.common.security.component.jwt.JwtLogoutFilter;
 import com.heartsave.todaktodak_api.common.security.component.jwt.JwtValidationFilter;
+import com.heartsave.todaktodak_api.common.security.component.oauth2.CookieOauth2AuthorizationRequestRepository;
 import com.heartsave.todaktodak_api.common.security.component.oauth2.OAuth2SuccessHandler;
 import com.heartsave.todaktodak_api.common.security.component.oauth2.Oauth2FailureHandler;
 import com.heartsave.todaktodak_api.common.security.component.oauth2.TodakOauth2UserDetailsService;
@@ -59,6 +60,10 @@ public class SecurityConfig {
         .oauth2Login(
             (oauth2) ->
                 oauth2
+                    .authorizationEndpoint(
+                        ep ->
+                            ep.authorizationRequestRepository(
+                                new CookieOauth2AuthorizationRequestRepository()))
                     .userInfoEndpoint((config) -> config.userService(oauth2UserDetailsService))
                     .successHandler(oAuth2SuccessHandler)
                     .failureHandler(oauth2FailureHandler))
