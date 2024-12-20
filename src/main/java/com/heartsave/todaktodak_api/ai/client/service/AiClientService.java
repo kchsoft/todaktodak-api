@@ -96,6 +96,7 @@ public class AiClientService {
     // 요청 json
     builder.part("memberId", request.getMemberId());
     builder.part("characterStyle", request.getCharacterStyle());
+    builder.part("apiDomainUrl", request.getSeverDomainUrl());
 
     // 이미지
     try {
