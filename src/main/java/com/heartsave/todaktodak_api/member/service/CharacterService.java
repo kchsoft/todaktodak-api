@@ -48,11 +48,13 @@ public class CharacterService {
         .build();
   }
 
-  // TODO: 화풍 동적 변경 필요
-  public void createCharacterImage(MultipartFile file, Long memberId) {
+  public void createCharacterImage(MultipartFile file, String characterStyle, Long memberId) {
     MemberEntity member = findMemberById(memberId);
     ClientCharacterRequest dto =
-        ClientCharacterRequest.builder().characterStyle("romance").memberId(member.getId()).build();
+        ClientCharacterRequest.builder()
+            .characterStyle(characterStyle)
+            .memberId(member.getId())
+            .build();
     aiClientService.callCharacter(file, dto);
   }
 

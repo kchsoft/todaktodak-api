@@ -24,7 +24,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -80,11 +79,11 @@ public class SecurityConfig {
         .sessionManagement(
             sessionManagement ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(new JwtValidationFilter(authenticationEntryPoint), JwtAuthFilter.class)
+        .addFilterBefore(new JwtLogoutFilter(refreshTokenCacheRepository), LogoutFilter.class)
         .addFilterBefore(
             new JwtAuthFilter(authenticationManager, objectMapper, refreshTokenCacheRepository),
-            UsernamePasswordAuthenticationFilter.class)
-        .addFilterBefore(new JwtLogoutFilter(), LogoutFilter.class)
+            JwtLogoutFilter.class)
+        .addFilterBefore(new JwtValidationFilter(authenticationEntryPoint), JwtAuthFilter.class)
         .build();
   }
 

@@ -49,7 +49,7 @@ public class S3FileStorageManager {
   }
 
   public String preSignedCharacterImageUrlFrom(String key) {
-    return key == null ? preSign(s3Properties.defaultKey().character()) : preSign(key);
+    return key == null ? null : preSign(key);
   }
 
   public String preSignedBgmUrlFrom(String key) {
@@ -119,7 +119,7 @@ public class S3FileStorageManager {
       copyObject(tempKey, key);
       deleteObject(tempKey);
     } catch (NoSuchKeyException e) {
-      throw new InvalidS3UrlException(S3ErrorSpec.INVALID_S3_URL, tempKey + "->" + key);
+      throw new InvalidS3UrlException(S3ErrorSpec.NON_EXISTED_S3_URL, tempKey + "->" + key);
     }
   }
 
