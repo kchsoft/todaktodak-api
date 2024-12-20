@@ -48,7 +48,10 @@ public class AuthService {
     if (!checkCache(id, refreshToken))
       throw new AuthException(
           AuthErrorSpec.ABNORMAL_ACCESS,
-          ErrorFieldBuilder.builder().add("reason", "캐시 토큰과 동일하지 않아요.").build());
+          ErrorFieldBuilder.builder()
+              .add("reason", "캐시 토큰과 동일하지 않아요.")
+              .add("cookie", refreshToken)
+              .build());
 
     // 토큰 재발급 및 쿠키 갱신
     var accessToken = JwtUtils.issueToken(user, ACCESS_TYPE);
