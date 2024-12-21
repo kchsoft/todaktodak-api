@@ -8,7 +8,10 @@ import jakarta.annotation.Nullable;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Base64;
+import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +26,14 @@ public class CookieUtils {
   public static Cookie createValidCookie(String key, String value) {
     Cookie cookie = new Cookie(key, value);
     cookie.setMaxAge(MAX_AGE.intValue());
+    cookie.setPath("/");
+    cookie.setHttpOnly(true);
+    return cookie;
+  }
+
+  public static Cookie createValidCookie(String key, String value, int maxAge) {
+    Cookie cookie = new Cookie(key, value);
+    cookie.setMaxAge(maxAge);
     cookie.setPath("/");
     cookie.setHttpOnly(true);
     return cookie;
@@ -52,5 +63,30 @@ public class CookieUtils {
         .filter(cookie -> cookie.getName().equals(cookieName))
         .findFirst()
         .orElse(null);
+  }
+
+  public static void deleteCookie(
+      HttpServletRequest request, HttpServletResponse response, String cookieName) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if (cookie.getName().equals(cookieName)) {
+          cookie.setValue("");
+          cookie.setPath("/");
+          cookie.setMaxAge(0);
+          response.addCookie(cookie);
+        }
+      }
+    }
+  }
+
+  public static String serialize(Object object) {
+    return Base64.getUrlEncoder()
+        .encodeToString(SerializationUtils.serialize((Serializable) object));
+  }
+
+  public static <T> T deserialize(Cookie cookie, Class<T> clazz) {
+    return clazz.cast(
+        SerializationUtils.deserialize(Base64.getUrlDecoder().decode(cookie.getValue())));
   }
 }
