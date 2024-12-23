@@ -92,8 +92,53 @@ public class S3FileStorageManager {
 
   public void deleteDiaryContents(List<String> keys) {
     log.info("S3에 일기 컨텐츠 삭제를 요청합니다.");
-    keys.forEach(this::deleteDiaryContent);
+    keys.forEach(this::deleteFolderAndContents);
     log.info("S3에서 일기 컨텐츠를 삭제했습니다.");
+  }
+
+  public void deleteFolderAndContents(String folderPath) {
+    if (folderPath == null) return;
+    if (!folderPath.contains("/")) return;
+
+    try {
+      // 1. 먼저 해당 폴더의 모든 객체를 나열
+      ListObjectsV2Request listRequest =
+          ListObjectsV2Request.builder()
+              .bucket(s3Properties.bucketName())
+              .prefix(folderPath)
+              .build();
+
+      ListObjectsV2Response listResponse;
+      do {
+        listResponse = s3Client.listObjectsV2(listRequest);
+
+        // 2. 찾은 모든 객체를 삭제
+        for (S3Object s3Object : listResponse.contents()) {
+          DeleteObjectRequest deleteRequest =
+              DeleteObjectRequest.builder()
+                  .bucket(s3Properties.bucketName())
+                  .key(s3Object.key())
+                  .build();
+
+          s3Client.deleteObject(deleteRequest);
+          log.info("Deleted object: {}", s3Object.key());
+        }
+
+        // 다음 페이지가 있다면 계속 진행
+        listRequest =
+            ListObjectsV2Request.builder()
+                .bucket(s3Properties.bucketName())
+                .prefix(folderPath)
+                .continuationToken(listResponse.nextContinuationToken())
+                .build();
+
+      } while (listResponse.isTruncated());
+
+      log.info("Successfully deleted folder: {}", folderPath);
+    } catch (Exception e) {
+      log.error("Error deleting folder: {} - {}", folderPath, e.getMessage());
+      throw new RuntimeException("Failed to delete folder: " + folderPath, e);
+    }
   }
 
   // 객체 메타데이터 조회로 존재 확인
