@@ -75,6 +75,7 @@ public class SecurityConfig {
                         "/swagger-resources/**",
                         "/v3/api-docs/**",
                         "/api/v1/webhook/ai/**",
+                        "/api/v1/event/**",
                         "/error")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/v1/diary/my")

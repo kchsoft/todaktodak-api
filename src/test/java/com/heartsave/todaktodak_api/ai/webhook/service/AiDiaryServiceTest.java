@@ -14,7 +14,7 @@ import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.event.service.EventService;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,7 +37,7 @@ class AiDiaryServiceTest {
   private WebhookWebtoonCompletionRequest webtoonRequest;
   private WebhookBgmCompletionRequest bgmRequest;
   private final Long memberId = 1L;
-  private final LocalDate createdDate = LocalDate.now();
+  private final Instant createdDate = Instant.now();
   private final String PARSED_KEY_URL = "parsed-key-url";
 
   @BeforeEach

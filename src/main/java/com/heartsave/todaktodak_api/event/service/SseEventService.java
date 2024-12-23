@@ -60,6 +60,7 @@ public class SseEventService implements EventService {
     try {
       emitter.send(createEvent(event));
       logEventSuccess(event);
+      emitter.complete();
     } catch (IOException e) {
       save(event);
       handleEmitterError(event.getMemberEntity().getId(), e);

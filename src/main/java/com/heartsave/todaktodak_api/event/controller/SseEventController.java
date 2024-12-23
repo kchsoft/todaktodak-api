@@ -26,7 +26,7 @@ public class SseEventController {
   private static final Logger logger = LoggerFactory.getLogger(SseEventController.class);
   private final SseManager sseManager;
   private final SseEventService eventService;
-  private final long SSE_TIMEOUT_MILLI_SECOND = 85_000L;
+  private final long SSE_TIMEOUT_MILLI_SECOND = 300_000L;
 
   @Operation(summary = "SSE 이벤트 수신을 위한 연결")
   @ApiResponses(

@@ -9,7 +9,6 @@ import com.heartsave.todaktodak_api.config.BaseSpringbootTest;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import java.io.IOException;
-import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -89,13 +88,6 @@ class AiClientServiceTest extends BaseSpringbootTest {
       String body = request.getBody().readUtf8();
       String path = request.getPath();
       log.info("{} = {}", path, body);
-
-      // /bgm 또는 /webtoon 요청일 경우에만 날짜 형식 검사
-      if (path.equals(BGM_URI) || path.equals(WEBTOON_URI)) {
-        assertThat(body.contains(LocalDate.now().toString()))
-            .as("요청하는 LocalDate 형식이 yyyy-MM-dd 가 아닙니다. Path: " + path)
-            .isTrue();
-      }
     }
   }
 }
