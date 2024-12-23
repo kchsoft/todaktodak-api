@@ -20,7 +20,7 @@ public class ContentReactionCountCache {
 
   public void save(List<ContentReactionCountEntity> contents) {
     if (!Boolean.TRUE.equals(redisTemplate.hasKey(PUBLIC_DIARY_KEY))) {
-      redisTemplate.expire(PUBLIC_DIARY_KEY, Duration.ofMinutes(60));
+      redisTemplate.expire(PUBLIC_DIARY_KEY, Duration.ofMinutes(2));
     }
 
     contents.forEach(
