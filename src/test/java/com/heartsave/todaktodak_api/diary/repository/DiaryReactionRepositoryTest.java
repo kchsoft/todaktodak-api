@@ -101,7 +101,8 @@ public class DiaryReactionRepositoryTest {
               .build());
     }
 
-    DiaryReactionCountProjection result = diaryReactionRepository.countEachByDiaryId(diary.getId());
+    DiaryReactionCountProjection result =
+        diaryReactionRepository.countEachByPublicDiaryId(diary.getId());
 
     assertThat(result).isNotNull();
     DiaryReactionCountProjection count = result;
@@ -114,7 +115,8 @@ public class DiaryReactionRepositoryTest {
   @Test
   @DisplayName("findReactionCountById - 반응이 없는 경우")
   void findReactionCountByIdEmpty() {
-    DiaryReactionCountProjection result = diaryReactionRepository.countEachByDiaryId(diary.getId());
+    DiaryReactionCountProjection result =
+        diaryReactionRepository.countEachByPublicDiaryId(diary.getId());
 
     assertThat(result).isNotNull();
     DiaryReactionCountProjection count = result;
@@ -152,7 +154,7 @@ public class DiaryReactionRepositoryTest {
     tem.remove(diary);
 
     DiaryReactionCountProjection result =
-        diaryReactionRepository.countEachByDiaryId(publicDiary.getId());
+        diaryReactionRepository.countEachByPublicDiaryId(publicDiary.getId());
 
     assertThat(result.getLikes()).as("삭제된 일기의 반응 수가 조회되었습니다.").isEqualTo(0);
     assertThat(result.getCheering()).as("삭제된 일기의 반응 수가 조회되었습니다.").isEqualTo(0);
@@ -173,13 +175,13 @@ public class DiaryReactionRepositoryTest {
     diaryReactionRepository.save(reaction);
 
     DiaryReactionCountProjection resultAfterSave =
-        diaryReactionRepository.countEachByDiaryId(diary.getId());
+        diaryReactionRepository.countEachByPublicDiaryId(diary.getId());
     assertThat(resultAfterSave.getLikes()).as("반응이 저장되지 않았습니다.").isEqualTo(1);
 
     diaryReactionRepository.deleteReaction(member.getId(), diary.getId(), DiaryReactionType.LIKE);
 
     DiaryReactionCountProjection resultAfterDelete =
-        diaryReactionRepository.countEachByDiaryId(diary.getId());
+        diaryReactionRepository.countEachByPublicDiaryId(diary.getId());
     assertThat(resultAfterDelete.getLikes()).as("반응이 삭제되지 않았습니다.").isEqualTo(0);
   }
 
@@ -203,7 +205,8 @@ public class DiaryReactionRepositoryTest {
     diaryReactionRepository.save(likeReaction);
     diaryReactionRepository.save(cheeringReaction);
 
-    DiaryReactionCountProjection result = diaryReactionRepository.countEachByDiaryId(diary.getId());
+    DiaryReactionCountProjection result =
+        diaryReactionRepository.countEachByPublicDiaryId(diary.getId());
     assertThat(result.getLikes()).as("LIKE 반응이 저장되지 않았습니다.").isEqualTo(1);
     assertThat(result.getCheering()).as("CHEERING 반응이 저장되지 않았습니다.").isEqualTo(1);
   }
@@ -231,7 +234,8 @@ public class DiaryReactionRepositoryTest {
     diaryReactionRepository.save(reaction1);
     diaryReactionRepository.save(reaction2);
 
-    DiaryReactionCountProjection result = diaryReactionRepository.countEachByDiaryId(diary.getId());
+    DiaryReactionCountProjection result =
+        diaryReactionRepository.countEachByPublicDiaryId(diary.getId());
     assertThat(result.getLikes()).as("두 멤버의 LIKE 반응이 모두 저장되지 않았습니다.").isEqualTo(2);
   }
 
@@ -265,7 +269,7 @@ public class DiaryReactionRepositoryTest {
         .isInstanceOf(ConstraintViolationException.class);
     tem.clear(); // duplicateReaction clear
     DiaryReactionCountProjection result =
-        diaryReactionRepository.countEachByDiaryId(publicDiary.getId());
+        diaryReactionRepository.countEachByPublicDiaryId(publicDiary.getId());
     Assertions.assertThat(result.getLikes()).as("기존 반응이 유지되어야 합니다.").isEqualTo(1);
   }
 }

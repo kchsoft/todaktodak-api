@@ -20,4 +20,8 @@ public class DiaryPageIndex {
   public static DiaryPageIndex from(DiaryPageRequest request) {
     return new DiaryPageIndex(request.publicDiaryId(), request.createdTime());
   }
+
+  public Long getMilsTimeStamp() {
+    return createdTime.toEpochMilli();
+  }
 }
