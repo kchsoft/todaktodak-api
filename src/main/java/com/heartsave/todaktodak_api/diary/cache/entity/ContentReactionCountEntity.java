@@ -56,4 +56,8 @@ public class ContentReactionCountEntity {
   public void setOrderPivot(String orderPivot) {
     this.orderPivot = orderPivot;
   }
+
+  public Long getMilsTimeStamp() {
+    return getDate().toEpochMilli();
+  }
 }

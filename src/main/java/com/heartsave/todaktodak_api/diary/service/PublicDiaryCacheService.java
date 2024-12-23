@@ -11,25 +11,27 @@ import org.springframework.stereotype.Repository;
 @AllArgsConstructor
 public class PublicDiaryCacheService {
   private final ContentReactionCountCache contentReactionCountCache;
-  private final String ORDER_PIVOT_FORMAT = "%d:%19d";
+  private final String ORDER_PIVOT_ENTITY_FORMAT = "%d:%019d";
+  private final String ORDER_PIVOT_GET_FORMAT = "({\"orderPivot\":\"%d:%019d\"";
 
-  public void saveContentReactionCounts(
-      DiaryPageIndex pageIndex, List<ContentReactionCountEntity> contents) {
-    setOrderPivotPadding(pageIndex, contents);
+  public void saveContentReactionCounts(List<ContentReactionCountEntity> contents) {
+    setOrderPivotPadding(contents);
     contentReactionCountCache.save(contents);
   }
 
-  private void setOrderPivotPadding(
-      DiaryPageIndex pageIndex, List<ContentReactionCountEntity> contents) {
-    contents.forEach(content -> content.setOrderPivot(joinOrderPivot(pageIndex)));
-  }
-
-  private String joinOrderPivot(DiaryPageIndex pageIndex) {
-    return String.format(
-        ORDER_PIVOT_FORMAT, pageIndex.getMilsTimeStamp(), pageIndex.getPublicDiaryId());
+  private void setOrderPivotPadding(List<ContentReactionCountEntity> contents) {
+    contents.forEach(
+        content ->
+            content.setOrderPivot(
+                String.format(
+                    ORDER_PIVOT_ENTITY_FORMAT,
+                    content.getMilsTimeStamp(),
+                    content.getPublicDiaryId())));
   }
 
   public List<ContentReactionCountEntity> getContentReactionCounts(DiaryPageIndex pageIndex) {
-    return contentReactionCountCache.get(joinOrderPivot(pageIndex));
+    return contentReactionCountCache.get(
+        String.format(
+            ORDER_PIVOT_GET_FORMAT, pageIndex.getMilsTimeStamp(), pageIndex.getPublicDiaryId()));
   }
 }

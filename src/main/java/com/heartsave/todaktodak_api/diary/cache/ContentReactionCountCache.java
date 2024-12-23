@@ -2,15 +2,13 @@ package com.heartsave.todaktodak_api.diary.cache;
 
 import com.heartsave.todaktodak_api.diary.cache.entity.ContentReactionCountEntity;
 import com.heartsave.todaktodak_api.diary.cache.serializer.PublicDiaryContentSerializer;
+import com.heartsave.todaktodak_api.metric.DatabaseMetrics;
+import io.micrometer.core.instrument.Timer;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Range;
-import org.springframework.data.domain.Range.Bound;
-import org.springframework.data.redis.connection.Limit;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -21,10 +19,11 @@ public class ContentReactionCountCache {
   private final int DEFAULT_SCORE = 0;
   private final RedisTemplate<String, String> redisTemplate;
   private final PublicDiaryContentSerializer serializer;
+  private final DatabaseMetrics metric;
 
   public void save(List<ContentReactionCountEntity> contents) {
     if (!Boolean.TRUE.equals(redisTemplate.hasKey(PUBLIC_DIARY_KEY))) {
-      redisTemplate.expire(PUBLIC_DIARY_KEY, Duration.ofMinutes(2));
+      redisTemplate.expire(PUBLIC_DIARY_KEY, Duration.ofMinutes(60));
     }
 
     contents.forEach(
@@ -35,18 +34,37 @@ public class ContentReactionCountCache {
   }
 
   public List<ContentReactionCountEntity> get(String orderPivot) {
-    LinkedHashSet<String> resultSet =
-        (LinkedHashSet<String>)
-            redisTemplate
-                .opsForZSet()
-                .reverseRangeByLex(
-                    PUBLIC_DIARY_KEY,
-                    Range.leftUnbounded(Bound.exclusive(orderPivot)),
-                    Limit.limit().offset(0).count(5));
+    Timer.Sample redisSample = Timer.start();
+    List<String> results =
+        redisTemplate.execute(
+            (RedisCallback<List<String>>)
+                connection -> {
+                  Object rawResponse =
+                      connection.execute(
+                          "ZRANGE",
+                          PUBLIC_DIARY_KEY.getBytes(),
+                          orderPivot.getBytes(),
+                          "-".getBytes(),
+                          "BYLEX".getBytes(),
+                          "REV".getBytes(),
+                          "LIMIT".getBytes(),
+                          "0".getBytes(),
+                          "5".getBytes());
 
-    if (resultSet == null) return Collections.emptyList();
+                  List<String> stringList = new ArrayList<>();
+                  if (rawResponse instanceof List<?> responseList) {
+                    responseList.forEach(
+                        item -> {
+                          if (item instanceof byte[]) {
+                            stringList.add(new String((byte[]) item));
+                          }
+                        });
+                  }
+                  return stringList;
+                });
+    redisSample.stop(metric.getRedisTimer());
     List<ContentReactionCountEntity> contents = new ArrayList<>();
-    resultSet.forEach(result -> contents.add(serializer.deserialize(result)));
+    results.forEach(result -> contents.add(serializer.deserialize(result)));
     return contents;
   }
 }

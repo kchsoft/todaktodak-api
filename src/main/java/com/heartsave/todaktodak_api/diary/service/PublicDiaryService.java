@@ -22,6 +22,9 @@ import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.member.repository.MemberRepository;
+import com.heartsave.todaktodak_api.metric.DatabaseMetrics;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.Timer.Sample;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +44,7 @@ public class PublicDiaryService {
   private final MemberRepository memberRepository;
   private final S3FileStorageManager s3FileStorageManager;
   private final PublicDiaryCacheService publicDiaryCacheService;
+  private final DatabaseMetrics metrics;
 
   @Transactional(readOnly = true)
   public PublicDiaryPageResponse getPagination(Long memberId, DiaryPageRequest request) {
@@ -49,6 +53,7 @@ public class PublicDiaryService {
     List<ContentReactionCountEntity> contentReactionCounts =
         publicDiaryCacheService.getContentReactionCounts(pageIndex);
     if (contentReactionCounts.isEmpty()) {
+      log.info("공개 일기 Cache Miss");
       List<PublicDiaryContentProjection> projections = fetchContents(pageIndex);
 
       for (PublicDiaryContentProjection projection : projections) {
@@ -56,7 +61,7 @@ public class PublicDiaryService {
         entity.applyReactionCount(fetchReactionCount(projection.getPublicDiaryId()));
         contentReactionCounts.add(entity);
       }
-      publicDiaryCacheService.saveContentReactionCounts(pageIndex, contentReactionCounts);
+      publicDiaryCacheService.saveContentReactionCounts(contentReactionCounts);
     }
     updateUrlsWithPreSigned(contentReactionCounts);
 
@@ -71,7 +76,11 @@ public class PublicDiaryService {
   }
 
   private List<PublicDiaryContentProjection> fetchContents(DiaryPageIndex pageIndex) {
-    return publicDiaryRepository.findNextContents(pageIndex, PageRequest.of(0, 5));
+    Sample postgresSample = Timer.start();
+    List<PublicDiaryContentProjection> nextContents =
+        publicDiaryRepository.findNextContents(pageIndex, PageRequest.of(0, 5));
+    postgresSample.stop(metrics.getPostgresTimer());
+    return nextContents;
   }
 
   private void updateUrlsWithPreSigned(List<ContentReactionCountEntity> entitys) {
@@ -86,11 +95,19 @@ public class PublicDiaryService {
   }
 
   private DiaryReactionCount fetchReactionCount(Long publicDiaryId) {
-    return DiaryReactionCount.from(reactionRepository.countEachByPublicDiaryId(publicDiaryId));
+    Sample postgresSample = Timer.start();
+    DiaryReactionCount reactionCount =
+        DiaryReactionCount.from(reactionRepository.countEachByPublicDiaryId(publicDiaryId));
+    postgresSample.stop(metrics.getPostgresTimer());
+    return reactionCount;
   }
 
   private List<DiaryReactionType> fetchMemberReactions(Long memberId, Long publicDiaryId) {
-    return reactionRepository.findMemberReactions(memberId, publicDiaryId);
+    Sample postgresSample = Timer.start();
+    List<DiaryReactionType> reactions =
+        reactionRepository.findMemberReactions(memberId, publicDiaryId);
+    postgresSample.stop(metrics.getPostgresTimer());
+    return reactions;
   }
 
   public void write(Long memberId, Long diaryId, String publicContent) {

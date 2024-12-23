@@ -53,6 +53,7 @@ management:
         include:
           - metrics
           - health
+          - prometheus
       cors:
         allowed-origins: "*"
         allowed-methods:
@@ -60,6 +61,8 @@ management:
           - POST
   endpoint:
     metrics:
+      tags:
+        application: ${spring.application.name}
       enabled: true
     health:
       show-details: always

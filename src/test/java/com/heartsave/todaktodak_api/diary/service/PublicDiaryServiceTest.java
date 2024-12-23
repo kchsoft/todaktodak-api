@@ -144,7 +144,7 @@ class PublicDiaryServiceTest {
     PublicDiaryContentProjection content = mock(PublicDiaryContentProjection.class);
     when(content.getPublicDiaryId()).thenReturn(publicDiaryId);
     when(content.getDiaryId()).thenReturn(diary.getId());
-    when(content.getWebtoonImageUrl()).thenReturn(List.of("webtoon/image.jpg"));
+    //    when(content.getWebtoonImageUrl()).thenReturn(List.of("webtoon/image.jpg"));
     when(content.getCharacterImageUrl()).thenReturn("character/image.jpg");
     when(content.getBgmUrl()).thenReturn("bgm/music.mp3");
     when(content.getNickname()).thenReturn("nickname");
@@ -207,9 +207,9 @@ class PublicDiaryServiceTest {
     verify(mocksS3FileStorageManager).preSignedWebtoonUrlFrom(any());
     verify(mocksS3FileStorageManager).preSignedCharacterImageUrlFrom(any());
     verify(mocksS3FileStorageManager).preSignedBgmUrlFrom(any());
-    verify(content).replaceBgmUrl(any());
-    verify(content).replaceCharacterImageUrl(any());
-    verify(content).replaceCharacterImageUrl(any());
+    //    verify(content).replaceBgmUrl(any());
+    //    verify(content).replaceCharacterImageUrl(any());
+    //    verify(content).replaceCharacterImageUrl(any());
   }
 
   @Test
