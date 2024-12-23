@@ -1,20 +1,17 @@
 package com.heartsave.todaktodak_api.ai.client.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.heartsave.todaktodak_api.common.converter.InstantUtils;
 import com.heartsave.todaktodak_api.diary.constant.DiaryBgmGenre;
 import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.member.entity.MemberEntity;
-import java.time.LocalDate;
+import java.time.Instant;
 import lombok.Getter;
 
 @Getter
 public class ClientBgmRequest extends ClientDomainInfo {
   private final Long memberId;
 
-  @JsonFormat(pattern = "yyyy-MM-dd")
-  private final LocalDate date;
+  private final Instant date;
 
   private final String content;
   private final DiaryEmotion emotion;
@@ -22,7 +19,7 @@ public class ClientBgmRequest extends ClientDomainInfo {
 
   private ClientBgmRequest(DiaryEntity diary, MemberEntity member) {
     this.memberId = member.getId();
-    this.date = InstantUtils.toLocalDate(diary.getDiaryCreatedTime());
+    this.date = diary.getDiaryCreatedTime();
     this.content = diary.getContent();
     this.emotion = diary.getEmotion();
     this.genre = diary.getBgmGenre();

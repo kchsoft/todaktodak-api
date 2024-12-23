@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.ai.webhook.repository;
 
 import com.heartsave.todaktodak_api.ai.webhook.domain.WebhookBgmCompletion;
 import com.heartsave.todaktodak_api.ai.webhook.domain.WebhookWebtoonCompletion;
-import java.time.LocalDate;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -22,7 +22,7 @@ public class AiRepository {
         completion.getMemberId(), completion.getCreatedDate(), completion.getKeyUrl());
   }
 
-  public Boolean isContentCompleted(Long memberId, LocalDate createdDate) {
+  public Boolean isContentCompleted(Long memberId, Instant createdDate) {
     return jpaRepository.isContentCompleted(memberId, createdDate).orElse(false);
   }
 }

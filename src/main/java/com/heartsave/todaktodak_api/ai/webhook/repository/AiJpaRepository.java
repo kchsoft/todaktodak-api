@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.ai.webhook.repository;
 
 import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,11 +15,11 @@ public interface AiJpaRepository extends JpaRepository<DiaryEntity, Long> {
           """
         UPDATE DiaryEntity d
         SET d.webtoonImageUrl = :url
-        WHERE d.memberEntity.id = :memberId AND  CAST(d.diaryCreatedTime AS DATE ) = :createdDate
+        WHERE d.memberEntity.id = :memberId AND  d.diaryCreatedTime = :createdDate
 """)
   int updateWebtoonUrl(
       @Param("memberId") Long memberId,
-      @Param("createdDate") LocalDate createdDate,
+      @Param("createdDate") Instant createdDate,
       @Param("url") String url);
 
   @Modifying
@@ -28,11 +28,11 @@ public interface AiJpaRepository extends JpaRepository<DiaryEntity, Long> {
           """
                 UPDATE DiaryEntity d
                 SET d.bgmUrl = :url
-                WHERE d.memberEntity.id = :memberId AND  CAST(d.diaryCreatedTime AS DATE ) = :createdDate
+                WHERE d.memberEntity.id = :memberId AND d.diaryCreatedTime = :createdDate
         """)
   int updateBgmUrl(
       @Param("memberId") Long memberId,
-      @Param("createdDate") LocalDate createdDate,
+      @Param("createdDate") Instant createdDate,
       @Param("url") String url);
 
   @Query(
@@ -42,8 +42,8 @@ public interface AiJpaRepository extends JpaRepository<DiaryEntity, Long> {
         CASE WHEN d.bgmUrl != "" AND d.webtoonImageUrl != "" THEN TRUE
         ELSE FALSE END
         FROM DiaryEntity d
-        WHERE d.memberEntity.id = :memberId AND CAST(d.diaryCreatedTime AS DATE) = :createdDate
+        WHERE d.memberEntity.id = :memberId AND d.diaryCreatedTime  = :createdDate
 """)
   Optional<Boolean> isContentCompleted(
-      @Param("memberId") Long memberId, @Param("createdDate") LocalDate createdDate);
+      @Param("memberId") Long memberId, @Param("createdDate") Instant createdDate);
 }
