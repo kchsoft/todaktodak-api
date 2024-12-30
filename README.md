@@ -19,7 +19,7 @@
 
 #### 결과
 
-![img.png](img.png)
+<img src="img.png" width="500" height="300">
 
 - 평균 응답시간 6.47s에서 __0.83s__ 로 최적화
 
@@ -35,8 +35,7 @@
 - Webhook 통신 구현
 
 #### 결과
-
-![img_1.png](img_1.png)
+<img src="img_1.png" width="500" height="300">
 
 - 일기 작성시 약 2분 12초의 대기 시간을 위로 코멘트 생성 시간 대기(__2초__)만으로 최적화
 - AI 서버에서 컨텐츠 생성 완료시 API 서버에게 Request를 보냄.
@@ -48,12 +47,14 @@
 #### 문제
 
 - 반복적인 getId() 메서드 발생
-  ![img_3.png](img_3.png)
+- 
+  <img src="img_3.png" width="700" height="200">
 
 #### 해결
 
 - 커스텀 에노테이션 생성 및 SpEL 활용
-  ![img_5.png](img_5.png)
+- 
+  <img src="img_5.png" width="600" height="200">
 
 #### 결과
 
