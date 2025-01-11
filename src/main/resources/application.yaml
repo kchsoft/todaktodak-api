@@ -1,6 +1,10 @@
 # 공통
 server:
   port: 8080
+  tomcat:
+    threads:
+      max: 16
+      min-spare: 16
 spring:
   profiles:
     active: "local"
@@ -47,8 +51,8 @@ client:
 ---
 spring:
   datasource:
-    hikari:
-      maximum-pool-size: 20
+#    hikari:
+#      maximum-pool-size: 20
     driver-class-name: org.postgresql.Driver
     url: ${POSTGRESQL_URL}
     username: ${POSTGRESQL_USER}
@@ -95,7 +99,7 @@ spring:
             user-name-attribute: id
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
