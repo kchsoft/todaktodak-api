@@ -161,7 +161,6 @@ Thread Pool 조정 부하테스트 결과 Table
 </details>
 <img src="docs/img/img_7.png" width="350" height="250"/>
 
----
 ### 2. AI 서버 비동기 Callback 통신으로 컨텐츠 생성 시간 최적화
 
 #### 문제
@@ -218,7 +217,6 @@ Thread Pool 조정 부하테스트 결과 Table
 
   <img src="docs/img/img_4.png" width="600" height="200">
 
----
 
 ### 2. Commit 메시지에 Jira Issue 번호 작성 자동화
 
@@ -232,7 +230,13 @@ Thread Pool 조정 부하테스트 결과 Table
 #### 결과
 
 - Jira Issue 번호를 신경쓰지 않고 편하게 Commit 가능
-```bash
+
+<details>
+<summary>
+Shell Script
+</summary>
+
+```shell
 #!/bin/sh
 #
 # Get the current branch name
@@ -270,6 +274,6 @@ insert_project_id() {
 if [ -n "$PROJECT_ID" ] && ! grep -qiF "$PROJECT_ID" "$commit_msg_file"; then
     insert_project_id
 fi
-
-
 ```
+</details>
+
