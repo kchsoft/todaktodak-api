@@ -25,7 +25,7 @@ public class ContentReactionCountCache {
               redisTemplate
                   .opsForZSet()
                   .add(PUBLIC_DIARY_KEY, serializer.serialize(content), DEFAULT_SCORE));
-      redisTemplate.expire(PUBLIC_DIARY_KEY, Duration.ofMinutes(2));
+      redisTemplate.expire(PUBLIC_DIARY_KEY, Duration.ofMinutes(5));
     }
 
     contents.forEach(

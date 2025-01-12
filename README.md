@@ -12,6 +12,13 @@
 
 ## 담당 업무 - 풀스택(백엔드)
 
+### 기술 스택 : 
+- SpringBoot
+- Spring Security
+- JPA
+- PostgreSql
+- Redis 
+
 ## 성능 개선
 
 ### 1. 공개 일기 무한 스크롤 API 최적화 (DB Index, Redis 적용 및 Thread Pool 조정)
@@ -61,7 +68,7 @@
 
 <br>   
 
-<img src="img_2.png" width="390" height="300"/>
+<img src="docs/img/img_2.png" width="390" height="300"/>
 
 <br>
 
@@ -88,7 +95,8 @@
 - 여전히 쿼리에 대한 결과를 가져오는 것에 많은 시간이 필요함
 
 #### 해결 과정
- - Redis 캐시 적용 **(Look Aside)**
+ - Redis를 캐시로 적용 **(Look Aside)**
+ - 캐시 데이터 TTL 5분 설정
  - 새로운 `Entity`에 `일기 내용`과 `리액션 개수`를 담아서 Redis에 저장
    - 문제 발생 1: Redis에서 <u>**한 번의 `read` 명령**</u>을 통해 <u>**2가지 조건**</u> (1.Timestamp , 2.Id)을 바탕으로 결과를 가져와야 한다
    - 해결 과정 1: 
@@ -117,7 +125,7 @@ Redis 적용 부하테스트 결과 Table
 
 </details>
 
-<img src="img_6.png" width="350" height="250"/>
+<img src="docs/img/img_6.png" width="350" height="250"/>
 
 
 #### 문제3 - Thread Pool 조정
@@ -150,7 +158,7 @@ Thread Pool 조정 부하테스트 결과 Table
 
 
 </details>
-<img src="img_7.png" width="350" height="250"/>
+<img src="docs/img/img_7.png" width="350" height="250"/>
 
 
 ### 2. AI 서버 비동기 Call Back 통신으로 컨텐츠 생성 시간 최적화
@@ -175,7 +183,7 @@ Thread Pool 조정 부하테스트 결과 Table
 - 일기 작성시 약 <u>**2분 12초의 대기 시간**</u>을 위로 코멘트 생성 시간 대기(<u>__2초__</u>)만으로 <u>**98.48%**</u> 최적화
 - 콘텐츠를 생성하는 동안 <u>**클라이언트는 페이지간 이동이 자유롭게 가능**</u>하여 사용자 경험 개선
 
-<img src="img_1.png" width="400" height="250">
+<img src="docs/img/img_1.png" width="400" height="250">
 
 
 ### 개발 편의성 개선
@@ -184,13 +192,13 @@ Thread Pool 조정 부하테스트 결과 Table
 
 - 18번의 반복적인 getId() 메서드 발생
 
-<img src="img_3.png" width="600" height="200">
+<img src="docs/img/img_3.png" width="600" height="200">
 
 #### 해결 과정
 
 - `@AuthenticationPrincipal` 에노테이션을 활용한, <u>**커스텀 에노테이션 생성 및 SpEL 활용**</u>  
 <br>
-  <img src="img_5.png" width="400" height="150">
+  <img src="docs/img/img_5.png" width="400" height="150">
 
 
 
@@ -200,4 +208,4 @@ Thread Pool 조정 부하테스트 결과 Table
 
 <br>
 
-  <img src="img_4.png" width="600" height="200">
+  <img src="docs/img/img_4.png" width="600" height="200">
