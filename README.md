@@ -161,7 +161,7 @@ Thread Pool 조정 부하테스트 결과 Table
 </details>
 <img src="docs/img/img_7.png" width="350" height="250"/>
 
-
+---
 ### 2. AI 서버 비동기 Callback 통신으로 컨텐츠 생성 시간 최적화
 
 #### 문제
@@ -190,8 +190,11 @@ Thread Pool 조정 부하테스트 결과 Table
 - 일기 작성 후, 실제 2초를 기다려 보니 체감이 상당히 길었음
 - 위로 메시지 또한 **비동기 요청 및 Callback** 방식으로 전환이 필요  
 
+---
 
-### 개발 편의성 개선
+## 개발 편의성 개선
+
+### 1. 인증 객체의 getId() 값을 Controller에 자동 전달
 
 #### 문제
 
@@ -214,3 +217,59 @@ Thread Pool 조정 부하테스트 결과 Table
 <br>
 
   <img src="docs/img/img_4.png" width="600" height="200">
+
+---
+
+### 2. Commit 메시지에 Jira Issue 번호 작성 자동화
+
+#### 문제
+- Commit Message 컨벤션에 의해 Message의 1번 줄 가장 오른쪽에 Jira Issue 번호 작성 필요 
+
+#### 해결 과정
+- `.git/hooks/commit-msg` 파일에 `Shell` 스크립트 작성
+- Branch 이름에 있는 Jira Issue 번호를 가져와 Commit시 Message에 번호 작성 자동화
+
+#### 결과
+
+- Jira Issue 번호를 신경쓰지 않고 편하게 Commit 가능
+```bash
+#!/bin/sh
+#
+# Get the current branch name
+BRANCH_NAME=$(git symbolic-ref --short HEAD)
+
+# Extract project ID from branch name (e.g., 'todak4' from 'feature/todak4/auth')
+PROJECT_ID=$(echo $BRANCH_NAME | sed -n 's/.*\/\([^/]*\)\/.*/\1/p')
+
+# Convert PROJECT_ID to uppercase
+PROJECT_ID=$(echo "$PROJECT_ID" | tr '[:lower:]' '[:upper:]')
+
+# Read the commit message from the file
+commit_msg_file=$1
+commit_source=$2
+sha1=$3
+
+# Function to insert project ID at the end of the first line
+insert_project_id() {
+    # Read the first line
+    first_line=$(head -n 1 "$commit_msg_file")
+    # Read the rest of the lines
+    rest_of_msg=$(tail -n +2 "$commit_msg_file")
+
+    # Append project ID to the first line
+    modified_first_line="$first_line $PROJECT_ID"
+
+    # Write the modified first line and the rest of the message back to the file
+    echo "$modified_first_line" > "$commit_msg_file"
+    if [ -n "$rest_of_msg" ]; then
+        echo "$rest_of_msg" >> "$commit_msg_file"
+    fi
+}
+
+# Check if the commit message already contains the project ID
+if [ -n "$PROJECT_ID" ] && ! grep -qiF "$PROJECT_ID" "$commit_msg_file"; then
+    insert_project_id
+fi
+
+
+```
