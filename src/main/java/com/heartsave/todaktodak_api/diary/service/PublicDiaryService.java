@@ -1,5 +1,7 @@
 package com.heartsave.todaktodak_api.diary.service;
 
+import static com.heartsave.todaktodak_api.common.constant.CoreConstant.DIARY.PUBLIC_DIARY_PAGE_SIZE;
+
 import com.heartsave.todaktodak_api.common.exception.errorspec.DiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
@@ -73,7 +75,8 @@ public class PublicDiaryService {
 
   private List<PublicDiaryContentProjection> fetchContents(DiaryPageIndex pageIndex) {
     List<PublicDiaryContentProjection> nextContents =
-        publicDiaryRepository.findNextContents(pageIndex, PageRequest.of(0, 5));
+        publicDiaryRepository.findNextContents(
+            pageIndex, PageRequest.of(0, PUBLIC_DIARY_PAGE_SIZE));
     return nextContents;
   }
 
@@ -107,7 +110,6 @@ public class PublicDiaryService {
             .orElseThrow(
                 () ->
                     new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, diaryId));
-
     if (ids.getPublicDiaryId() != null) {
       throw new PublicDiaryExistException(
           PublicDiaryErrorSpec.PUBLIC_DIARY_EXIST, memberId, ids.getPublicDiaryId());

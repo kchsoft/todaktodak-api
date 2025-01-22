@@ -1,5 +1,7 @@
 package com.heartsave.todaktodak_api.diary.cache;
 
+import static com.heartsave.todaktodak_api.common.constant.CoreConstant.DIARY.PUBLIC_DIARY_PAGE_SIZE;
+
 import com.heartsave.todaktodak_api.diary.cache.entity.ContentReactionCountEntity;
 import com.heartsave.todaktodak_api.diary.cache.serializer.PublicDiaryContentSerializer;
 import java.time.Duration;
@@ -50,7 +52,7 @@ public class ContentReactionCountCache {
                           "REV".getBytes(),
                           "LIMIT".getBytes(),
                           "0".getBytes(),
-                          "5".getBytes());
+                          String.valueOf(PUBLIC_DIARY_PAGE_SIZE).getBytes());
 
                   List<String> stringList = new ArrayList<>();
                   if (rawResponse instanceof List<?> responseList) {

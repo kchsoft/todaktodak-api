@@ -23,5 +23,6 @@ public final class CoreConstant {
   public static class DIARY {
     public static final Long PAGE_DEFAULT_ID = 0L;
     public static final Instant PAGE_DEFAULT_TIME = Instant.EPOCH;
+    public static final Integer PUBLIC_DIARY_PAGE_SIZE = 5;
   }
 }

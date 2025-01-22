@@ -103,7 +103,7 @@ public class PublicDiaryControllerTest {
   }
 
   @Test
-  @DisplayName("공개 일기 조회 성공 - after,date 파라미터 미입력시 기본값 (0L, Instant.MIN) 사용")
+  @DisplayName("공개 일기 조회 성공 - after,date 파라미터 미입력시 기본값 (0L, Instant.EPOCH) 사용")
   @WithMockTodakUser
   void getPublicDiaryPagination_Success_DefaultParameter() throws Exception {
     PublicDiaryPageResponse response = new PublicDiaryPageResponse();
