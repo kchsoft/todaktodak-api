@@ -69,16 +69,15 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
     diary = diaryList.getFirst();
 
     // set 10 public diary
-    publicDiaryList = new ArrayList<>();
     for (int i = 0; i < diaryList.size(); i++) {
-      publicDiaryList.add(
+      publicDiaryRepository.save(
           PublicDiaryEntity.builder()
               .diaryEntity(diaryList.get(i))
               .memberEntity(member)
               .publicContent("public-content" + (i + 1))
               .build());
     }
-    publicDiaryRepository.saveAll(publicDiaryList);
+    publicDiaryList = publicDiaryRepository.findAll();
   }
 
   @Nested
@@ -168,7 +167,6 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
         throws Exception {
       // no cache
       when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
-      List<PublicDiaryEntity> publicDiaryList = publicDiaryRepository.findAll();
 
       // query parameter
       PublicDiaryEntity requestParam = publicDiaryList.get(target);
@@ -181,32 +179,42 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
                       .contentType(MediaType.APPLICATION_JSON))
               .andExpect(status().isOk())
               .andExpect(
-                  jsonPath("$.diaries[0].diaryId").value(diaryList.get(responseFirst).getId()))
+                  jsonPath("$.diaries[0].publicDiaryId")
+                      .value(publicDiaryList.get(responseFirst).getId()))
               .andExpect(
-                  jsonPath("$.diaries[-1].diaryId").value(diaryList.get(responseLast).getId()))
+                  jsonPath("$.diaries[-1].publicDiaryId")
+                      .value(publicDiaryList.get(responseLast).getId()))
               .andDo(print())
               .andReturn();
     }
 
     @Test
-    @DisplayName("최신 공개 일기 조회 성공 - RDBMS")
+    @DisplayName("최신 공개 일기 조회 성공 - 파라미터 없음")
     @WithMockTodakUser
-    void Recent_getPagination_Success() throws Exception {
-      // no cache
+    void Recent_getPagination_NoParameter_Success() throws Exception {
+      // Given
       when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
 
-      // no query parameter
+      // When & Then
       mockMvc
           .perform(get("/api/v1/diary/public").contentType(MediaType.APPLICATION_JSON))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.diaries[0].diaryId").value(diaryList.getLast().getId()))
           .andExpect(
-              jsonPath("$.diaries[-1].diaryId")
-                  .value(diaryList.get(diaryCnt - PUBLIC_DIARY_PAGE_SIZE).getId()))
-          .andDo(print())
-          .andReturn();
+              jsonPath("$.diaries[0].publicDiaryId").value(publicDiaryList.getLast().getId()))
+          .andExpect(
+              jsonPath("$.diaries[-1].publicDiaryId")
+                  .value(publicDiaryList.getLast().getId() - PUBLIC_DIARY_PAGE_SIZE + 1))
+          .andDo(print());
+    }
 
-      // default query parameter
+    @Test
+    @DisplayName("최신 공개 일기 조회 성공 - 기본 파라미터")
+    @WithMockTodakUser
+    void Recent_getPagination_DefaultParameter_Success() throws Exception {
+      // Given
+      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
+
+      // When & Then
       mockMvc
           .perform(
               get("/api/v1/diary/public")
@@ -214,12 +222,56 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
                   .param("date", "1970-01-01T00:00:00Z")
                   .contentType(MediaType.APPLICATION_JSON))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.diaries[0].diaryId").value(diaryList.getLast().getId()))
           .andExpect(
-              jsonPath("$.diaries[-1].diaryId")
-                  .value(diaryList.get(diaryCnt - PUBLIC_DIARY_PAGE_SIZE).getId()))
-          .andDo(print())
-          .andReturn();
+              jsonPath("$.diaries[0].publicDiaryId").value(publicDiaryList.getLast().getId()))
+          .andExpect(
+              jsonPath("$.diaries[-1].publicDiaryId")
+                  .value(publicDiaryList.getLast().getId() - PUBLIC_DIARY_PAGE_SIZE + 1))
+          .andDo(print());
+    }
+
+    @Test
+    @DisplayName("최신 공개 일기 조회 성공 - after 파라미터만")
+    @WithMockTodakUser
+    void Recent_getPagination_AfterParameter_Success() throws Exception {
+      // Given
+      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
+
+      // When & Then
+      mockMvc
+          .perform(
+              get("/api/v1/diary/public")
+                  .param("after", "0")
+                  .contentType(MediaType.APPLICATION_JSON))
+          .andExpect(status().isOk())
+          .andExpect(
+              jsonPath("$.diaries[0].publicDiaryId").value(publicDiaryList.getLast().getId()))
+          .andExpect(
+              jsonPath("$.diaries[-1].publicDiaryId")
+                  .value(publicDiaryList.getLast().getId() - PUBLIC_DIARY_PAGE_SIZE + 1))
+          .andDo(print());
+    }
+
+    @Test
+    @DisplayName("최신 공개 일기 조회 성공 - date 파라미터만")
+    @WithMockTodakUser
+    void Recent_getPagination_DateParameter_Success() throws Exception {
+      // Given
+      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
+
+      // When & Then
+      mockMvc
+          .perform(
+              get("/api/v1/diary/public")
+                  .param("date", "1970-01-01T00:00:00Z")
+                  .contentType(MediaType.APPLICATION_JSON))
+          .andExpect(status().isOk())
+          .andExpect(
+              jsonPath("$.diaries[0].publicDiaryId").value(publicDiaryList.getLast().getId()))
+          .andExpect(
+              jsonPath("$.diaries[-1].publicDiaryId")
+                  .value(publicDiaryList.getLast().getId() - PUBLIC_DIARY_PAGE_SIZE + 1))
+          .andDo(print());
     }
 
     @Test

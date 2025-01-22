@@ -1,5 +1,7 @@
 package com.heartsave.todaktodak_api.diary.service;
 
+import static com.heartsave.todaktodak_api.common.constant.CoreConstant.DIARY.MY_SHARED_DIARY_PAGE_SIZE;
+
 import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
@@ -48,7 +50,8 @@ public class MySharedDiaryService {
   private List<MySharedDiaryPreviewProjection> fetchPreviews(
       Long memberId, DiaryPageIndex pageIndex) {
     log.info("나의 공개된 일기 preview 정보를 조회합니다.");
-    return mySharedDiaryRepository.findNextPreviews(memberId, pageIndex, PageRequest.of(0, 12));
+    return mySharedDiaryRepository.findNextPreviews(
+        memberId, pageIndex, PageRequest.of(0, MY_SHARED_DIARY_PAGE_SIZE));
   }
 
   private void replaceWithPreSignedUrls(List<MySharedDiaryPreviewProjection> previews) {
@@ -102,7 +105,6 @@ public class MySharedDiaryService {
                 () ->
                     new PublicDiaryNotFoundException(
                         PublicDiaryErrorSpec.PUBLIC_DIARY_NOT_FOUND, publicDiaryId));
-
     if (!Objects.equals(memberId, publicDiary.getMemberEntity().getId())) {
       throw new PublicDiaryNotFoundException(
           PublicDiaryErrorSpec.PUBLIC_DIARY_DELETE_NOT_FOUND, publicDiaryId);

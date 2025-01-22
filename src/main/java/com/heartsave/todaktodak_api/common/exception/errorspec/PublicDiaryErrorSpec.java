@@ -19,7 +19,7 @@ public enum PublicDiaryErrorSpec implements ErrorSpec {
       "이미 공개된 일기가 있습니다.",
       "하나의 일기에 대해 2번 이상 공개 작성을 하려는 시도입니다."),
   PUBLIC_DIARY_DELETE_NOT_FOUND(
-      HttpStatus.BAD_REQUEST,
+      HttpStatus.NOT_FOUND,
       "PUBLIC_DIARY-003",
       "공개 일기 삭제에 실패했습니다.",
       "사용자가 삭제하려는 공개 일기의 작성자가 아니거나, 삭제하려는 공개 일기가 없습니다.");
