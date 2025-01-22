@@ -211,31 +211,31 @@ class AiRepositoryTest {
       assertThat(result).isFalse();
     }
 
-    //    @Test
-    //    @DisplayName("bgmUrl과 webtoonImageUrl이 모두 존재할 때 true를 반환한다")
-    //    void returnsTrueWhenBothUrlsExist() {
-    //      DiaryEntity completedDiary =
-    //          DiaryEntity.builder()
-    //              .memberEntity(member)
-    //              .content(DUMMY_STRING_CONTENT)
-    //              .bgmUrl(TEST_BGM_KEY_URL)
-    //              .webtoonImageUrl(TEST_WEBTOON_KEY_URL)
-    //              .diaryCreatedTime(
-    //                  Instant.now().plus(1, ChronoUnit.DAYS)) // BeforeEach의 diary 날짜 다르게 하기 위해
-    //              .emotion(DiaryEmotion.HAPPY)
-    //              .bgmGenre(DiaryBgmGenre.EDM)
-    //              .build();
-    //
-    //      tem.persist(completedDiary);
-    //      tem.flush();
-    //      tem.clear();
-    //
-    //      Boolean result =
-    //          aiRepository.isContentCompleted(member.getId(),
-    // completedDiary.getDiaryCreatedTime());
-    //
-    //      assertThat(result).isTrue();
-    //    }
+    @Test
+    @DisplayName("bgmUrl과 webtoonImageUrl이 모두 존재할 때 true를 반환한다")
+    void returnsTrueWhenBothUrlsExist() {
+      DiaryEntity completedDiary =
+          DiaryEntity.builder()
+              .memberEntity(member)
+              .content(DUMMY_STRING_CONTENT)
+              .bgmUrl(TEST_BGM_KEY_URL)
+              .webtoonImageUrl(TEST_WEBTOON_KEY_URL)
+              .diaryCreatedTime(
+                  Instant.now().plus(1, ChronoUnit.DAYS)) // BeforeEach의 diary 날짜 다르게 하기 위해
+              .emotion(DiaryEmotion.HAPPY)
+              .bgmGenre(DiaryBgmGenre.EDM)
+              .build();
+
+      tem.persist(completedDiary);
+      tem.flush();
+      tem.clear();
+      completedDiary = tem.find(DiaryEntity.class, completedDiary.getId());
+
+      Boolean result =
+          aiRepository.isContentCompleted(member.getId(), completedDiary.getDiaryCreatedTime());
+
+      assertThat(result).isTrue();
+    }
 
     @Test
     @DisplayName("존재하지 않는 데이터에 대해 false를 반환한다")

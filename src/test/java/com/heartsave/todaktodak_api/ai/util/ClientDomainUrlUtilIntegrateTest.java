@@ -3,11 +3,11 @@ package com.heartsave.todaktodak_api.ai.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.heartsave.todaktodak_api.ai.client.util.ClientDomainUrlUtil;
-import com.heartsave.todaktodak_api.config.BaseSpringbootTest;
+import com.heartsave.todaktodak_api.config.BaseIntegrateTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ClientDomainUrlUtilTest extends BaseSpringbootTest {
+public class ClientDomainUrlUtilIntegrateTest extends BaseIntegrateTest {
 
   @Test
   @DisplayName("Spring API 서버의 IP를 추출합니다.")
