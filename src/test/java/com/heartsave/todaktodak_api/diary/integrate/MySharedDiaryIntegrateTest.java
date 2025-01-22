@@ -65,7 +65,7 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
     for (int i = 0; i < diaryCnt; i++) {
       diaryList.add(createDiaryNoIdWithMember(member));
     }
-    diaryRepository.saveAll(diaryList);
+    diaryList = diaryRepository.saveAll(diaryList);
 
     // set 20 public diary with urls
     publicDiaryList = new ArrayList<>();
@@ -111,10 +111,10 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
           .andExpect(status().isOk())
           .andExpect(
               jsonPath("$.sharedDiaries[0].publicDiaryId")
-                  .value(diaryList.get(responseFirst).getId()))
+                  .value(publicDiaryList.get(responseFirst).getId()))
           .andExpect(
               jsonPath("$.sharedDiaries[-1].publicDiaryId")
-                  .value(diaryList.get(responseLast).getId()))
+                  .value(publicDiaryList.get(responseLast).getId()))
           .andDo(print());
     }
 
@@ -130,10 +130,10 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
           .perform(get(DEFAULT_URL).contentType(MediaType.APPLICATION_JSON))
           .andExpect(status().isOk())
           .andExpect(
-              jsonPath("$.sharedDiaries[0].publicDiaryId").value(diaryList.getLast().getId()))
+              jsonPath("$.sharedDiaries[0].publicDiaryId").value(publicDiaryList.getLast().getId()))
           .andExpect(
               jsonPath("$.sharedDiaries[-1].publicDiaryId")
-                  .value(diaryList.getLast().getId() - MY_SHARED_DIARY_PAGE_SIZE + 1))
+                  .value(publicDiaryList.getLast().getId() - MY_SHARED_DIARY_PAGE_SIZE + 1))
           .andDo(print());
     }
 
@@ -143,7 +143,6 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
     void Recent_getPagination_DefaultParameter_Success() throws Exception {
       // Given
       when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
-
       // When & Then
       mockMvc
           .perform(
@@ -153,10 +152,10 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
                   .contentType(MediaType.APPLICATION_JSON))
           .andExpect(status().isOk())
           .andExpect(
-              jsonPath("$.sharedDiaries[0].publicDiaryId").value(diaryList.getLast().getId()))
+              jsonPath("$.sharedDiaries[0].publicDiaryId").value(publicDiaryList.getLast().getId()))
           .andExpect(
               jsonPath("$.sharedDiaries[-1].publicDiaryId")
-                  .value(diaryList.getLast().getId() - MY_SHARED_DIARY_PAGE_SIZE + 1))
+                  .value(publicDiaryList.getLast().getId() - MY_SHARED_DIARY_PAGE_SIZE + 1))
           .andDo(print());
     }
 
@@ -172,10 +171,10 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
           .perform(get(DEFAULT_URL).param("after", "0").contentType(MediaType.APPLICATION_JSON))
           .andExpect(status().isOk())
           .andExpect(
-              jsonPath("$.sharedDiaries[0].publicDiaryId").value(diaryList.getLast().getId()))
+              jsonPath("$.sharedDiaries[0].publicDiaryId").value(publicDiaryList.getLast().getId()))
           .andExpect(
               jsonPath("$.sharedDiaries[-1].publicDiaryId")
-                  .value(diaryList.getLast().getId() - MY_SHARED_DIARY_PAGE_SIZE + 1))
+                  .value(publicDiaryList.getLast().getId() - MY_SHARED_DIARY_PAGE_SIZE + 1))
           .andDo(print());
     }
 
@@ -194,10 +193,10 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
                   .contentType(MediaType.APPLICATION_JSON))
           .andExpect(status().isOk())
           .andExpect(
-              jsonPath("$.sharedDiaries[0].publicDiaryId").value(diaryList.getLast().getId()))
+              jsonPath("$.sharedDiaries[0].publicDiaryId").value(publicDiaryList.getLast().getId()))
           .andExpect(
               jsonPath("$.sharedDiaries[-1].publicDiaryId")
-                  .value(diaryList.getLast().getId() - MY_SHARED_DIARY_PAGE_SIZE + 1))
+                  .value(publicDiaryList.getLast().getId() - MY_SHARED_DIARY_PAGE_SIZE + 1))
           .andDo(print());
     }
 

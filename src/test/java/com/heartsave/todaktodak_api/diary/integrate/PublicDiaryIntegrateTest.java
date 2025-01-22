@@ -90,12 +90,13 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
     void write_Success() throws Exception {
 
       // given
-      publicDiaryRepository.deleteById(diary.getId());
+      PublicDiaryEntity first = publicDiaryList.getFirst();
+      publicDiaryRepository.deleteById(first.getId());
       entityManager.flush();
       entityManager.clear();
 
       PublicDiaryWriteRequest request =
-          new PublicDiaryWriteRequest(diary.getId(), "public-content");
+          new PublicDiaryWriteRequest(first.getDiaryEntity().getId(), "public-content");
 
       // when & then
       mockMvc
@@ -145,7 +146,7 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
               post("/api/v1/diary/public")
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(objectMapper.writeValueAsString(request)))
-          .andExpect(status().isBadRequest())
+          .andExpect(status().isNotFound())
           .andExpect(
               result ->
                   assertThat(result.getResolvedException())

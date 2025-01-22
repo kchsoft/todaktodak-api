@@ -67,7 +67,7 @@ public class DiaryService {
     log.info("DB에 일기를 삭제를 요청합니다.");
     DiaryEntity diary =
         diaryRepository
-            .findById(diaryId)
+            .findDiaryEntityByMemberEntity_IdAndId(memberId, diaryId)
             .orElseThrow(
                 () ->
                     new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, diaryId));

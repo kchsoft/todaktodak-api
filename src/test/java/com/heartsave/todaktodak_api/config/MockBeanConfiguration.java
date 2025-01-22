@@ -1,7 +1,9 @@
 package com.heartsave.todaktodak_api.config;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.heartsave.todaktodak_api.ai.client.config.properties.AiServerProperties;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
 import com.heartsave.todaktodak_api.diary.cache.ContentReactionCountCache;
 import com.heartsave.todaktodak_api.diary.service.PublicDiaryCacheService;
@@ -30,5 +32,17 @@ public class MockBeanConfiguration {
   @Bean
   public ContentReactionCountCache mockContentReactionCountCache() {
     return mock(ContentReactionCountCache.class);
+  }
+
+  @Primary
+  @Bean
+  public AiServerProperties mockAiServerProperties() {
+    String aiServerDomain = "http://localhost:50000";
+    AiServerProperties mockProperties = mock(AiServerProperties.class);
+
+    when(mockProperties.imageDomain()).thenReturn(aiServerDomain);
+    when(mockProperties.bgmDomain()).thenReturn(aiServerDomain);
+    when(mockProperties.textDomain()).thenReturn(aiServerDomain);
+    return mockProperties;
   }
 }

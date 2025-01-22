@@ -37,4 +37,6 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
             WHERE d.id = :diaryId
           """)
   Optional<DiaryIdsProjection> findIdsById(@Param("diaryId") Long diaryId);
+
+  Optional<DiaryEntity> findDiaryEntityByMemberEntity_IdAndId(Long memberId, Long diaryId);
 }
