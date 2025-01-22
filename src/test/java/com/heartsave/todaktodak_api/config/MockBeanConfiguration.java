@@ -8,9 +8,11 @@ import com.heartsave.todaktodak_api.diary.service.PublicDiaryCacheService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
-public abstract class MockBeanConfiguration {
+@Profile("test")
+public class MockBeanConfiguration {
 
   @Primary
   @Bean
