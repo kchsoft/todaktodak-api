@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.diary.controller;
 
-import static com.heartsave.todaktodak_api.common.constant.CoreConstant.DIARY.PAGE_DEFAULT_ID;
-import static com.heartsave.todaktodak_api.common.constant.CoreConstant.DIARY.PAGE_DEFAULT_TIME;
+import static com.heartsave.todaktodak_api.common.constant.TodakConstant.DIARY.PAGE_DEFAULT_ID;
+import static com.heartsave.todaktodak_api.common.constant.TodakConstant.DIARY.PAGE_DEFAULT_TIME;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -15,11 +15,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
-import com.heartsave.todaktodak_api.diary.dto.PublicDiary;
-import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
-import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryWriteRequest;
-import com.heartsave.todaktodak_api.diary.dto.response.PublicDiaryPageResponse;
-import com.heartsave.todaktodak_api.diary.service.PublicDiaryService;
+import com.heartsave.todaktodak_api.domain.diary.controller.PublicDiaryController;
+import com.heartsave.todaktodak_api.domain.diary.dto.PublicDiary;
+import com.heartsave.todaktodak_api.domain.diary.dto.request.DiaryPageRequest;
+import com.heartsave.todaktodak_api.domain.diary.dto.request.PublicDiaryWriteRequest;
+import com.heartsave.todaktodak_api.domain.diary.dto.response.PublicDiaryPageResponse;
+import com.heartsave.todaktodak_api.domain.diary.service.PublicDiaryService;
 import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

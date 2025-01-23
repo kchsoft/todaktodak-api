@@ -1,11 +1,11 @@
 package com.heartsave.todaktodak_api.common;
 
 import com.heartsave.todaktodak_api.common.security.domain.AuthType;
-import com.heartsave.todaktodak_api.diary.constant.DiaryBgmGenre;
-import com.heartsave.todaktodak_api.diary.constant.DiaryEmotion;
-import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
-import com.heartsave.todaktodak_api.member.domain.TodakRole;
-import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.domain.diary.constant.DiaryBgmGenre;
+import com.heartsave.todaktodak_api.domain.diary.constant.DiaryEmotion;
+import com.heartsave.todaktodak_api.domain.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.domain.member.domain.TodakRole;
+import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

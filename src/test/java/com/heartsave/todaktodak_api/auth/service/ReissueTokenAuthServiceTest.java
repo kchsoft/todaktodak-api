@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.auth.service;
 
-import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.REFRESH_TOKEN_COOKIE_KEY;
-import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.REFRESH_TYPE;
+import static com.heartsave.todaktodak_api.common.security.jwt.constant.JwtConstant.REFRESH_TOKEN_COOKIE_KEY;
+import static com.heartsave.todaktodak_api.common.security.jwt.constant.JwtConstant.REFRESH_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -9,18 +9,19 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-import com.heartsave.todaktodak_api.auth.dto.response.TokenReissueResponse;
-import com.heartsave.todaktodak_api.auth.exception.AuthException;
-import com.heartsave.todaktodak_api.auth.repository.RefreshTokenCacheRepository;
-import com.heartsave.todaktodak_api.common.exception.errorspec.AuthErrorSpec;
+import com.heartsave.todaktodak_api.common.exception.errorspec.auth.AuthErrorSpec;
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
+import com.heartsave.todaktodak_api.common.security.cookie.CookieUtils;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
-import com.heartsave.todaktodak_api.common.security.util.CookieUtils;
-import com.heartsave.todaktodak_api.common.security.util.JwtUtils;
+import com.heartsave.todaktodak_api.common.security.jwt.util.JwtUtils;
 import com.heartsave.todaktodak_api.common.security.util.UtilConfig;
-import com.heartsave.todaktodak_api.member.domain.TodakRole;
-import com.heartsave.todaktodak_api.member.entity.MemberEntity;
-import com.heartsave.todaktodak_api.member.repository.MemberRepository;
+import com.heartsave.todaktodak_api.domain.auth.cache.RefreshTokenCache;
+import com.heartsave.todaktodak_api.domain.auth.dto.response.TokenReissueResponse;
+import com.heartsave.todaktodak_api.domain.auth.exception.AuthException;
+import com.heartsave.todaktodak_api.domain.auth.service.AuthService;
+import com.heartsave.todaktodak_api.domain.member.domain.TodakRole;
+import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.domain.member.repository.MemberRepository;
 import jakarta.servlet.http.Cookie;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -39,7 +40,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class ReissueTokenAuthServiceTest {
   @Autowired private AuthService authService;
-  @MockBean RefreshTokenCacheRepository cacheRepository;
+  @MockBean RefreshTokenCache cacheRepository;
   @MockBean MemberRepository memberRepository;
   private static MemberEntity member;
   MockHttpServletRequest request;

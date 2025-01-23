@@ -2,13 +2,13 @@ package com.heartsave.todaktodak_api.common.security.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.heartsave.todaktodak_api.common.security.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
-import com.heartsave.todaktodak_api.member.domain.TodakRole;
+import com.heartsave.todaktodak_api.common.security.jwt.constant.JwtConstant;
+import com.heartsave.todaktodak_api.common.security.jwt.util.JwtUtils;
+import com.heartsave.todaktodak_api.domain.member.domain.TodakRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;

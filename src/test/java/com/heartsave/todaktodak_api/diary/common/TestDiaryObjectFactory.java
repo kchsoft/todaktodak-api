@@ -1,6 +1,6 @@
 package com.heartsave.todaktodak_api.diary.common;
 
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryYearMonthProjection;
+import com.heartsave.todaktodak_api.domain.diary.entity.projection.DiaryYearMonthProjection;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

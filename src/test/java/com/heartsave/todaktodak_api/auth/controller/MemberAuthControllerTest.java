@@ -6,12 +6,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.heartsave.todaktodak_api.auth.dto.request.LoginIdCheckRequest;
-import com.heartsave.todaktodak_api.auth.dto.request.NicknameCheckRequest;
-import com.heartsave.todaktodak_api.auth.dto.request.SignUpRequest;
-import com.heartsave.todaktodak_api.auth.exception.AuthException;
-import com.heartsave.todaktodak_api.auth.service.AuthService;
-import com.heartsave.todaktodak_api.common.exception.errorspec.AuthErrorSpec;
+import com.heartsave.todaktodak_api.domain.auth.controller.AuthController;
+import com.heartsave.todaktodak_api.domain.auth.dto.request.LoginIdCheckRequest;
+import com.heartsave.todaktodak_api.domain.auth.dto.request.NicknameCheckRequest;
+import com.heartsave.todaktodak_api.domain.auth.dto.request.SignUpRequest;
+import com.heartsave.todaktodak_api.domain.auth.exception.AuthException;
+import com.heartsave.todaktodak_api.domain.auth.service.AuthService;
+import com.heartsave.todaktodak_api.common.exception.errorspec.auth.AuthErrorSpec;
 import com.heartsave.todaktodak_api.config.TestSecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

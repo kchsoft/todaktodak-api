@@ -8,9 +8,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
-import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
-import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryReactionRequest;
-import com.heartsave.todaktodak_api.diary.service.DiaryReactionService;
+import com.heartsave.todaktodak_api.domain.diary.constant.DiaryReactionType;
+import com.heartsave.todaktodak_api.domain.diary.controller.DiaryReactionController;
+import com.heartsave.todaktodak_api.domain.diary.dto.request.PublicDiaryReactionRequest;
+import com.heartsave.todaktodak_api.domain.diary.service.DiaryReactionService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

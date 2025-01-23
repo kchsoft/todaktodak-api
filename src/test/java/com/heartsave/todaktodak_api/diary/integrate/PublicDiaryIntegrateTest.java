@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.diary.integrate;
 
 import static com.heartsave.todaktodak_api.common.BaseTestObject.createDiaryNoIdWithMember;
-import static com.heartsave.todaktodak_api.common.constant.CoreConstant.DIARY.*;
+import static com.heartsave.todaktodak_api.common.constant.TodakConstant.DIARY.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -14,16 +14,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
 import com.heartsave.todaktodak_api.config.BaseIntegrateTest;
-import com.heartsave.todaktodak_api.diary.dto.request.PublicDiaryWriteRequest;
-import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
-import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
-import com.heartsave.todaktodak_api.diary.exception.DiaryNotFoundException;
-import com.heartsave.todaktodak_api.diary.exception.PublicDiaryExistException;
-import com.heartsave.todaktodak_api.diary.repository.DiaryRepository;
-import com.heartsave.todaktodak_api.diary.repository.PublicDiaryRepository;
-import com.heartsave.todaktodak_api.diary.service.PublicDiaryCacheService;
-import com.heartsave.todaktodak_api.member.entity.MemberEntity;
-import com.heartsave.todaktodak_api.member.repository.MemberRepository;
+import com.heartsave.todaktodak_api.domain.diary.dto.request.PublicDiaryWriteRequest;
+import com.heartsave.todaktodak_api.domain.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.domain.diary.entity.PublicDiaryEntity;
+import com.heartsave.todaktodak_api.domain.diary.exception.DiaryNotFoundException;
+import com.heartsave.todaktodak_api.domain.diary.exception.PublicDiaryExistException;
+import com.heartsave.todaktodak_api.domain.diary.repository.DiaryRepository;
+import com.heartsave.todaktodak_api.domain.diary.repository.PublicDiaryRepository;
+import com.heartsave.todaktodak_api.domain.diary.service.PublicDiaryCacheService;
+import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.domain.member.repository.MemberRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;

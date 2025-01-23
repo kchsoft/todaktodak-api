@@ -6,10 +6,11 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
 import com.heartsave.todaktodak_api.common.BaseTestObject;
-import com.heartsave.todaktodak_api.event.entity.EventEntity;
-import com.heartsave.todaktodak_api.event.repository.EventRepository;
-import com.heartsave.todaktodak_api.event.repository.SseEmitterRepository;
-import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.domain.event.entity.EventEntity;
+import com.heartsave.todaktodak_api.domain.event.repository.EventRepository;
+import com.heartsave.todaktodak_api.domain.event.repository.SseEmitterRepository;
+import com.heartsave.todaktodak_api.domain.event.service.SseEventService;
+import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;

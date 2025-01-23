@@ -1,16 +1,17 @@
 package com.heartsave.todaktodak_api.diary.repository;
 
-import static com.heartsave.todaktodak_api.common.constant.CoreConstant.HEADER.DEFAULT_TIME_ZONE;
+import static com.heartsave.todaktodak_api.common.constant.TodakConstant.HEADER.DEFAULT_TIME_ZONE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.heartsave.todaktodak_api.common.BaseTestObject;
 import com.heartsave.todaktodak_api.common.converter.InstantUtils;
-import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
-import com.heartsave.todaktodak_api.diary.entity.PublicDiaryEntity;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryIdsProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryYearMonthProjection;
-import com.heartsave.todaktodak_api.member.entity.MemberEntity;
-import com.heartsave.todaktodak_api.member.repository.MemberRepository;
+import com.heartsave.todaktodak_api.domain.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.domain.diary.entity.PublicDiaryEntity;
+import com.heartsave.todaktodak_api.domain.diary.entity.projection.DiaryIdsProjection;
+import com.heartsave.todaktodak_api.domain.diary.entity.projection.DiaryYearMonthProjection;
+import com.heartsave.todaktodak_api.domain.diary.repository.DiaryRepository;
+import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.domain.member.repository.MemberRepository;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;

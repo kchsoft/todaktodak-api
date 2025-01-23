@@ -2,6 +2,7 @@ package com.heartsave.todaktodak_api.event.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.heartsave.todaktodak_api.domain.event.repository.SseEmitterRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

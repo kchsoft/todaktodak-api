@@ -3,10 +3,10 @@ package com.heartsave.todaktodak_api.config;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.heartsave.todaktodak_api.ai.client.config.properties.AiServerProperties;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
-import com.heartsave.todaktodak_api.diary.cache.ContentReactionCountCache;
-import com.heartsave.todaktodak_api.diary.service.PublicDiaryCacheService;
+import com.heartsave.todaktodak_api.domain.ai.client.config.properties.AiServerProperties;
+import com.heartsave.todaktodak_api.domain.diary.cache.ContentReactionCountCache;
+import com.heartsave.todaktodak_api.domain.diary.service.PublicDiaryCacheService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;

@@ -6,15 +6,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.heartsave.todaktodak_api.common.exception.errorspec.MemberErrorSpec;
+import com.heartsave.todaktodak_api.common.exception.errorspec.member.MemberErrorSpec;
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.config.TestSecurityConfig;
-import com.heartsave.todaktodak_api.member.dto.request.NicknameUpdateRequest;
-import com.heartsave.todaktodak_api.member.dto.response.MemberProfileResponse;
-import com.heartsave.todaktodak_api.member.dto.response.NicknameUpdateResponse;
-import com.heartsave.todaktodak_api.member.exception.MemberNotFoundException;
-import com.heartsave.todaktodak_api.member.service.MemberService;
+import com.heartsave.todaktodak_api.domain.member.controller.MemberController;
+import com.heartsave.todaktodak_api.domain.member.dto.request.NicknameUpdateRequest;
+import com.heartsave.todaktodak_api.domain.member.dto.response.MemberProfileResponse;
+import com.heartsave.todaktodak_api.domain.member.dto.response.NicknameUpdateResponse;
+import com.heartsave.todaktodak_api.domain.member.exception.MemberNotFoundException;
+import com.heartsave.todaktodak_api.domain.member.service.MemberService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

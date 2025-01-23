@@ -2,11 +2,12 @@ package com.heartsave.todaktodak_api.ai.client.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.heartsave.todaktodak_api.ai.client.config.properties.AiServerProperties;
-import com.heartsave.todaktodak_api.ai.client.dto.response.AiDiaryContentResponse;
 import com.heartsave.todaktodak_api.common.BaseTestObject;
-import com.heartsave.todaktodak_api.diary.entity.DiaryEntity;
-import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.domain.ai.client.config.properties.AiServerProperties;
+import com.heartsave.todaktodak_api.domain.ai.client.dto.response.AiClientCommentResponse;
+import com.heartsave.todaktodak_api.domain.ai.client.service.AiClientService;
+import com.heartsave.todaktodak_api.domain.diary.entity.DiaryEntity;
+import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.mockwebserver.Dispatcher;
@@ -75,7 +76,7 @@ class AiClientServiceTest {
     MemberEntity member = BaseTestObject.createMember();
     DiaryEntity diary = BaseTestObject.createDiaryWithMember(member);
 
-    AiDiaryContentResponse aiResponse = aiClientService.callDiaryContent(diary);
+    AiClientCommentResponse aiResponse = aiClientService.callDiaryContent(diary);
     log.info("aiComment 결과 = {}", aiResponse.getAiComment());
     assertThat(aiResponse.getAiComment()).as("AI 코멘트 비동기 요청 응답이 올바르지 않습니다.").isEqualTo(AI_COMMENT);
     assertThat(aiResponse.getAiComment().startsWith("{"))

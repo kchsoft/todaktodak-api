@@ -11,17 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.heartsave.todaktodak_api.common.exception.errorspec.PublicDiaryErrorSpec;
+import com.heartsave.todaktodak_api.common.exception.errorspec.diary.PublicDiaryErrorSpec;
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
-import com.heartsave.todaktodak_api.diary.constant.DiaryReactionType;
-import com.heartsave.todaktodak_api.diary.dto.request.DiaryPageRequest;
-import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryPaginationResponse;
-import com.heartsave.todaktodak_api.diary.dto.response.MySharedDiaryResponse;
-import com.heartsave.todaktodak_api.diary.entity.projection.DiaryReactionCountProjection;
-import com.heartsave.todaktodak_api.diary.entity.projection.MySharedDiaryPreviewProjection;
-import com.heartsave.todaktodak_api.diary.exception.PublicDiaryNotFoundException;
-import com.heartsave.todaktodak_api.diary.service.MySharedDiaryService;
+import com.heartsave.todaktodak_api.domain.diary.constant.DiaryReactionType;
+import com.heartsave.todaktodak_api.domain.diary.controller.MySharedDiaryController;
+import com.heartsave.todaktodak_api.domain.diary.dto.request.DiaryPageRequest;
+import com.heartsave.todaktodak_api.domain.diary.dto.response.MySharedDiaryPaginationResponse;
+import com.heartsave.todaktodak_api.domain.diary.dto.response.MySharedDiaryResponse;
+import com.heartsave.todaktodak_api.domain.diary.entity.projection.DiaryReactionCountProjection;
+import com.heartsave.todaktodak_api.domain.diary.entity.projection.MySharedDiaryPreviewProjection;
+import com.heartsave.todaktodak_api.domain.diary.exception.PublicDiaryNotFoundException;
+import com.heartsave.todaktodak_api.domain.diary.service.MySharedDiaryService;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;

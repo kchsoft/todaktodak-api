@@ -1,21 +1,22 @@
 package com.heartsave.todaktodak_api.auth.controller;
 
-import static com.heartsave.todaktodak_api.common.security.constant.JwtConstant.ACCESS_TYPE;
+import static com.heartsave.todaktodak_api.common.security.jwt.constant.JwtConstant.ACCESS_TYPE;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.heartsave.todaktodak_api.auth.dto.response.TokenReissueResponse;
-import com.heartsave.todaktodak_api.auth.exception.AuthException;
-import com.heartsave.todaktodak_api.auth.service.AuthService;
-import com.heartsave.todaktodak_api.common.exception.errorspec.AuthErrorSpec;
+import com.heartsave.todaktodak_api.common.exception.errorspec.auth.AuthErrorSpec;
 import com.heartsave.todaktodak_api.common.security.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
-import com.heartsave.todaktodak_api.common.security.util.JwtUtils;
+import com.heartsave.todaktodak_api.common.security.jwt.util.JwtUtils;
 import com.heartsave.todaktodak_api.common.security.util.UtilConfig;
 import com.heartsave.todaktodak_api.config.TestSecurityConfig;
+import com.heartsave.todaktodak_api.domain.auth.controller.AuthController;
+import com.heartsave.todaktodak_api.domain.auth.dto.response.TokenReissueResponse;
+import com.heartsave.todaktodak_api.domain.auth.exception.AuthException;
+import com.heartsave.todaktodak_api.domain.auth.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;

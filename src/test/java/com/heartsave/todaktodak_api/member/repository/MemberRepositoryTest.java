@@ -3,7 +3,8 @@ package com.heartsave.todaktodak_api.member.repository;
 import static org.assertj.core.api.Assertions.*;
 
 import com.heartsave.todaktodak_api.common.BaseTestObject;
-import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

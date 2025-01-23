@@ -4,8 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.heartsave.todaktodak_api.common.BaseTestObject;
-import com.heartsave.todaktodak_api.event.repository.SseEmitterRepository;
-import com.heartsave.todaktodak_api.member.entity.MemberEntity;
+import com.heartsave.todaktodak_api.domain.event.repository.SseEmitterRepository;
+import com.heartsave.todaktodak_api.domain.event.service.SseManager;
+import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
