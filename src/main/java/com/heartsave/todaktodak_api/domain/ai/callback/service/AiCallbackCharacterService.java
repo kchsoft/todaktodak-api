@@ -6,10 +6,10 @@ import com.heartsave.todaktodak_api.domain.ai.callback.dto.request.AiCallbackCha
 import com.heartsave.todaktodak_api.domain.event.constant.EventType;
 import com.heartsave.todaktodak_api.domain.event.entity.EventEntity;
 import com.heartsave.todaktodak_api.domain.event.service.EventService;
+import com.heartsave.todaktodak_api.domain.member.cache.CharacterCache;
 import com.heartsave.todaktodak_api.domain.member.entity.CharacterEntity;
 import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.domain.member.exception.MemberNotFoundException;
-import com.heartsave.todaktodak_api.domain.member.repository.CharacterCache;
 import com.heartsave.todaktodak_api.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.domain.ai.webhook.repository;
+package com.heartsave.todaktodak_api.domain.ai.callback.repository;
 
 import static com.heartsave.todaktodak_api.config.BaseTestObject.DUMMY_STRING_CONTENT;
 import static com.heartsave.todaktodak_api.config.BaseTestObject.TEST_BGM_KEY_URL;
@@ -10,7 +10,6 @@ import com.heartsave.todaktodak_api.domain.ai.callback.domain.AiCallbackBgmCompl
 import com.heartsave.todaktodak_api.domain.ai.callback.domain.AiCallbackWebtoonCompletion;
 import com.heartsave.todaktodak_api.domain.ai.callback.dto.request.AiCallbackBgmRequest;
 import com.heartsave.todaktodak_api.domain.ai.callback.dto.request.AiCallbackWebtoonRequest;
-import com.heartsave.todaktodak_api.domain.ai.callback.repository.AiCallbackRepository;
 import com.heartsave.todaktodak_api.domain.diary.constant.DiaryBgmGenre;
 import com.heartsave.todaktodak_api.domain.diary.constant.DiaryEmotion;
 import com.heartsave.todaktodak_api.domain.diary.entity.DiaryEntity;

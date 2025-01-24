@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.domain.ai.webhook.service;
+package com.heartsave.todaktodak_api.domain.ai.callback.service;
 
 import static com.heartsave.todaktodak_api.config.BaseTestObject.TEST_BGM_KEY_URL;
 import static com.heartsave.todaktodak_api.config.BaseTestObject.TEST_WEBTOON_KEY_URL;
@@ -11,7 +11,6 @@ import com.heartsave.todaktodak_api.domain.ai.callback.domain.AiCallbackWebtoonC
 import com.heartsave.todaktodak_api.domain.ai.callback.dto.request.AiCallbackBgmRequest;
 import com.heartsave.todaktodak_api.domain.ai.callback.dto.request.AiCallbackWebtoonRequest;
 import com.heartsave.todaktodak_api.domain.ai.callback.repository.AiCallbackRepository;
-import com.heartsave.todaktodak_api.domain.ai.callback.service.AiDiaryService;
 import com.heartsave.todaktodak_api.domain.event.service.EventService;
 import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.domain.member.repository.MemberRepository;

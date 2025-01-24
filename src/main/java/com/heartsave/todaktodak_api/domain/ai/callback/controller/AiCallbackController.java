@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/webhook/ai")
+@RequestMapping("/api/v1/callback/ai")
 public class AiCallbackController {
 
   private final AiDiaryService aiDiaryService;

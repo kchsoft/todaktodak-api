@@ -1,20 +1,18 @@
-package com.heartsave.todaktodak_api.domain.ai.webhook.service;
+package com.heartsave.todaktodak_api.domain.ai.callback.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.heartsave.todaktodak_api.config.BaseTestObject;
 import com.heartsave.todaktodak_api.common.exception.errorspec.event.EventErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
+import com.heartsave.todaktodak_api.config.BaseTestObject;
 import com.heartsave.todaktodak_api.domain.ai.callback.dto.request.AiCallbackCharacterRequest;
-import com.heartsave.todaktodak_api.domain.ai.callback.service.AiCallbackCharacterService;
 import com.heartsave.todaktodak_api.domain.event.constant.EventType;
 import com.heartsave.todaktodak_api.domain.event.entity.EventEntity;
 import com.heartsave.todaktodak_api.domain.event.exception.EventException;
 import com.heartsave.todaktodak_api.domain.event.service.EventService;
 import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.domain.member.exception.MemberNotFoundException;
-import com.heartsave.todaktodak_api.domain.member.repository.CharacterCache;
 import com.heartsave.todaktodak_api.domain.member.repository.MemberRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +29,6 @@ final class AiCallbackCharacterServiceTest {
   @Mock private MemberRepository memberRepository;
   @Mock private S3FileStorageManager s3FileStorageManager;
   @Mock private EventService eventService;
-  @Mock private CharacterCache characterCache;
   @InjectMocks private AiCallbackCharacterService characterService;
 
   private MemberEntity member;

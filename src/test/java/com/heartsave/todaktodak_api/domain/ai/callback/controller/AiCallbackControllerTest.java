@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.domain.ai.webhook.controller;
+package com.heartsave.todaktodak_api.domain.ai.callback.controller;
 
 import static com.heartsave.todaktodak_api.config.BaseTestObject.TEST_BGM_KEY_URL;
 import static com.heartsave.todaktodak_api.config.BaseTestObject.TEST_WEBTOON_KEY_URL;
@@ -7,9 +7,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.heartsave.todaktodak_api.config.BaseTestObject;
 import com.heartsave.todaktodak_api.common.exception.errorspec.member.MemberErrorSpec;
-import com.heartsave.todaktodak_api.domain.ai.callback.controller.AiCallbackController;
+import com.heartsave.todaktodak_api.config.BaseTestObject;
 import com.heartsave.todaktodak_api.domain.ai.callback.dto.request.AiCallbackBgmRequest;
 import com.heartsave.todaktodak_api.domain.ai.callback.dto.request.AiCallbackCharacterRequest;
 import com.heartsave.todaktodak_api.domain.ai.callback.dto.request.AiCallbackWebtoonRequest;
@@ -43,8 +42,11 @@ class AiCallbackControllerTest {
   @MockBean private AiDiaryService aiDiaryService;
   @MockBean private AiCallbackCharacterService aiCallbackCharacterService;
 
-  MemberEntity member;
-  DiaryEntity diary;
+  private MemberEntity member;
+  private DiaryEntity diary;
+  private String CALL_WEBTOON_URL = "/api/v1/callback/ai/webtoon";
+  private String CALL_BGM_URL = "/api/v1/callback/ai/bgm";
+  private String CALL_CHARACTER_URL = "/api/v1/callback/ai/character";
 
   @BeforeEach
   void setup() {
@@ -67,7 +69,7 @@ class AiCallbackControllerTest {
 
       mockMvc
           .perform(
-              post("/api/v1/webhook/ai/webtoon")
+              post(CALL_WEBTOON_URL)
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(objectMapper.writeValueAsString(request)))
           .andExpect(status().isNoContent());
@@ -83,7 +85,7 @@ class AiCallbackControllerTest {
 
       mockMvc
           .perform(
-              post("/api/v1/webhook/ai/webtoon")
+              post(CALL_WEBTOON_URL)
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(objectMapper.writeValueAsString(request))
                   .characterEncoding(StandardCharsets.UTF_8))
@@ -107,7 +109,7 @@ class AiCallbackControllerTest {
 
       mockMvc
           .perform(
-              post("/api/v1/webhook/ai/bgm")
+              post(CALL_BGM_URL)
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(objectMapper.writeValueAsString(request)))
           .andExpect(status().isNoContent());
@@ -123,7 +125,7 @@ class AiCallbackControllerTest {
 
       mockMvc
           .perform(
-              post("/api/v1/webhook/ai/bgm")
+              post(CALL_BGM_URL)
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(objectMapper.writeValueAsString(request))
                   .characterEncoding(StandardCharsets.UTF_8))
@@ -140,7 +142,7 @@ class AiCallbackControllerTest {
 
       mockMvc
           .perform(
-              post("/api/v1/webhook/ai/bgm")
+              post(CALL_BGM_URL)
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(objectMapper.writeValueAsString(request))
                   .characterEncoding(StandardCharsets.UTF_8))
@@ -163,7 +165,7 @@ class AiCallbackControllerTest {
 
       mockMvc
           .perform(
-              post("/api/v1/webhook/ai/bgm")
+              post(CALL_BGM_URL)
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(requestBody)
                   .characterEncoding(StandardCharsets.UTF_8))
@@ -192,7 +194,7 @@ class AiCallbackControllerTest {
       // when + then
       mockMvc
           .perform(
-              post("/api/v1/webhook/ai/character")
+              post(CALL_CHARACTER_URL)
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(objectMapper.writeValueAsString(request))
                   .characterEncoding(StandardCharsets.UTF_8))
@@ -229,7 +231,7 @@ class AiCallbackControllerTest {
       // then
       mockMvc
           .perform(
-              post("/api/v1/webhook/ai/character")
+              post(CALL_CHARACTER_URL)
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(new ObjectMapper().writeValueAsString(request)))
           .andExpect(status().isBadRequest());
@@ -268,7 +270,7 @@ class AiCallbackControllerTest {
       // then
       mockMvc
           .perform(
-              post("/api/v1/webhook/ai/character")
+              post(CALL_CHARACTER_URL)
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(objectMapper.writeValueAsString(request))
                   .characterEncoding(StandardCharsets.UTF_8))

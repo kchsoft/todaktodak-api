@@ -75,7 +75,7 @@ public class SecurityConfig {
                         "/swagger-ui/**",
                         "/swagger-resources/**",
                         "/v3/api-docs/**",
-                        "/api/v1/webhook/ai/**",
+                        "/api/v1/callback/ai/**",
                         "/api/v1/event/**",
                         "/error")
                     .permitAll()
