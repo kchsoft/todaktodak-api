@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.domain.ai.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.heartsave.todaktodak_api.config.BaseIntegrateTest;
+import com.heartsave.todaktodak_api.config.integrate.BaseIntegrateTest;
 import com.heartsave.todaktodak_api.domain.ai.client.util.AiClientDomainUrlUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

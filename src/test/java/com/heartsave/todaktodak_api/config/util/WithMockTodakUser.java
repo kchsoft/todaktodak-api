@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.config;
+package com.heartsave.todaktodak_api.config.util;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

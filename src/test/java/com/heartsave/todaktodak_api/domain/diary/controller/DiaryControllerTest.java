@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.config.BaseTestObject;
-import com.heartsave.todaktodak_api.config.WithMockTodakUser;
+import com.heartsave.todaktodak_api.config.util.WithMockTodakUser;
 import com.heartsave.todaktodak_api.domain.diary.common.TestDiaryObjectFactory;
 import com.heartsave.todaktodak_api.domain.diary.constant.DiaryBgmGenre;
 import com.heartsave.todaktodak_api.domain.diary.constant.DiaryEmotion;

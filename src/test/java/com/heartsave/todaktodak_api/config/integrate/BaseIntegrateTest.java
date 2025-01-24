@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.config;
+package com.heartsave.todaktodak_api.config.integrate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
-@Import(MockBeanConfiguration.class)
+@Import(IntegrateMockBeanConfiguration.class)
 public class BaseIntegrateTest {
   @Autowired protected MockMvc mockMvc;
   @Autowired protected ObjectMapper objectMapper;

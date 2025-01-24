@@ -12,8 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.heartsave.todaktodak_api.common.exception.errorspec.diary.PublicDiaryErrorSpec;
-import com.heartsave.todaktodak_api.config.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
+import com.heartsave.todaktodak_api.config.util.WithMockTodakUser;
 import com.heartsave.todaktodak_api.domain.diary.constant.DiaryReactionType;
 import com.heartsave.todaktodak_api.domain.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.domain.diary.dto.response.MySharedDiaryPaginationResponse;

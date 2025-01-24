@@ -7,9 +7,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heartsave.todaktodak_api.common.exception.errorspec.member.MemberErrorSpec;
-import com.heartsave.todaktodak_api.config.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.config.TestSecurityConfig;
+import com.heartsave.todaktodak_api.config.util.WithMockTodakUser;
 import com.heartsave.todaktodak_api.domain.member.dto.request.NicknameUpdateRequest;
 import com.heartsave.todaktodak_api.domain.member.dto.response.MemberProfileResponse;
 import com.heartsave.todaktodak_api.domain.member.dto.response.NicknameUpdateResponse;

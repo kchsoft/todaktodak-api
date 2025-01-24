@@ -3,9 +3,9 @@ package com.heartsave.todaktodak_api.common.security.handler.jwt;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.heartsave.todaktodak_api.config.WithMockTodakUser;
 import com.heartsave.todaktodak_api.common.security.jwt.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.jwt.filter.JwtLogoutFilter;
+import com.heartsave.todaktodak_api.config.util.WithMockTodakUser;
 import com.heartsave.todaktodak_api.domain.auth.cache.RefreshTokenCache;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;

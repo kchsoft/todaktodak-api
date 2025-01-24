@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.config;
+package com.heartsave.todaktodak_api.config.integrate;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -22,7 +22,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 
 @Configuration
 @Profile("test")
-public class MockBeanConfiguration {
+public class IntegrateMockBeanConfiguration {
 
   @Primary
   @Bean

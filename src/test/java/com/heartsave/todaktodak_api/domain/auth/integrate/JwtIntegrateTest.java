@@ -12,8 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.security.jwt.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.jwt.util.JwtUtils;
-import com.heartsave.todaktodak_api.config.BaseIntegrateTest;
 import com.heartsave.todaktodak_api.config.BaseTestObject;
+import com.heartsave.todaktodak_api.config.integrate.BaseIntegrateTest;
 import com.heartsave.todaktodak_api.domain.auth.cache.RefreshTokenCache;
 import com.heartsave.todaktodak_api.domain.auth.dto.request.LoginRequest;
 import com.heartsave.todaktodak_api.domain.auth.dto.request.SignUpRequest;

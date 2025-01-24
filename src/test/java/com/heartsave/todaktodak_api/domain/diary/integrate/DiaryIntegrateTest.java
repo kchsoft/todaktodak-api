@@ -12,8 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.heartsave.todaktodak_api.config.BaseTestObject;
-import com.heartsave.todaktodak_api.config.WithMockTodakUser;
-import com.heartsave.todaktodak_api.config.BaseIntegrateTest;
+import com.heartsave.todaktodak_api.config.integrate.BaseIntegrateTest;
+import com.heartsave.todaktodak_api.config.util.WithMockTodakUser;
 import com.heartsave.todaktodak_api.domain.diary.dto.request.DiaryWriteRequest;
 import com.heartsave.todaktodak_api.domain.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.domain.diary.exception.DiaryDailyWritingLimitExceedException;
