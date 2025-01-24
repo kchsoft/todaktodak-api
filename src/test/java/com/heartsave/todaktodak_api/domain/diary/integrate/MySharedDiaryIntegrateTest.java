@@ -1,10 +1,9 @@
 package com.heartsave.todaktodak_api.domain.diary.integrate;
 
-import static com.heartsave.todaktodak_api.config.BaseTestObject.createDiaryNoIdWithMember;
 import static com.heartsave.todaktodak_api.common.constant.TodakConstant.DIARY.*;
+import static com.heartsave.todaktodak_api.config.BaseTestObject.createDiaryNoIdWithMember;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -12,10 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.heartsave.todaktodak_api.config.BaseIntegrateTest;
 import com.heartsave.todaktodak_api.config.BaseTestObject;
 import com.heartsave.todaktodak_api.config.WithMockTodakUser;
-import com.heartsave.todaktodak_api.common.storage.s3.S3FileStorageManager;
-import com.heartsave.todaktodak_api.config.BaseIntegrateTest;
 import com.heartsave.todaktodak_api.domain.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.domain.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.domain.diary.exception.PublicDiaryNotFoundException;
@@ -43,15 +41,12 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
   @Autowired private DiaryRepository diaryRepository;
   @Autowired private MemberRepository memberRepository;
 
-  @Autowired private S3FileStorageManager s3FileStorageManager;
   @Autowired private PublicDiaryCacheService publicDiaryCacheService;
 
   private MemberEntity member;
   private final int diaryCnt = 20;
   private List<DiaryEntity> diaryList;
   private List<PublicDiaryEntity> publicDiaryList;
-  private final String preSigned_webtoonUrl = "preSigned_webtoonUrl";
-  private final String preSigned_bgmUrl = "preSigned_bgmUrl";
   private final String DEFAULT_URL = "/api/v1/diary/my/shared";
 
   @BeforeAll
@@ -78,13 +73,6 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
               .build());
     }
     publicDiaryList = publicDiaryRepository.findAll();
-
-    // mock S3 pre-signed URLs
-    when(s3FileStorageManager.preSignedFirstWebtoonUrlFrom(anyString()))
-        .thenReturn(preSigned_webtoonUrl);
-    when(s3FileStorageManager.preSignedWebtoonUrlFrom(any()))
-        .thenReturn(List.of(preSigned_webtoonUrl));
-    when(s3FileStorageManager.preSignedBgmUrlFrom(anyString())).thenReturn(preSigned_bgmUrl);
   }
 
   @Nested
