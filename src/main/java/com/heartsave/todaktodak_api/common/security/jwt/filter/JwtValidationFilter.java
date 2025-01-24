@@ -129,7 +129,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
-    return Stream.of("auth/**", "webhook/ai/**")
+    return Stream.of("auth/**", "callback/ai/**")
         .anyMatch(pattern -> new AntPathMatcher().match(pattern, request.getRequestURI()));
   }
 }

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.heartsave.todaktodak_api.domain.ai.client.config.properties.AiServerProperties;
+import com.heartsave.todaktodak_api.domain.auth.cache.RefreshTokenCache;
 import com.heartsave.todaktodak_api.domain.diary.cache.ContentReactionCountCache;
 import java.net.URL;
 import java.util.List;
@@ -58,6 +59,12 @@ public class MockBeanConfiguration {
   @Bean
   public ContentReactionCountCache mockContentReactionCountCache() {
     return mock(ContentReactionCountCache.class);
+  }
+
+  @Primary
+  @Bean
+  public RefreshTokenCache mockRefreshTokenCache() {
+    return mock(RefreshTokenCache.class);
   }
 
   @Primary

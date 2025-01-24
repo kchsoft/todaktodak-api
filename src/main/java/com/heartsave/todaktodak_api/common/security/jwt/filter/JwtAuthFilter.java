@@ -31,16 +31,16 @@ public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final AuthenticationManager authenticationManager;
   private final ObjectMapper objectMapper;
-  private final RefreshTokenCache cacheRepository;
+  private final RefreshTokenCache refreshCache;
   private static final String LOGIN_URL = "/api/v1/auth/login";
 
   public JwtAuthFilter(
       AuthenticationManager authenticationManager,
       ObjectMapper objectMapper,
-      RefreshTokenCache cacheRepository) {
+      RefreshTokenCache refreshCache) {
     this.authenticationManager = authenticationManager;
     this.objectMapper = objectMapper;
-    this.cacheRepository = cacheRepository;
+    this.refreshCache = refreshCache;
     setFilterProcessesUrl(LOGIN_URL);
   }
 
@@ -69,7 +69,7 @@ public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
     var refreshCookie = CookieUtils.createValidCookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken);
 
     // 캐싱
-    cacheRepository.set(String.valueOf(user.getId()), refreshToken);
+    refreshCache.set(String.valueOf(user.getId()), refreshToken);
 
     // 응답
     CookieUtils.updateCookie(response, refreshCookie);

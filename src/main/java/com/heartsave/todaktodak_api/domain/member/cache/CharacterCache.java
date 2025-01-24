@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.domain.member.repository;
+package com.heartsave.todaktodak_api.domain.member.cache;
 
 import com.heartsave.todaktodak_api.domain.member.entity.CharacterEntity;
 import org.springframework.data.repository.CrudRepository;

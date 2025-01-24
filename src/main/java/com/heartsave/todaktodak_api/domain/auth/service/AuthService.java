@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class AuthService {
-  private final RefreshTokenCache cacheRepository;
+  private final RefreshTokenCache refreshTokenCache;
   private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -58,7 +58,7 @@ public class AuthService {
     var newRefreshToken = JwtUtils.issueToken(user, REFRESH_TYPE);
 
     // 토큰 캐싱
-    cacheRepository.set(String.valueOf(id), newRefreshToken);
+    refreshTokenCache.set(String.valueOf(id), newRefreshToken);
     updateRefreshTokenCookie(response, newRefreshToken);
 
     return TokenReissueResponse.builder().accessToken(accessToken).build();
@@ -98,7 +98,7 @@ public class AuthService {
   }
 
   private boolean checkCache(Long memberId, String refreshToken) {
-    var retrievedToken = cacheRepository.get(String.valueOf(memberId));
+    var retrievedToken = refreshTokenCache.get(String.valueOf(memberId));
     return retrievedToken.equals(refreshToken);
   }
 
