@@ -3,8 +3,6 @@ package com.heartsave.todaktodak_api.domain.diary.integrate;
 import static com.heartsave.todaktodak_api.common.constant.TodakConstant.DIARY.*;
 import static com.heartsave.todaktodak_api.config.BaseTestObject.createDiaryNoIdWithMember;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -19,7 +17,6 @@ import com.heartsave.todaktodak_api.domain.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.domain.diary.exception.PublicDiaryNotFoundException;
 import com.heartsave.todaktodak_api.domain.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.domain.diary.repository.PublicDiaryRepository;
-import com.heartsave.todaktodak_api.domain.diary.service.PublicDiaryCacheService;
 import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.domain.member.repository.MemberRepository;
 import java.time.Instant;
@@ -40,8 +37,6 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
   @Autowired private PublicDiaryRepository publicDiaryRepository;
   @Autowired private DiaryRepository diaryRepository;
   @Autowired private MemberRepository memberRepository;
-
-  @Autowired private PublicDiaryCacheService publicDiaryCacheService;
 
   private MemberEntity member;
   private final int diaryCnt = 20;
@@ -85,9 +80,6 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
     @CsvSource({"19,18,7", "16,15,4", "10,9,0", "1,0,0"})
     void getPagination_Success(Integer target, Integer responseFirst, Integer responseLast)
         throws Exception {
-      // Given
-      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
-
       // When & Then
       PublicDiaryEntity requestParam = publicDiaryList.get(target);
       mockMvc
@@ -110,8 +102,6 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
     @DisplayName("최신 페이지 조회 성공 - 파라미터 없음")
     @WithMockTodakUser
     void Recent_getPagination_NoParameter_Success() throws Exception {
-      // Given
-      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
 
       // When & Then
       mockMvc
@@ -129,8 +119,7 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
     @DisplayName("최신 페이지 조회 성공 - 기본 파라미터")
     @WithMockTodakUser
     void Recent_getPagination_DefaultParameter_Success() throws Exception {
-      // Given
-      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
+
       // When & Then
       mockMvc
           .perform(
@@ -151,8 +140,6 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
     @DisplayName("최신 페이지 조회 성공 - after 파라미터만")
     @WithMockTodakUser
     void Recent_getPagination_AfterParameter_Success() throws Exception {
-      // Given
-      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
 
       // When & Then
       mockMvc
@@ -170,8 +157,6 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
     @DisplayName("최신 페이지 조회 성공 - date 파라미터만")
     @WithMockTodakUser
     void Recent_getPagination_DateParameter_Success() throws Exception {
-      // Given
-      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
 
       // When & Then
       mockMvc
@@ -192,8 +177,6 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
     @DisplayName("공개 일기 0개 조회 성공")
     @WithMockTodakUser
     void Zero_getPagination_Success() throws Exception {
-      // Given
-      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
       publicDiaryRepository.deleteAll();
       entityManager.flush();
       entityManager.clear();

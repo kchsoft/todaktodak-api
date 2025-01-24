@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import com.heartsave.todaktodak_api.domain.ai.client.config.properties.AiServerProperties;
 import com.heartsave.todaktodak_api.domain.diary.cache.ContentReactionCountCache;
-import com.heartsave.todaktodak_api.domain.diary.service.PublicDiaryCacheService;
 import java.net.URL;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -26,18 +25,12 @@ public class MockBeanConfiguration {
 
   @Primary
   @Bean
-  public PublicDiaryCacheService mockPublicDiaryCacheService() {
-    return mock(PublicDiaryCacheService.class);
-  }
-
-  @Primary
-  @Bean
   public S3Client mockS3Client() {
     // mock object
     S3Client mockS3Client = mock(S3Client.class);
     ListObjectsV2Response mockResponse = mock(ListObjectsV2Response.class);
 
-    // method setting
+    // setting
     when(mockS3Client.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(mockResponse);
     when(mockResponse.contents()).thenReturn(List.of());
 

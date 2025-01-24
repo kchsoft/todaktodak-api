@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.domain.diary.integrate;
 
-import static com.heartsave.todaktodak_api.config.BaseTestObject.createDiaryNoIdWithMember;
 import static com.heartsave.todaktodak_api.common.constant.TodakConstant.DIARY.*;
+import static com.heartsave.todaktodak_api.config.BaseTestObject.createDiaryNoIdWithMember;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -11,9 +11,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.heartsave.todaktodak_api.config.BaseIntegrateTest;
 import com.heartsave.todaktodak_api.config.BaseTestObject;
 import com.heartsave.todaktodak_api.config.WithMockTodakUser;
-import com.heartsave.todaktodak_api.config.BaseIntegrateTest;
+import com.heartsave.todaktodak_api.domain.diary.cache.ContentReactionCountCache;
 import com.heartsave.todaktodak_api.domain.diary.dto.request.PublicDiaryWriteRequest;
 import com.heartsave.todaktodak_api.domain.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.domain.diary.entity.PublicDiaryEntity;
@@ -21,12 +22,12 @@ import com.heartsave.todaktodak_api.domain.diary.exception.DiaryNotFoundExceptio
 import com.heartsave.todaktodak_api.domain.diary.exception.PublicDiaryExistException;
 import com.heartsave.todaktodak_api.domain.diary.repository.DiaryRepository;
 import com.heartsave.todaktodak_api.domain.diary.repository.PublicDiaryRepository;
-import com.heartsave.todaktodak_api.domain.diary.service.PublicDiaryCacheService;
 import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.domain.member.repository.MemberRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
   @Autowired DiaryRepository diaryRepository;
   @Autowired MemberRepository memberRepository;
 
-  @Autowired PublicDiaryCacheService publicDiaryCacheService;
+  @Autowired ContentReactionCountCache ContentReactionCountCache;
 
   private DiaryEntity diary;
   private MemberEntity member;
@@ -157,17 +158,21 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
   }
 
   @Nested
-  @DisplayName("공개 일기 조회 테스트")
+  @DisplayName("공개 일기 조회 테스트 - RDBMS")
   class PublicDiary_Read_Test {
 
+    @BeforeEach
+    void setup() {
+      // no cache
+      when(ContentReactionCountCache.get(any())).thenReturn(new ArrayList<>());
+    }
+
     @ParameterizedTest
-    @DisplayName("공개 일기 조회 성공 - RDBMS")
+    @DisplayName("공개 일기 조회 성공")
     @WithMockTodakUser
     @CsvSource({"9,8,4", "6,5,1", "4,3,0", "1,0,0"}) // diaryCnt is 10
     void getPagination_Success(Integer target, Integer responseFirst, Integer responseLast)
         throws Exception {
-      // no cache
-      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
 
       // query parameter
       PublicDiaryEntity requestParam = publicDiaryList.get(target);
@@ -193,8 +198,6 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
     @DisplayName("최신 공개 일기 조회 성공 - 파라미터 없음")
     @WithMockTodakUser
     void Recent_getPagination_NoParameter_Success() throws Exception {
-      // Given
-      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
 
       // When & Then
       mockMvc
@@ -212,8 +215,6 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
     @DisplayName("최신 공개 일기 조회 성공 - 기본 파라미터")
     @WithMockTodakUser
     void Recent_getPagination_DefaultParameter_Success() throws Exception {
-      // Given
-      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
 
       // When & Then
       mockMvc
@@ -235,8 +236,6 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
     @DisplayName("최신 공개 일기 조회 성공 - after 파라미터만")
     @WithMockTodakUser
     void Recent_getPagination_AfterParameter_Success() throws Exception {
-      // Given
-      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
 
       // When & Then
       mockMvc
@@ -257,8 +256,6 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
     @DisplayName("최신 공개 일기 조회 성공 - date 파라미터만")
     @WithMockTodakUser
     void Recent_getPagination_DateParameter_Success() throws Exception {
-      // Given
-      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
 
       // When & Then
       mockMvc
@@ -276,11 +273,9 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
     }
 
     @Test
-    @DisplayName("공개 일기 0개 조회 성공 - RDBMS")
+    @DisplayName("공개 일기 0개 조회 성공")
     @WithMockTodakUser
     void Zero_getPagination_Success() throws Exception {
-      // no cache
-      when(publicDiaryCacheService.getContentReactionCounts(any())).thenReturn(new ArrayList<>());
       // no public diary
       publicDiaryRepository.deleteAll();
 
@@ -290,6 +285,15 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
           .andExpect(jsonPath("$.isEnd").value(true))
           .andDo(print())
           .andReturn();
+    }
+  }
+
+  @Nested
+  @DisplayName("공개 일기 조회 테스트 - Redis(cache)")
+  class publicDiary_Read_Test_Redis {
+    @BeforeEach
+    void setup() {
+      when(ContentReactionCountCache.get(any())).thenReturn(new ArrayList<>());
     }
   }
 }
