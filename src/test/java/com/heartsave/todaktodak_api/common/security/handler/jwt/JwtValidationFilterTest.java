@@ -4,7 +4,7 @@
 // import static org.assertj.core.api.Assertions.assertThat;
 // import static org.mockito.Mockito.*;
 //
-// import com.heartsave.todaktodak_api.common.BaseTestObject;
+// import com.heartsave.todaktodak_api.config.BaseTestObject;
 // import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 // import com.heartsave.todaktodak_api.common.security.jwt.filter.JwtValidationFilter;
 // import com.heartsave.todaktodak_api.common.security.jwt.util.JwtUtils;

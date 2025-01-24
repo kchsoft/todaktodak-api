@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import com.heartsave.todaktodak_api.common.BaseTestObject;
+import com.heartsave.todaktodak_api.config.BaseTestObject;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.security.service.TodakUserDetailsService;
 import com.heartsave.todaktodak_api.domain.member.domain.TodakRole;

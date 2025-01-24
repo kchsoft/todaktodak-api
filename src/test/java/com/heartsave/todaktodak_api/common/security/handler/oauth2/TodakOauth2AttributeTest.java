@@ -2,7 +2,7 @@ package com.heartsave.todaktodak_api.common.security.handler.oauth2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.heartsave.todaktodak_api.common.BaseTestObject;
+import com.heartsave.todaktodak_api.config.BaseTestObject;
 import com.heartsave.todaktodak_api.common.security.domain.AuthType;
 import com.heartsave.todaktodak_api.common.security.oauth2.domain.TodakOauth2Attribute;
 import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
