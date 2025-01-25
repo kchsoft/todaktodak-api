@@ -1,8 +1,8 @@
 package com.heartsave.todaktodak_api.domain.diary.integrate;
 
 import static com.heartsave.todaktodak_api.config.BaseTestObject.DUMMY_STRING_CONTENT;
-import static com.heartsave.todaktodak_api.config.BaseTestObject.createDiaryNoIdWithMember;
-import static com.heartsave.todaktodak_api.config.BaseTestObject.createMemberNoId;
+import static com.heartsave.todaktodak_api.config.BaseTestObject.createDiary_NoId_ByMember;
+import static com.heartsave.todaktodak_api.config.BaseTestObject.createMember_NoId;
 import static com.heartsave.todaktodak_api.domain.diary.constant.DiaryBgmGenre.ACOUSTIC;
 import static com.heartsave.todaktodak_api.domain.diary.constant.DiaryEmotion.HAPPY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -135,7 +135,7 @@ public class DiaryIntegrateTest extends BaseIntegrateTest {
     @WithMockTodakUser
     void delete_Success() throws Exception {
       // given
-      DiaryEntity testDiary = createDiaryNoIdWithMember(member);
+      DiaryEntity testDiary = createDiary_NoId_ByMember(member);
       diaryRepository.save(testDiary);
 
       // when
@@ -166,9 +166,9 @@ public class DiaryIntegrateTest extends BaseIntegrateTest {
     @WithMockTodakUser
     void delete_others_Fail_NotFound() throws Exception {
       // given
-      MemberEntity member2 = createMemberNoId();
+      MemberEntity member2 = createMember_NoId();
       memberRepository.save(member2);
-      DiaryEntity testDiary = createDiaryNoIdWithMember(member2);
+      DiaryEntity testDiary = createDiary_NoId_ByMember(member2);
       diaryRepository.save(testDiary);
 
       // when & then
@@ -205,7 +205,7 @@ public class DiaryIntegrateTest extends BaseIntegrateTest {
     @DisplayName("연월 일기 작성 현황 조회 성공")
     @WithMockTodakUser
     void getYearMonth_Success() throws Exception {
-      DiaryEntity testDiary = createDiaryNoIdWithMember(member);
+      DiaryEntity testDiary = createDiary_NoId_ByMember(member);
       diaryRepository.save(testDiary);
 
       mockMvc
@@ -229,7 +229,7 @@ public class DiaryIntegrateTest extends BaseIntegrateTest {
     void getDiary_Success() throws Exception {
 
       // given
-      DiaryEntity testDiary = createDiaryNoIdWithMember(member);
+      DiaryEntity testDiary = createDiary_NoId_ByMember(member);
       diaryRepository.save(testDiary);
 
       mockMvc

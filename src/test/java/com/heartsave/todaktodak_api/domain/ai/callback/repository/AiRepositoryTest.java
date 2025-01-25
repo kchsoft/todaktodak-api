@@ -41,10 +41,10 @@ class AiRepositoryTest {
 
   @BeforeEach
   void setUp() {
-    member = BaseTestObject.createMemberNoId();
+    member = BaseTestObject.createMember_NoId();
     tem.persist(member);
 
-    diary = BaseTestObject.createDiaryNoIdWithMember(member);
+    diary = BaseTestObject.createDiary_NoId_ByMember(member);
     tem.persist(diary);
 
     tem.flush();
@@ -121,7 +121,7 @@ class AiRepositoryTest {
     @Test
     @DisplayName("같은 날짜에 여러 일기가 있을 경우 memberId와 날짜로 정확히 찾아서 업데이트")
     void updateBgmUrlWithMultipleDiariesOnSameDate() {
-      MemberEntity member2 = BaseTestObject.createMemberNoId();
+      MemberEntity member2 = BaseTestObject.createMember_NoId();
       tem.persist(member2);
 
       DiaryEntity diary2 =

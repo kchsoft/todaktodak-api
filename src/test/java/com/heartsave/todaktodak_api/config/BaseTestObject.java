@@ -17,9 +17,9 @@ public class BaseTestObject {
       "이렇게 한국말을 적으면 그래도 글자 수가 좀 더 많이 올라가지 않을까? 왜냐하면 더 많은 bit를 사용하기 때문이지 그러나 utf-8로 인코딩을 한다면 영어나 한글이나 같은 단위로 쪼개져 계산이 되기 때문에 어차피 비슷할 수 도 있겠구나 그렇다면 이제부터 무지성 영어를 눌러야겠다."
           + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbb";
   public static final String TEST_WEBTOON_KEY_URL = "webtoon/1/2024/11/06";
-  public static final String TEST_WEBTOON_URL = "https:test-url/webtoon/1/2024/11/06";
+  public static final String TEST_WEBTOON_URL = "https:bucket-url/webtoon/1/2024/11/06";
   public static final String TEST_BGM_KEY_URL = "music-ai/1/2024/11/06/bgm.mp3";
-  public static final String TEST_BGM_URL = "https:test-url/1/2024/11/06/bgm.mp3";
+  public static final String TEST_BGM_URL = "https:bucket-url/1/2024/11/06/bgm.mp3";
   private static String TEST_DIARY_CONTENT =
       "TEST_DIARY_CONTENT : need to fill min Len = " + DUMMY_STRING_CONTENT;
   private static String TEST_DEFAULT_WEBTOON_URL = "";
@@ -59,7 +59,7 @@ public class BaseTestObject {
         .build();
   }
 
-  public static MemberEntity createMemberNoId() {
+  public static MemberEntity createMember_NoId() {
     return MemberEntity.builder()
         .loginId(TEST_LOGIN_ID)
         .password(TEST_PASSWORD)
@@ -85,7 +85,7 @@ public class BaseTestObject {
         .build();
   }
 
-  public static DiaryEntity createDiaryWithMember(MemberEntity member) {
+  public static DiaryEntity createDiary_ByMember(MemberEntity member) {
     return DiaryEntity.builder()
         .id(1L)
         .emotion(DiaryEmotion.HAPPY)
@@ -99,7 +99,7 @@ public class BaseTestObject {
         .build();
   }
 
-  public static DiaryEntity createDiaryNoIdWithMember(MemberEntity member) {
+  public static DiaryEntity createDiary_NoId_ByMember(MemberEntity member) {
     return DiaryEntity.builder()
         .emotion(DiaryEmotion.HAPPY)
         .diaryCreatedTime(Instant.now().truncatedTo(ChronoUnit.MILLIS))
@@ -112,7 +112,7 @@ public class BaseTestObject {
         .build();
   }
 
-  public static DiaryEntity createDiaryNoIdWithMemberAndCreatedDateTime(
+  public static DiaryEntity createDiary_NoId_ByMemberAndCreatedDateTime(
       MemberEntity member, Instant createdDateTime) {
     return DiaryEntity.builder()
         .emotion(DiaryEmotion.HAPPY)
@@ -121,6 +121,45 @@ public class BaseTestObject {
         .memberEntity(member)
         .webtoonImageUrl(TEST_DEFAULT_WEBTOON_URL)
         .bgmUrl(TEST_DEFAULT_BGM_URL)
+        .bgmGenre(DiaryBgmGenre.CLASSICAL)
+        .aiComment(TEST_COMMENT)
+        .build();
+  }
+
+  public static DiaryEntity createDiary_NoId_WithWebtoonUrl_ByMember(MemberEntity member) {
+    return DiaryEntity.builder()
+        .emotion(DiaryEmotion.HAPPY)
+        .diaryCreatedTime(Instant.now().truncatedTo(ChronoUnit.MILLIS))
+        .content(TEST_DIARY_CONTENT)
+        .memberEntity(member)
+        .webtoonImageUrl(TEST_WEBTOON_URL)
+        .bgmUrl(TEST_DEFAULT_BGM_URL)
+        .bgmGenre(DiaryBgmGenre.CLASSICAL)
+        .aiComment(TEST_COMMENT)
+        .build();
+  }
+
+  public static DiaryEntity createDiary_NoId_WithBgmUrl_ByMember(MemberEntity member) {
+    return DiaryEntity.builder()
+        .emotion(DiaryEmotion.HAPPY)
+        .diaryCreatedTime(Instant.now().truncatedTo(ChronoUnit.MILLIS))
+        .content(TEST_DIARY_CONTENT)
+        .memberEntity(member)
+        .webtoonImageUrl(TEST_DEFAULT_WEBTOON_URL)
+        .bgmUrl(TEST_BGM_URL)
+        .bgmGenre(DiaryBgmGenre.CLASSICAL)
+        .aiComment(TEST_COMMENT)
+        .build();
+  }
+
+  public static DiaryEntity createDiary_NoId_WithWebtoonUrlAndBgmUrl_ByMember(MemberEntity member) {
+    return DiaryEntity.builder()
+        .emotion(DiaryEmotion.HAPPY)
+        .diaryCreatedTime(Instant.now().truncatedTo(ChronoUnit.MILLIS))
+        .content(TEST_DIARY_CONTENT)
+        .memberEntity(member)
+        .webtoonImageUrl(TEST_WEBTOON_URL)
+        .bgmUrl(TEST_BGM_URL)
         .bgmGenre(DiaryBgmGenre.CLASSICAL)
         .aiComment(TEST_COMMENT)
         .build();

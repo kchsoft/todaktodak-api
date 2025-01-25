@@ -48,7 +48,7 @@ class MySharedDiaryRepositoryTest {
 
   @BeforeEach
   void setUp() throws InterruptedException {
-    member = BaseTestObject.createMemberNoId();
+    member = BaseTestObject.createMember_NoId();
     tem.persist(member);
 
     publicDiaries = createTestPublicDiaries();
@@ -59,7 +59,7 @@ class MySharedDiaryRepositoryTest {
   private List<PublicDiaryEntity> createTestPublicDiaries() throws InterruptedException {
     for (int i = 0; i < TEST_PUBLIC_DIARY_SIZE; i++) {
       DiaryEntity diary =
-          BaseTestObject.createDiaryNoIdWithMemberAndCreatedDateTime(
+          BaseTestObject.createDiary_NoId_ByMemberAndCreatedDateTime(
               member, Instant.now().minus(TEST_PUBLIC_DIARY_SIZE - (i + 1), ChronoUnit.DAYS));
       PublicDiaryEntity publicDiary =
           PublicDiaryEntity.builder()
@@ -91,7 +91,7 @@ class MySharedDiaryRepositoryTest {
   @Test
   @DisplayName("공개 일기가 없는 경우 빈 Optional을 반환한다")
   void shouldReturnEmptyOptionalWhenNoPublicDiaries() {
-    MemberEntity newMember = BaseTestObject.createMemberNoId();
+    MemberEntity newMember = BaseTestObject.createMember_NoId();
     tem.persist(newMember);
     tem.flush();
     tem.clear();

@@ -73,7 +73,7 @@ class AiClientServiceTest {
   @DisplayName("AI 컨텐츠 요청 결과 확인")
   void aiContentRequestTest() throws InterruptedException {
     MemberEntity member = BaseTestObject.createMember();
-    DiaryEntity diary = BaseTestObject.createDiaryWithMember(member);
+    DiaryEntity diary = BaseTestObject.createDiary_ByMember(member);
 
     AiClientCommentResponse aiResponse = aiClientService.callDiaryContent(diary);
     log.info("aiComment 결과 = {}", aiResponse.getAiComment());

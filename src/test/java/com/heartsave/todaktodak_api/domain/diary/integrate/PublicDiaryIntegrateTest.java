@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.domain.diary.integrate;
 
 import static com.heartsave.todaktodak_api.common.constant.TodakConstant.DIARY.*;
-import static com.heartsave.todaktodak_api.config.BaseTestObject.createDiaryNoIdWithMember;
+import static com.heartsave.todaktodak_api.config.BaseTestObject.createDiary_NoId_ByMember;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -62,7 +62,7 @@ public class PublicDiaryIntegrateTest extends BaseIntegrateTest {
     // set 10 diary
     diaryList = new ArrayList<>();
     for (int i = 0; i < diaryCnt; i++) {
-      diaryList.add(createDiaryNoIdWithMember(member));
+      diaryList.add(createDiary_NoId_ByMember(member));
     }
     diaryRepository.saveAll(diaryList);
 

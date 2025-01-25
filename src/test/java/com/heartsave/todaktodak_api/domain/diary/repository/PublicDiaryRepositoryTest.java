@@ -3,8 +3,8 @@ package com.heartsave.todaktodak_api.domain.diary.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.heartsave.todaktodak_api.config.BaseTestObject;
 import com.heartsave.todaktodak_api.common.exception.errorspec.diary.DiaryErrorSpec;
+import com.heartsave.todaktodak_api.config.BaseTestObject;
 import com.heartsave.todaktodak_api.domain.diary.domain.DiaryPageIndex;
 import com.heartsave.todaktodak_api.domain.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.domain.diary.entity.DiaryEntity;
@@ -62,8 +62,8 @@ public class PublicDiaryRepositoryTest {
   @BeforeEach
   void setup() {
     // member , diary 생성
-    member = BaseTestObject.createMemberNoId();
-    diary = BaseTestObject.createDiaryNoIdWithMember(member);
+    member = BaseTestObject.createMember_NoId();
+    diary = BaseTestObject.createDiary_NoId_ByMember(member);
     member = memberRepository.save(member);
     diary = diaryRepository.save(diary);
 
@@ -77,8 +77,8 @@ public class PublicDiaryRepositoryTest {
     publicDiary = publicDiaryRepository.save(publicDiary);
 
     // member1 , diary1 생성
-    member1 = BaseTestObject.createMemberNoId();
-    diary1 = BaseTestObject.createDiaryNoIdWithMember(member1);
+    member1 = BaseTestObject.createMember_NoId();
+    diary1 = BaseTestObject.createDiary_NoId_ByMember(member1);
     member1 = memberRepository.save(member1);
     diary1 = diaryRepository.save(diary1);
 
@@ -92,8 +92,8 @@ public class PublicDiaryRepositoryTest {
     publicDiary1 = publicDiaryRepository.save(publicDiary1);
 
     // member2 , diary2 생성
-    member2 = BaseTestObject.createMemberNoId();
-    diary2 = BaseTestObject.createDiaryNoIdWithMember(member2);
+    member2 = BaseTestObject.createMember_NoId();
+    diary2 = BaseTestObject.createDiary_NoId_ByMember(member2);
     member2 = memberRepository.save(member2);
     diary2 = diaryRepository.save(diary2);
 

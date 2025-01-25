@@ -1,7 +1,7 @@
 package com.heartsave.todaktodak_api.domain.diary.integrate;
 
 import static com.heartsave.todaktodak_api.common.constant.TodakConstant.DIARY.*;
-import static com.heartsave.todaktodak_api.config.BaseTestObject.createDiaryNoIdWithMember;
+import static com.heartsave.todaktodak_api.config.BaseTestObject.createDiary_NoId_ByMember;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -53,7 +53,7 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
     // set 20 diary
     diaryList = new ArrayList<>();
     for (int i = 0; i < diaryCnt; i++) {
-      diaryList.add(createDiaryNoIdWithMember(member));
+      diaryList.add(createDiary_NoId_ByMember(member));
     }
     diaryList = diaryRepository.saveAll(diaryList);
 
@@ -282,10 +282,10 @@ public class MySharedDiaryIntegrateTest extends BaseIntegrateTest {
     @WithMockTodakUser
     void delete_Fail_OtherUserDiary() throws Exception {
       // Given
-      MemberEntity otherMember = BaseTestObject.createMemberNoId();
+      MemberEntity otherMember = BaseTestObject.createMember_NoId();
       memberRepository.save(otherMember);
 
-      DiaryEntity otherDiary = createDiaryNoIdWithMember(otherMember);
+      DiaryEntity otherDiary = createDiary_NoId_ByMember(otherMember);
       diaryRepository.save(otherDiary);
 
       PublicDiaryEntity otherPublicDiary =

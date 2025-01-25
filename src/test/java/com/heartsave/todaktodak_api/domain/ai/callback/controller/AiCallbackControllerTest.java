@@ -51,7 +51,7 @@ class AiCallbackControllerTest {
   @BeforeEach
   void setup() {
     member = BaseTestObject.createMember();
-    diary = BaseTestObject.createDiaryWithMember(member);
+    diary = BaseTestObject.createDiary_ByMember(member);
   }
 
   @Nested

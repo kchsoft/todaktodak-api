@@ -33,8 +33,8 @@ public class DiaryReactionRepositoryTest {
 
   @BeforeEach
   void setupAll() {
-    member = BaseTestObject.createMemberNoId();
-    diary = BaseTestObject.createDiaryNoIdWithMember(member);
+    member = BaseTestObject.createMember_NoId();
+    diary = BaseTestObject.createDiary_NoId_ByMember(member);
     publicDiary =
         PublicDiaryEntity.builder()
             .memberEntity(member)
@@ -55,7 +55,7 @@ public class DiaryReactionRepositoryTest {
     Long expectedSurprised = 3L;
     Long expectedEmpathize = 14L;
     Long expectedCheering = 100L;
-    MemberEntity testMember = BaseTestObject.createMemberNoId();
+    MemberEntity testMember = BaseTestObject.createMember_NoId();
     tem.persist(testMember);
     // LIKE 1개 생성
     diaryReactionRepository.save(
@@ -67,7 +67,7 @@ public class DiaryReactionRepositoryTest {
 
     // SURPRISED 3개 생성
     for (int i = 0; i < expectedSurprised; i++) {
-      testMember = BaseTestObject.createMemberNoId();
+      testMember = BaseTestObject.createMember_NoId();
       tem.persist(testMember);
       diaryReactionRepository.save(
           DiaryReactionEntity.builder()
@@ -79,7 +79,7 @@ public class DiaryReactionRepositoryTest {
 
     // EMPATHIZE 14개 생성
     for (int i = 0; i < expectedEmpathize; i++) {
-      testMember = BaseTestObject.createMemberNoId();
+      testMember = BaseTestObject.createMember_NoId();
       tem.persist(testMember);
       diaryReactionRepository.save(
           DiaryReactionEntity.builder()
@@ -91,7 +91,7 @@ public class DiaryReactionRepositoryTest {
 
     // CHEERING 100개 생성
     for (int i = 0; i < expectedCheering; i++) {
-      testMember = BaseTestObject.createMemberNoId();
+      testMember = BaseTestObject.createMember_NoId();
       tem.persist(testMember);
       diaryReactionRepository.save(
           DiaryReactionEntity.builder()
@@ -214,7 +214,7 @@ public class DiaryReactionRepositoryTest {
   @Test
   @DisplayName("toggleReactionStatus - 다른 멤버가 같은 일기에 같은 타입의 반응을 하면 모두 저장됨")
   void toggleSameReactionTypeDifferentMemberTest() {
-    MemberEntity anotherMember = BaseTestObject.createMemberNoId();
+    MemberEntity anotherMember = BaseTestObject.createMember_NoId();
     tem.persist(anotherMember);
 
     DiaryReactionEntity reaction1 =

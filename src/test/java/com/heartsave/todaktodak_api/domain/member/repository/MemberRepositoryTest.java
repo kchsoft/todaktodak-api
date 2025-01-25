@@ -65,7 +65,7 @@ class MemberRepositoryTest {
   @DisplayName("중복 이메일 확인")
   void getDupliactedEmailTest() {
     // Given
-    MemberEntity member = memberRepository.save(BaseTestObject.createMemberNoId());
+    MemberEntity member = memberRepository.save(BaseTestObject.createMember_NoId());
 
     // When
     boolean isExisted = memberRepository.existsByEmail(member.getEmail());
@@ -78,7 +78,7 @@ class MemberRepositoryTest {
   @DisplayName("회원 프로필 조회")
   void getMemberProfileProjectionTest() {
     // Given
-    MemberEntity member = memberRepository.save(BaseTestObject.createMemberNoId());
+    MemberEntity member = memberRepository.save(BaseTestObject.createMember_NoId());
 
     // When
     var memberProfile = memberRepository.findProjectedById(member.getId()).orElse(null);

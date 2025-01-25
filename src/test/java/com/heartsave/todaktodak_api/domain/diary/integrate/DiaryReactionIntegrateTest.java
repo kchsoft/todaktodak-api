@@ -48,7 +48,7 @@ public class DiaryReactionIntegrateTest extends BaseIntegrateTest {
 
   @BeforeEach
   void setup() {
-    diary = BaseTestObject.createDiaryNoIdWithMember(member);
+    diary = BaseTestObject.createDiary_NoId_ByMember(member);
     diaryRepository.save(diary);
 
     publicDiary =
