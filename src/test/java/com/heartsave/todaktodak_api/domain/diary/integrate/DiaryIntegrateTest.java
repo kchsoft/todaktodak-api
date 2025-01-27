@@ -28,6 +28,7 @@ import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -75,6 +76,11 @@ public class DiaryIntegrateTest extends BaseIntegrateTest {
             }
           }
         });
+  }
+
+  @AfterAll
+  void destroy() throws IOException {
+    mockWebServer.shutdown();
   }
 
   @Nested

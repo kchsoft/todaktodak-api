@@ -58,7 +58,7 @@ public class IntegrateMockBeanConfig {
 
   @Primary
   @Bean
-  public CharacterCache mockCharacterCaceh() {
+  public CharacterCache mockCharacterCache() {
     return mock(CharacterCache.class);
   }
 
