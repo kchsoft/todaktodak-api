@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
+import java.util.UUID;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ public class JwtUtils {
   private static final String ROLE = "role";
   private static final String TYPE = "type";
   private static final String USERNAME = "username";
+  private static final String UNIQUE_ID = "unique_id";
   private static Long ACCESS_TOKEN_EXPIRE_TIME_MILLI_SECOND;
   private static Long REFRESH_TOKEN_EXPIRE_TIME_MILLI_SECOND;
   private static SecretKey key;
@@ -42,6 +44,7 @@ public class JwtUtils {
         .claim(USERNAME, user.getUsername())
         .claim(ROLE, user.getRole())
         .claim(TYPE, type)
+        .claim(UNIQUE_ID, UUID.randomUUID())
         .issuedAt(new Date(now))
         .expiration(new Date(now + expireTime))
         .signWith(key)

@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
-@Import(IntegrateMockBeanConfiguration.class)
+@Import(IntegrateMockBeanConfig.class)
 public class BaseIntegrateTest {
   @Autowired protected MockMvc mockMvc;
   @Autowired protected ObjectMapper objectMapper;

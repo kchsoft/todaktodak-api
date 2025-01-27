@@ -7,10 +7,11 @@ import static org.mockito.Mockito.when;
 import com.heartsave.todaktodak_api.domain.ai.client.config.properties.AiServerProperties;
 import com.heartsave.todaktodak_api.domain.auth.cache.RefreshTokenCache;
 import com.heartsave.todaktodak_api.domain.diary.cache.ContentReactionCountCache;
+import com.heartsave.todaktodak_api.domain.member.cache.CharacterCache;
 import java.net.URL;
 import java.util.List;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -20,9 +21,9 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
-@Configuration
+@TestConfiguration
 @Profile("test")
-public class IntegrateMockBeanConfiguration {
+public class IntegrateMockBeanConfig {
 
   @Primary
   @Bean
@@ -53,6 +54,12 @@ public class IntegrateMockBeanConfiguration {
     when(mockUrl.toString()).thenReturn("presigned-url");
 
     return mockS3Presigner;
+  }
+
+  @Primary
+  @Bean
+  public CharacterCache mockCharacterCaceh() {
+    return mock(CharacterCache.class);
   }
 
   @Primary

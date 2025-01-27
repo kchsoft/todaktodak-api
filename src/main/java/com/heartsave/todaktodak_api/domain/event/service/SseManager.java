@@ -16,8 +16,8 @@ public class SseManager {
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final SseEmitterRepository emitterRepository;
   private static final String CONNECT_EVENT_NAME = "connect";
-  private static final String CONNECT_MESSAGE = "이벤트 수신 연결 성공";
-  private static final String TIMEOUT_MESSAGE = "시간 초과";
+  private static final String CONNECT_MESSAGE = "event connection suceess";
+  private static final String TIMEOUT_MESSAGE = "time out";
   private static final String COMPLETION_MESSAGE = "전송 완료 또는 재접속";
 
   public SseEmitter connect(Long memberId, Long timeout) {

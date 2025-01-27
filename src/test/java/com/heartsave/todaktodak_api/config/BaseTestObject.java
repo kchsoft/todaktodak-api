@@ -20,6 +20,7 @@ public class BaseTestObject {
   public static final String TEST_WEBTOON_URL = "https:bucket-url/webtoon/1/2024/11/06";
   public static final String TEST_BGM_KEY_URL = "music-ai/1/2024/11/06/bgm.mp3";
   public static final String TEST_BGM_URL = "https:bucket-url/1/2024/11/06/bgm.mp3";
+  public static final String TEST_CHARACTER_URL = "https:bucket-url/1/2024/11/06/character.webp";
   private static String TEST_DIARY_CONTENT =
       "TEST_DIARY_CONTENT : need to fill min Len = " + DUMMY_STRING_CONTENT;
   private static String TEST_DEFAULT_WEBTOON_URL = "";
@@ -68,6 +69,9 @@ public class BaseTestObject {
         .nickname(TEST_NICKNAME)
         .characterInfo(TEST_CHARACTER_INFO)
         .characterImageUrl(TEST_CHARACTER_IMAGE_URL)
+        .characterStyle(TEST_CHARACTER_STYLE)
+        .characterSeed(TEST_CHARACTER_SEED)
+        .role(TodakRole.ROLE_USER)
         .build();
   }
 
