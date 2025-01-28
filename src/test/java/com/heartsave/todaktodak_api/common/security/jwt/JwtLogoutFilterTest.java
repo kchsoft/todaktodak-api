@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.common.security.handler.jwt;
+package com.heartsave.todaktodak_api.common.security.jwt;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;

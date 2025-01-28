@@ -1,9 +1,8 @@
-package com.heartsave.todaktodak_api.common.security.util;
+package com.heartsave.todaktodak_api.common.security.cookie;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.heartsave.todaktodak_api.common.security.cookie.CookieUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Constructor;

@@ -10,8 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.heartsave.todaktodak_api.common.exception.errorspec.auth.AuthErrorSpec;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.security.jwt.util.JwtUtils;
-import com.heartsave.todaktodak_api.common.security.util.UtilConfig;
 import com.heartsave.todaktodak_api.config.TestSecurityConfig;
+import com.heartsave.todaktodak_api.config.config.JwtUtilTestConfig;
 import com.heartsave.todaktodak_api.config.util.WithMockTodakUser;
 import com.heartsave.todaktodak_api.domain.auth.dto.response.TokenReissueResponse;
 import com.heartsave.todaktodak_api.domain.auth.exception.AuthException;
@@ -36,7 +36,7 @@ public class ReissueTokenAuthControllerTest {
 
   @BeforeEach
   void setup() {
-    UtilConfig.utilSetup();
+    JwtUtilTestConfig.utilSetup();
   }
 
   @Test

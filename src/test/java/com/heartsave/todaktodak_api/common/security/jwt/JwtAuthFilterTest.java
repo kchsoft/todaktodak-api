@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.common.security.handler.jwt;
+package com.heartsave.todaktodak_api.common.security.jwt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -8,7 +8,7 @@ import com.heartsave.todaktodak_api.common.exception.ErrorResponse;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.security.jwt.constant.JwtConstant;
 import com.heartsave.todaktodak_api.common.security.jwt.filter.JwtAuthFilter;
-import com.heartsave.todaktodak_api.common.security.util.UtilConfig;
+import com.heartsave.todaktodak_api.config.config.JwtUtilTestConfig;
 import com.heartsave.todaktodak_api.domain.auth.cache.RefreshTokenCache;
 import com.heartsave.todaktodak_api.domain.auth.dto.request.LoginRequest;
 import com.heartsave.todaktodak_api.domain.auth.dto.response.LoginResponse;
@@ -38,7 +38,7 @@ final class JwtAuthFilterTest {
 
   @BeforeAll
   static void setupAll() {
-    UtilConfig.utilSetup();
+    JwtUtilTestConfig.utilSetup();
   }
 
   @BeforeEach

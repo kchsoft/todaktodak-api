@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.common.security.util;
+package com.heartsave.todaktodak_api.config.config;
 
 import com.heartsave.todaktodak_api.common.security.cookie.CookieUtils;
 import com.heartsave.todaktodak_api.common.security.jwt.util.JwtUtils;
@@ -6,7 +6,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.test.util.ReflectionTestUtils;
 
-public class UtilConfig {
+public class JwtUtilTestConfig {
   public static void utilSetup() {
     jwtUtilSetup();
     cookieUtilSetup();

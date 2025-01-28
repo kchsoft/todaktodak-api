@@ -1,4 +1,4 @@
-package com.heartsave.todaktodak_api.common.security.util;
+package com.heartsave.todaktodak_api.common.security.jwt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

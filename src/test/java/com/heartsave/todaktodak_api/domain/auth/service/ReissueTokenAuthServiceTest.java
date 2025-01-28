@@ -13,7 +13,7 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.auth.AuthErrorSpe
 import com.heartsave.todaktodak_api.common.security.cookie.CookieUtils;
 import com.heartsave.todaktodak_api.common.security.domain.TodakUser;
 import com.heartsave.todaktodak_api.common.security.jwt.util.JwtUtils;
-import com.heartsave.todaktodak_api.common.security.util.UtilConfig;
+import com.heartsave.todaktodak_api.config.config.JwtUtilTestConfig;
 import com.heartsave.todaktodak_api.config.util.WithMockTodakUser;
 import com.heartsave.todaktodak_api.domain.auth.cache.RefreshTokenCache;
 import com.heartsave.todaktodak_api.domain.auth.dto.response.TokenReissueResponse;
@@ -54,7 +54,7 @@ public class ReissueTokenAuthServiceTest {
 
   @AfterEach
   void teardown() {
-    UtilConfig.utilSetup();
+    JwtUtilTestConfig.utilSetup();
   }
 
   @Test
@@ -87,7 +87,7 @@ public class ReissueTokenAuthServiceTest {
   @WithMockTodakUser
   void reissueTokenFailTest() {
     // given
-    UtilConfig.expiredJwtUtilSetup();
+    JwtUtilTestConfig.expiredJwtUtilSetup();
     TodakUser user =
         (TodakUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     var oldRefreshToken = JwtUtils.issueToken(user, REFRESH_TYPE);
