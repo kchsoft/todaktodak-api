@@ -1,29 +1,31 @@
 package com.heartsave.todaktodak_api.common.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.heartsave.todaktodak_api.auth.repository.RefreshTokenCacheRepository;
-import com.heartsave.todaktodak_api.common.security.component.AccessDeniedHandlerImpl;
-import com.heartsave.todaktodak_api.common.security.component.AuthenticationEntryPointImpl;
-import com.heartsave.todaktodak_api.common.security.component.jwt.JwtAuthFilter;
-import com.heartsave.todaktodak_api.common.security.component.jwt.JwtLogoutFilter;
-import com.heartsave.todaktodak_api.common.security.component.jwt.JwtValidationFilter;
-import com.heartsave.todaktodak_api.common.security.component.oauth2.CookieOauth2AuthorizationRequestRepository;
-import com.heartsave.todaktodak_api.common.security.component.oauth2.OAuth2SuccessHandler;
-import com.heartsave.todaktodak_api.common.security.component.oauth2.Oauth2FailureHandler;
-import com.heartsave.todaktodak_api.common.security.component.oauth2.TodakOauth2UserDetailsService;
+import com.heartsave.todaktodak_api.common.security.handler.AccessDeniedHandlerImpl;
+import com.heartsave.todaktodak_api.common.security.handler.AuthenticationEntryPointImpl;
+import com.heartsave.todaktodak_api.common.security.jwt.filter.JwtAuthFilter;
+import com.heartsave.todaktodak_api.common.security.jwt.filter.JwtLogoutFilter;
+import com.heartsave.todaktodak_api.common.security.jwt.filter.JwtValidationFilter;
+import com.heartsave.todaktodak_api.common.security.oauth2.handler.OAuth2SuccessHandler;
+import com.heartsave.todaktodak_api.common.security.oauth2.handler.Oauth2FailureHandler;
+import com.heartsave.todaktodak_api.common.security.oauth2.repository.CookieOauth2AuthorizationRequestRepository;
+import com.heartsave.todaktodak_api.common.security.oauth2.service.TodakOauth2UserDetailsService;
+import com.heartsave.todaktodak_api.domain.auth.cache.RefreshTokenCache;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -39,13 +41,12 @@ public class SecurityConfig {
   private final Oauth2FailureHandler oauth2FailureHandler;
   private final AuthenticationEntryPointImpl authenticationEntryPoint;
   private final ObjectMapper objectMapper;
-  private final RefreshTokenCacheRepository refreshTokenCacheRepository;
+  private final RefreshTokenCache refreshTokenCache;
 
   @Value("${client.server.origin}")
   private String CLIENT_SERVER_ORIGIN;
 
   @Bean
-  @Profile("!test")
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
     return http.csrf(AbstractHttpConfigurer::disable)
@@ -74,7 +75,7 @@ public class SecurityConfig {
                         "/swagger-ui/**",
                         "/swagger-resources/**",
                         "/v3/api-docs/**",
-                        "/api/v1/webhook/ai/**",
+                        "/api/v1/callback/ai/**",
                         "/api/v1/event/**",
                         "/error")
                     .permitAll()
@@ -85,9 +86,9 @@ public class SecurityConfig {
         .sessionManagement(
             sessionManagement ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(new JwtLogoutFilter(refreshTokenCacheRepository), LogoutFilter.class)
+        .addFilterBefore(new JwtLogoutFilter(refreshTokenCache), LogoutFilter.class)
         .addFilterBefore(
-            new JwtAuthFilter(authenticationManager, objectMapper, refreshTokenCacheRepository),
+            new JwtAuthFilter(authenticationManager, objectMapper, refreshTokenCache),
             JwtLogoutFilter.class)
         .addFilterBefore(new JwtValidationFilter(authenticationEntryPoint), JwtAuthFilter.class)
         .build();
@@ -112,5 +113,15 @@ public class SecurityConfig {
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
     return (web) -> web.ignoring().requestMatchers("/favicon.ico", "/error");
+  }
+
+  @Bean
+  PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    return config.getAuthenticationManager();
   }
 }

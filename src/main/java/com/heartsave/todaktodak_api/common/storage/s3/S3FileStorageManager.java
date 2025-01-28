@@ -1,10 +1,10 @@
 package com.heartsave.todaktodak_api.common.storage.s3;
 
-import static com.heartsave.todaktodak_api.common.constant.CoreConstant.URL.DEFAULT_URL;
-import static com.heartsave.todaktodak_api.common.constant.CoreConstant.URL.TEMP_CHARACTER_IMAGE_URL_PREFIX;
+import static com.heartsave.todaktodak_api.common.constant.TodakConstant.URL.DEFAULT_URL;
+import static com.heartsave.todaktodak_api.common.constant.TodakConstant.URL.TEMP_CHARACTER_IMAGE_URL_PREFIX;
 
 import com.heartsave.todaktodak_api.common.config.properties.S3Properties;
-import com.heartsave.todaktodak_api.common.exception.errorspec.S3ErrorSpec;
+import com.heartsave.todaktodak_api.common.exception.errorspec.storage.S3ErrorSpec;
 import com.heartsave.todaktodak_api.common.storage.s3.expcetion.InvalidS3UrlException;
 import java.net.MalformedURLException;
 import java.net.URL;
