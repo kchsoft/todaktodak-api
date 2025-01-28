@@ -23,3 +23,14 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew clean build
+
+      - name: Discord Notification
+        uses: sarisia/actions-status-discord@v1
+        if: always()
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ job.status }}
+          title: "Build Result for ${{ github.repository }}"
+          description: |
+            ${{ job.status != 'success' && format('Failure at stage: {0}', job.status) || 'Build succeeded!' }}
+          color: ${{ job.status == 'success' && '0x00ff00' || '0xff0000' }}
