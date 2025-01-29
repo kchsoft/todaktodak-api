@@ -21,7 +21,6 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
@@ -38,11 +37,6 @@ import org.hibernate.annotations.OnDeleteAction;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@SequenceGenerator(
-    name = "DIARY_SEQ_GENERATOR", // jpa name
-    sequenceName = "DIARY_SEQ", // DB name
-    initialValue = 1,
-    allocationSize = 50)
 @Table(
     name = "diary",
     indexes = {
@@ -53,7 +47,7 @@ import org.hibernate.annotations.OnDeleteAction;
 public class DiaryEntity extends BaseEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DIARY_SEQ_GENERATOR")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(updatable = false)
   private Long id;
 

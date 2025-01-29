@@ -14,7 +14,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
@@ -32,11 +31,6 @@ import org.hibernate.annotations.OnDeleteAction;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@SequenceGenerator(
-    name = "PUBLIC_DIARY_SEQ_GENERATOR",
-    sequenceName = "PUBLIC_DIARY_SEQ",
-    initialValue = 1,
-    allocationSize = 50)
 @Table(
     name = "public_diary",
     indexes = {
@@ -48,7 +42,7 @@ import org.hibernate.annotations.OnDeleteAction;
 public class PublicDiaryEntity extends BaseEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PUBLIC_DIARY_SEQ_GENERATOR")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(updatable = false)
   private Long id;
 

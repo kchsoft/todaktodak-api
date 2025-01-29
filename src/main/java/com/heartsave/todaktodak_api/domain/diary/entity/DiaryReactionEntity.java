@@ -13,7 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -30,11 +29,6 @@ import org.hibernate.annotations.OnDeleteAction;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@SequenceGenerator(
-    name = "DIARY_REACTION_SEQ_GENERATOR",
-    sequenceName = "DIARY_REACTION_SEQ",
-    initialValue = 1,
-    allocationSize = 100)
 @Table(
     name = "diary_reaction",
     uniqueConstraints = {
@@ -45,7 +39,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @ToString
 public class DiaryReactionEntity extends BaseEntity {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DIARY_REACTION_SEQ_GENERATOR")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(updatable = false)
   private Long id;
 

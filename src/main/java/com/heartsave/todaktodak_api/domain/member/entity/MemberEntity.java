@@ -17,8 +17,7 @@ import lombok.*;
 @Table(name = "member")
 public class MemberEntity extends BaseEntity {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "member")
-  @SequenceGenerator(name = "member", sequenceName = "member_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column(length = EMAIL_MAX_SIZE)
