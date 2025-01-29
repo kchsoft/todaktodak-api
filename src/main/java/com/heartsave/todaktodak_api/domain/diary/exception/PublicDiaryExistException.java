@@ -5,12 +5,9 @@ import com.heartsave.todaktodak_api.common.exception.errorspec.ErrorSpec;
 
 public class PublicDiaryExistException extends PublicDiaryException {
 
-  public PublicDiaryExistException(ErrorSpec errorSpec, Long memberId, Long publicDiaryId) {
+  public PublicDiaryExistException(ErrorSpec errorSpec, Long memberId, Long diaryId) {
     super(
         errorSpec,
-        ErrorFieldBuilder.builder()
-            .add("memberId", memberId)
-            .add("publicDiaryId", publicDiaryId)
-            .build());
+        ErrorFieldBuilder.builder().add("memberId", memberId).add("diaryId", diaryId).build());
   }
 }

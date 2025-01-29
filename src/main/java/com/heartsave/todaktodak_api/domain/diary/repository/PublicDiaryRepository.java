@@ -36,4 +36,6 @@ public interface PublicDiaryRepository extends JpaRepository<PublicDiaryEntity, 
         """)
   List<PublicDiaryContentProjection> findNextContents(
       @Param("index") DiaryPageIndex index, Pageable pageable);
+
+  boolean existsByDiaryEntity_id(Long diaryId);
 }

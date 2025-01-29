@@ -14,7 +14,6 @@ import com.heartsave.todaktodak_api.domain.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.domain.diary.dto.response.PublicDiaryPageResponse;
 import com.heartsave.todaktodak_api.domain.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.domain.diary.entity.PublicDiaryEntity;
-import com.heartsave.todaktodak_api.domain.diary.entity.projection.DiaryIdsProjection;
 import com.heartsave.todaktodak_api.domain.diary.entity.projection.PublicDiaryContentProjection;
 import com.heartsave.todaktodak_api.domain.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.domain.diary.exception.PublicDiaryExistException;
@@ -104,16 +103,13 @@ public class PublicDiaryService {
   }
 
   public void write(Long memberId, Long diaryId, String publicContent) {
-    DiaryIdsProjection ids =
-        diaryRepository
-            .findIdsById(diaryId)
-            .orElseThrow(
-                () ->
-                    new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, diaryId));
-    if (ids.getPublicDiaryId() != null) {
+
+    if (diaryRepository.existsById(diaryId) == false)
+      throw new DiaryNotFoundException(DiaryErrorSpec.DIARY_NOT_FOUND, memberId, diaryId);
+
+    if (publicDiaryRepository.existsByDiaryEntity_id(diaryId) == true)
       throw new PublicDiaryExistException(
-          PublicDiaryErrorSpec.PUBLIC_DIARY_EXIST, memberId, ids.getPublicDiaryId());
-    }
+          PublicDiaryErrorSpec.PUBLIC_DIARY_EXIST, memberId, diaryId);
 
     DiaryEntity diaryRef = diaryRepository.getReferenceById(diaryId);
     MemberEntity memberRef = memberRepository.getReferenceById(memberId);

@@ -20,7 +20,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
@@ -83,9 +82,6 @@ public class DiaryEntity extends BaseEntity {
       updatable = false,
       columnDefinition = "TIMESTAMP(3)")
   private Instant diaryCreatedTime;
-
-  @OneToOne(fetch = FetchType.LAZY, mappedBy = "diaryEntity")
-  private PublicDiaryEntity publicDiaryEntity;
 
   public void addAiContent(AiClientCommentResponse response) {
     this.aiComment = response.getAiComment();

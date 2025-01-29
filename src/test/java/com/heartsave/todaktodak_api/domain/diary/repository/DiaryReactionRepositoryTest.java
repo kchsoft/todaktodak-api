@@ -12,13 +12,13 @@ import com.heartsave.todaktodak_api.domain.diary.entity.projection.DiaryReaction
 import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
-import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @Slf4j
 @DataJpaTest
@@ -266,7 +266,7 @@ public class DiaryReactionRepositoryTest {
               tem.flush();
             },
             "제약조건 위반 예외가 발생해야 합니다.")
-        .isInstanceOf(ConstraintViolationException.class);
+        .isInstanceOf(DataIntegrityViolationException.class);
     tem.clear(); // duplicateReaction clear
     DiaryReactionCountProjection result =
         diaryReactionRepository.countEachByPublicDiaryId(publicDiary.getId());

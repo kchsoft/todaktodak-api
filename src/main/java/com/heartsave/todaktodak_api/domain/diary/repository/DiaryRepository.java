@@ -1,7 +1,6 @@
 package com.heartsave.todaktodak_api.domain.diary.repository;
 
 import com.heartsave.todaktodak_api.domain.diary.entity.DiaryEntity;
-import com.heartsave.todaktodak_api.domain.diary.entity.projection.DiaryIdsProjection;
 import com.heartsave.todaktodak_api.domain.diary.entity.projection.DiaryYearMonthProjection;
 import java.time.Instant;
 import java.util.List;
@@ -27,16 +26,6 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
 
   Optional<DiaryEntity> findDiaryEntityByMemberEntity_IdAndDiaryCreatedTimeBetween(
       Long memberId, Instant startTime, Instant endTime);
-
-  @Query(
-      value =
-          """
-            SELECT d.id as diaryId, d.publicDiaryEntity.id as publicDiaryId
-            FROM DiaryEntity d
-            LEFT JOIN d.publicDiaryEntity pd
-            WHERE d.id = :diaryId
-          """)
-  Optional<DiaryIdsProjection> findIdsById(@Param("diaryId") Long diaryId);
 
   Optional<DiaryEntity> findDiaryEntityByMemberEntity_IdAndId(Long memberId, Long diaryId);
 }
