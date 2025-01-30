@@ -173,7 +173,6 @@ public class PublicDiaryRepositoryTest {
   @Test
   @DisplayName("최신 공개 일기 ID 조회 성공")
   void findLatestId_Success() {
-    diary2 = diaryRepository.findById(diary2.getId()).get();
     DiaryPageIndexProjection indexProjection =
         publicDiaryRepository.findFirstByOrderByCreatedTimeDescIdDesc().get();
 
@@ -185,7 +184,7 @@ public class PublicDiaryRepositoryTest {
 
     assertThat(indexProjection.getPublicDiaryId())
         .as("최신 공개 일기 ID는 diary2의 공개 일기 ID와 일치해야 합니다.")
-        .isEqualTo(diary2.getPublicDiaryEntity().getId());
+        .isEqualTo(publicDiary2.getId());
   }
 
   @Test
