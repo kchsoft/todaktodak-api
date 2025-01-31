@@ -77,7 +77,7 @@
 
 #### 원인 분석
 
-- MySql 실행 계획을 확인한 결과, **SQL 하나에 약 143ms**가 소요됨.
+- MySql 실행 계획을 확인한 결과, **SQL 하나에 약 143ms**가 소요됨
 - 또한 2번의 Join 과정에서 **Table Full Scan이 발생**하여 많은 응답 시간이 소요됨
 
 #### 해결 과정
@@ -140,14 +140,14 @@
 
 - Redis를 캐시로 적용 **(Look Aside)**
 - 캐시 데이터 TTL 5분 설정
-- 새로운 `Entity`에 `일기 내용`과 `리액션 개수`를 담아서 Redis에 저장 (6개의 SQL 결과를 Redis에 저장)
+- 새로운 `Entity`에 `일기 내용`과 `리액션 개수`를 필드에 넣고, Json으로 Redis에 저장 (6개의 SQL 결과를 Redis에 저장)
     - 문제 발생 1: Redis에서 <u>**한 번의 `read` 명령**</u>을 통해 <u>**2가지 조건**</u> (1.Timestamp , 2.Id)을 바탕으로
-      결과를 가져와야 한다
+      결과를 가져와야 함
     - 해결 과정 1:
         - ZSET 데이터 구조에 `SCORE는 모두 0`으로 설정
         - `Entity`의 `orderPivot` 이라는 필드에 `Timestam:Id` 와 같이 <u>**1.Timestamp, 2.Id 순으로 정렬**</u>이
           가능하게끔 설정
-    - 문제 발생 2: RDBMS와 Redis의 정렬 기준에 차이가 발생한다.
+    - 문제 발생 2: RDBMS와 Redis의 정렬 기준에 차이가 발생
         - RDBMS는 Id가 숫자로 정렬(100 > 2) 되지만, Redis의 ZSET은 Id가 문자열로 정렬("100" < "2")
     - 해결 과정 2:
         - Redis에 저장할 때 Id 앞에 <u>**0으로 패딩 처리**</u>
@@ -261,7 +261,7 @@ Thread 32 부하테스트 결과 Table
 
 - 컨텐츠(웹툰/BGM) 생성시 `WebClient`를 이용한 <u>**비동기 요청**</u>을 적용
 - 위로 메시지는 응답 시간(약 2초)이 빠르다고 판단하여, <u>**동기 요청 적용 및 즉시 클라이언트에게 응답**</u>
-- AI 서버는 컨텐츠(웹툰/BGM) 생성 완료시, WAS(Spring) 에게 `HTTP`의 `POST` 메서드로 <u>**컨텐츠 생성 완료 요청**</u>을 보냄
+- AI 서버는 컨텐츠(웹툰/BGM) 생성 완료시, WAS(Spring) 에게 `HTTP`의 `POST` 메서드로 <u>**컨텐츠 생성 완료 요청(callback)**</u>을 보냄
 - WAS는 결과를 DB에 저장
 
 #### 결과
@@ -383,7 +383,7 @@ fi
 
 ### 3. 동료와 Junit 기반으로 237개의 테스트 코드를 작성하여 Instruction Test Coverage 70% 기록
 
-- Google 에서 제안한 일반적인 Test Coverage를 기준으로 삼음 (70%는 "용인되는 수준")
+- Google 에서 제안한 일반적인 Test Coverage를 기준으로 목표치 60% 이상 설정
     - https://edykim.com/ko/post/code-coverage-best-practices/
 - 237개 중, **158개의 테스트 코드 작성**
 
