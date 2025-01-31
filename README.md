@@ -40,17 +40,17 @@
 부하 테스트에 대한 설정은 아래와 같다.
 
 1. Local PC (Window10 / vCPU = 16) 에서 진행한다.
-2. k6 부하테스트 도구를 활용 하였다.
-    - k6는 Go 언어로 만들어 져서 최소한의 리소스로 많은 부하를 줄 수 있다.
+2. `k6` 부하테스트 도구를 활용 하였다.
+    - k6는 Go 언어로 만들어 져서 **최소한의 리소스로 많은 부하**를 줄 수 있다.
     - 현재 테스트는 하나의 PC에서 부하를 발생 시키고 이에 대한 API 응답을 해야한다.
     - 따라서 API의 성능을 최대한으로 이끌어 내기 위해 K6 를 선택했다.
-3. API 응답 Latency 시간을 측정한다.
+3. **API 응답 Latency 시간을 측정**한다.
 4. 응답 시간 기준은 **개인적으로 답답함을 느끼는 시간**을 기준으로 정하였다.
 
 - 응답 시간 기준
 
   | avg < 1s | p(95) < 2s | max < 3s|
-                                              |---------|------------|---------|
+  |---------|------------|---------|
 
 <br> 
 
@@ -78,7 +78,7 @@
 #### 원인 분석
 
 - MySql 실행 계획을 확인한 결과, **SQL 하나에 약 143ms**가 소요됨.
-- 또한 **Full Scan이 발생**하여 많은 응답 시간이 소요됨
+- 또한 2번의 Join 과정에서 **Table Full Scan이 발생**하여 많은 응답 시간이 소요됨
 
 #### 해결 과정
 
@@ -156,7 +156,7 @@
 
 #### 결과
 
-- `일기 내용`과 `리액션 개수`를 구하는 SQL 결과(6개의 SQL)를 합쳐 Redis에 저장
+- `일기 내용`과 `리액션 개수`를 구하는 **SQL 결과(6개의 SQL)를 합쳐 Redis에 저장**
 - RDBMS 공개 일기 정렬 순서와, Redis 공개 일기 **정렬 순서 일치**
 - 평균 응답시간 <u>**3.10s에서 102.16ms로 96.70%**</u> 최적화
 
@@ -212,9 +212,9 @@ Redis 적용 부하테스트 결과 Table
 
 #### 2. I/O Bound - Number of cores * (1 + Wait time / Service time)
 
-- 임의적으로 `Thread 32개`로 설정하여 테스트를 진행했다.
-    - Wait time과 Service time 측정에 시간을 사용하기 보다는 우선 서버가 I/O Bound임을 가정하였다.
-    - 만약 서버가 I/O Bound인 경우, Cpu Bound 보다 많은 Thread를 설정했을 때 성능이 더 높을 것으로 예상한다.
+- **임의적**으로 `Thread 32개`로 설정하여 테스트를 진행했다.
+    - Wait time과 Service time 측정에 시간을 사용하기 보다는, 먼저 **서버가 I/O Bound임을 가정**하였다.
+    - 만약 서버가 I/O Bound인 경우, **Cpu Bound 보다 많은 Thread를 설정했을 때 성능이 더 높을 것으로 예상**한다.
 
 <details>
 <summary>
@@ -364,20 +364,22 @@ fi
 
 </details>
 
+---
+
 ## 고려한 점
 
 ### 1. JPA Projection 과 Covering Index를 활용하여 DB 조회시 비용 감소
 
 - 한 달간의 일기 작성 현황 정보를 API로 제공하기 위하여 아래와 같이 조치를 취함
     - Diary Table에 `1.Member Id`, `2.CreatedTime`에 대한 DB Index 생성
-    - `DiaryEntity`의 `Id`와 `Diary_Created_Time`만을 `Select` 하는 `Interface Projection` 활용
+    - 위의 2가지 조건으로 `Select` 할 때, Diary Table의 `Id`와 `Diary_Created_Time`만을 `Select` 하는 `Interface Projection` 활용
 
 ### 2. JPA Cascade Delete 설정시 연관된 객체 수 만큼 쿼리가 발생하여, DB Cascade Delete 설정
 
-- 공개 일기 삭제시, 연관된 일기 반응(Reaction)을 삭제하는 DB Cascade Delete 설정
-    - `공개 일기`와 `일기 반응`은 양방향 연결 관계이기에, `공개 일기`에 JPA Cascade Delete를 설정했을 때, 삭제시 `일기 반응` 개수
+- `공개 일기` 삭제시, 연관된 `일기 반응(Reaction)`을 삭제하는 DB Cascade Delete 설정
+    - `공개 일기`와 `일기 반응`은 양방향 연결 관계이기에, `공개 일기`에 JPA Cascade Delete를 설정한 후 삭제를 하면 `일기 반응` 개수
       만큼 Delete 쿼리가 발생하는 문제가 생겨 DB Cascade로 변경
-    - 그러나 10만개, 100만개의 `일기 반응`이 발생하면 DB에 부담이 가기에, 추후 **Batch와 Soft Delete를 활용하여 삭제** 구현 예정
+    - 그러나 10만개, 100만개의 `일기 반응` Cascade Delete가 발생하면 DB에 부담이 가기에, 추후에 **Batch와 Soft Delete를 활용하여 삭제** 구현 예정
 
 ### 3. 동료와 Junit 기반으로 237개의 테스트 코드를 작성하여 Instruction Test Coverage 70% 기록
 
