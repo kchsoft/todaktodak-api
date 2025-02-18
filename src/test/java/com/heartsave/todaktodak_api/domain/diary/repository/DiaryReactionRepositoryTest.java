@@ -10,6 +10,9 @@ import com.heartsave.todaktodak_api.domain.diary.entity.DiaryReactionEntity;
 import com.heartsave.todaktodak_api.domain.diary.entity.PublicDiaryEntity;
 import com.heartsave.todaktodak_api.domain.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -279,5 +282,93 @@ public class DiaryReactionRepositoryTest {
     DiaryReactionCountProjection result =
         diaryReactionRepository.countEachByPublicDiaryId(publicDiary.getId());
     Assertions.assertThat(result.getLikes()).as("기존 반응이 유지되어야 합니다.").isEqualTo(1);
+  }
+
+  @Test
+  @DisplayName("N개의 공개 일기 ID로 N개의 리액션 개수 정보 가져오기")
+  void findReactionCountByIdsSuccess() {
+
+    MemberEntity member2 = BaseTestObject.createMember_NoId();
+    DiaryEntity diary2 = BaseTestObject.createDiary_NoId_ByMember(member2);
+    PublicDiaryEntity publicDiary2 =
+        PublicDiaryEntity.builder()
+            .memberEntity(member2)
+            .diaryEntity(diary2)
+            .publicContent("public-content2")
+            .build();
+
+    tem.persist(member2);
+    tem.persist(diary2);
+    tem.persist(publicDiary2);
+
+    DiaryReactionEntity reaction1 =
+        DiaryReactionEntity.builder()
+            .memberEntity(member)
+            .publicDiaryEntity(publicDiary)
+            .reactionType(DiaryReactionType.LIKE)
+            .build();
+    DiaryReactionEntity reaction2 =
+        DiaryReactionEntity.builder()
+            .memberEntity(member)
+            .publicDiaryEntity(publicDiary)
+            .reactionType(DiaryReactionType.CHEERING)
+            .build();
+
+    diaryReactionRepository.save(reaction1);
+    diaryReactionRepository.save(reaction2);
+
+    DiaryReactionEntity reaction3 =
+        DiaryReactionEntity.builder()
+            .memberEntity(member2)
+            .publicDiaryEntity(publicDiary2)
+            .reactionType(DiaryReactionType.LIKE)
+            .build();
+    DiaryReactionEntity reaction4 =
+        DiaryReactionEntity.builder()
+            .memberEntity(member2)
+            .publicDiaryEntity(publicDiary2)
+            .reactionType(DiaryReactionType.CHEERING)
+            .build();
+
+    diaryReactionRepository.save(reaction3);
+    diaryReactionRepository.save(reaction4);
+
+    tem.flush();
+    tem.clear();
+    List<Long> ids = List.of(publicDiary.getId(), publicDiary2.getId());
+
+    // when
+    List<DiaryReactionCountProjection> reactionCount =
+        diaryReactionRepository.countEachByPublicDiaryIds(ids);
+    Map<Long, DiaryReactionCountProjection> results = new ConcurrentHashMap<>();
+    reactionCount.stream().forEach(rc -> results.put(rc.getPublicDiaryId(), rc));
+
+    // then
+    assertThat(results.containsKey(publicDiary.getId()))
+        .as("공개 일기 아이디가 존재하지 않습니다. id=%d", publicDiary.getId())
+        .isTrue();
+    assertThat(results.containsKey(publicDiary2.getId()))
+        .as("공개 일기2 아이디가 존재하지 않습니다. id=%d", publicDiary2.getId())
+        .isTrue();
+
+    DiaryReactionCountProjection pd1Reaction = results.get(publicDiary.getId());
+    assertThat(pd1Reaction.getLikes()).as("공개 일기 ID1 의 Like 개수가 예상(1)과 다릅니다.").isEqualTo(1);
+    assertThat(pd1Reaction.getCheering()).as("공개 일기 ID1 의 cheering 개수가 예상(1)과 다릅니다.").isEqualTo(1);
+    assertThat(pd1Reaction.getEmpathize())
+        .as("공개 일기 ID1 의 empathize 개수가 예상(0)과 다릅니다.")
+        .isEqualTo(0);
+    assertThat(pd1Reaction.getSurprised())
+        .as("공개 일기 ID1 의 surprised 개수가 예상(0)과 다릅니다.")
+        .isEqualTo(0);
+
+    DiaryReactionCountProjection pd2Reaction = results.get(publicDiary2.getId());
+    assertThat(pd2Reaction.getLikes()).as("공개 일기 ID2 의 Like 개수가 예상(1)과 다릅니다.").isEqualTo(1);
+    assertThat(pd2Reaction.getCheering()).as("공개 일기 ID2 의 cheering 개수가 예상(1)과 다릅니다.").isEqualTo(1);
+    assertThat(pd2Reaction.getEmpathize())
+        .as("공개 일기 ID2 의 empathize 개수가 예상(0)과 다릅니다.")
+        .isEqualTo(0);
+    assertThat(pd2Reaction.getSurprised())
+        .as("공개 일기 ID2 의 surprised 개수가 예상(0)과 다릅니다.")
+        .isEqualTo(0);
   }
 }

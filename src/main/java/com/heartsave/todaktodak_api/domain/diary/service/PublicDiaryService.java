@@ -14,6 +14,7 @@ import com.heartsave.todaktodak_api.domain.diary.dto.request.DiaryPageRequest;
 import com.heartsave.todaktodak_api.domain.diary.dto.response.PublicDiaryPageResponse;
 import com.heartsave.todaktodak_api.domain.diary.entity.DiaryEntity;
 import com.heartsave.todaktodak_api.domain.diary.entity.PublicDiaryEntity;
+import com.heartsave.todaktodak_api.domain.diary.entity.projection.DiaryReactionCountProjection;
 import com.heartsave.todaktodak_api.domain.diary.entity.projection.PublicDiaryContentProjection;
 import com.heartsave.todaktodak_api.domain.diary.exception.DiaryNotFoundException;
 import com.heartsave.todaktodak_api.domain.diary.exception.PublicDiaryExistException;
@@ -24,6 +25,7 @@ import com.heartsave.todaktodak_api.domain.diary.repository.PublicDiaryRepositor
 import com.heartsave.todaktodak_api.domain.member.entity.MemberEntity;
 import com.heartsave.todaktodak_api.domain.member.repository.MemberRepository;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -53,9 +55,11 @@ public class PublicDiaryService {
       log.info("공개 일기 Cache Miss");
       List<PublicDiaryContentProjection> projections = fetchContents(pageIndex);
 
+      List<Long> ids = projections.stream().map(pro -> pro.getPublicDiaryId()).toList();
+      Map<Long, DiaryReactionCount> reactionCounts = fetchReactionCount(ids);
       for (PublicDiaryContentProjection projection : projections) {
         ContentReactionCountEntity entity = ContentReactionCountEntity.createFrom(projection);
-        entity.applyReactionCount(fetchReactionCount(projection.getPublicDiaryId()));
+        entity.applyReactionCount(reactionCounts);
         contentReactionCounts.add(entity);
       }
       publicDiaryCacheService.saveContentReactionCounts(contentReactionCounts);
@@ -90,10 +94,10 @@ public class PublicDiaryService {
     }
   }
 
-  private DiaryReactionCount fetchReactionCount(Long publicDiaryId) {
-    DiaryReactionCount reactionCount =
-        DiaryReactionCount.from(reactionRepository.countEachByPublicDiaryId(publicDiaryId));
-    return reactionCount;
+  private Map<Long, DiaryReactionCount> fetchReactionCount(List<Long> publicDiaryIds) {
+    List<DiaryReactionCountProjection> reactionCountProjections =
+        reactionRepository.countEachByPublicDiaryIds(publicDiaryIds);
+    return DiaryReactionCount.from(reactionCountProjections);
   }
 
   private List<DiaryReactionType> fetchMemberReactions(Long memberId, Long publicDiaryId) {

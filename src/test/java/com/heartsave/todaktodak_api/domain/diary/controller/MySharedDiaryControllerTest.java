@@ -154,6 +154,11 @@ public class MySharedDiaryControllerTest {
         .thenReturn(
             new DiaryReactionCountProjection() {
               @Override
+              public Long getPublicDiaryId() {
+                return 0L;
+              }
+
+              @Override
               public Long getLikes() {
                 return 1L;
               }
