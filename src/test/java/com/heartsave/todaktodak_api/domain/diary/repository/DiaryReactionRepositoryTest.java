@@ -152,14 +152,22 @@ public class DiaryReactionRepositoryTest {
     diary = tem.find(DiaryEntity.class, diary.getId());
     System.out.println("diary.getDiaryCreatedTime() = " + diary.getDiaryCreatedTime());
     tem.remove(diary);
+    tem.flush();
+    tem.clear();
 
     DiaryReactionCountProjection result =
         diaryReactionRepository.countEachByPublicDiaryId(publicDiary.getId());
 
-    assertThat(result.getLikes()).as("삭제된 일기의 반응 수가 조회되었습니다.").isEqualTo(0);
-    assertThat(result.getCheering()).as("삭제된 일기의 반응 수가 조회되었습니다.").isEqualTo(0);
-    assertThat(result.getEmpathize()).as("삭제된 일기의 반응 수가 조회되었습니다.").isEqualTo(0);
-    assertThat(result.getSurprised()).as("삭제된 일기의 반응 수가 조회되었습니다.").isEqualTo(0);
+    assertThat(result.getLikes()).as("삭제된 일기의 반응 수 %d회가 조회되었습니다.", result.getLikes()).isEqualTo(0);
+    assertThat(result.getCheering())
+        .as("삭제된 일기의 반응 수 %d회가 조회되었습니다.", result.getCheering())
+        .isEqualTo(0);
+    assertThat(result.getEmpathize())
+        .as("삭제된 일기의 반응 수 %d회가 조회되었습니다.", result.getEmpathize())
+        .isEqualTo(0);
+    assertThat(result.getSurprised())
+        .as("삭제된 일기의 반응 수 %d회가 조회되었습니다.", result.getSurprised())
+        .isEqualTo(0);
   }
 
   @Test

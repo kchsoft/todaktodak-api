@@ -37,16 +37,30 @@ public interface DiaryReactionRepository extends JpaRepository<DiaryReactionEnti
   @Query(
       value =
           """
-            SELECT
-              COUNT(CASE WHEN reaction_type = 'LIKE' THEN 1 END) as likes,
-              COUNT(CASE WHEN reaction_type = 'SURPRISED' THEN 1 END) as surprised,
-              COUNT(CASE WHEN reaction_type = 'EMPATHIZE' THEN 1 END) as empathize,
-              COUNT(CASE WHEN reaction_type = 'CHEERING' THEN 1 END) as cheering
-            FROM diary_reaction
-            WHERE public_diary_id = :publicDiaryId
-          """,
-      nativeQuery = true)
+              SELECT
+                COALESCE(SUM(CASE WHEN dr.reactionType = 'LIKE' THEN 1 END),0) as likes,
+                COALESCE(SUM(CASE WHEN dr.reactionType = 'SURPRISED' THEN 1 END),0) as surprised,
+                COALESCE(SUM(CASE WHEN dr.reactionType = 'EMPATHIZE' THEN 1 END),0) as empathize,
+                COALESCE(SUM(CASE WHEN dr.reactionType = 'CHEERING' THEN 1 END),0) as cheering
+              FROM DiaryReactionEntity dr
+              WHERE dr.publicDiaryEntity.id = :publicDiaryId
+            """)
   DiaryReactionCountProjection countEachByPublicDiaryId(Long publicDiaryId);
+
+  @Query(
+      value =
+          """
+                    SELECT
+                      dr.publicDiaryEntity.id as publicDiaryId,
+                      SUM(CASE WHEN dr.reactionType = 'LIKE' THEN 1 ELSE 0 END) as likes,
+                      SUM(CASE WHEN dr.reactionType = 'SURPRISED' THEN 1 ELSE 0 END) as surprised,
+                      SUM(CASE WHEN dr.reactionType = 'EMPATHIZE' THEN 1 ELSE 0 END) as empathize,
+                      SUM(CASE WHEN dr.reactionType = 'CHEERING' THEN 1 ELSE 0 END) as cheering
+                    FROM DiaryReactionEntity dr
+                    WHERE dr.publicDiaryEntity.id IN :publicDiaryIds
+                    GROUP BY dr.publicDiaryEntity.id
+                          """)
+  List<DiaryReactionCountProjection> countEachByPublicDiaryIds(List<Long> publicDiaryIds);
 
   @Modifying
   @Query(
