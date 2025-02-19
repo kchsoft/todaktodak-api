@@ -4,6 +4,7 @@ import com.heartsave.todaktodak_api.domain.diary.domain.DiaryReactionCount;
 import com.heartsave.todaktodak_api.domain.diary.entity.projection.PublicDiaryContentProjection;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,8 +38,8 @@ public class ContentReactionCountEntity {
     return new ContentReactionCountEntity(projections);
   }
 
-  public void applyReactionCount(DiaryReactionCount count) {
-    this.reactionCount = count;
+  public void applyReactionCount(Map<Long, DiaryReactionCount> counts) {
+    this.reactionCount = counts.get(this.publicDiaryId);
   }
 
   public void updateWebtoonImageUrls(List<String> urls) {
